@@ -1,5 +1,6 @@
 ## Slip
 
+[![Swift 3.0](https://img.shields.io/badge/Swift-3.0-orange.svg?style=flat)](https://developer.apple.com/swift/)
 [![Platforms](https://img.shields.io/cocoapods/p/Slip.svg)](https://cocoapods.org/pods/Slip)
 [![License](https://img.shields.io/cocoapods/l/Slip.svg)](https://raw.githubusercontent.com/SwiftKidz/Slip/master/LICENSE)
 
@@ -71,7 +72,7 @@ To use Slip as a [Swift Package Manager](https://swift.org/package-manager/) pac
 import PackageDescription
 
 let package = Package(
-    name: "HelloSlip",
+    name: "Slip",
     dependencies: [
         .Package(url: "https://github.com/SwiftKidz/Slip.git", "0.0.1")
     ]

@@ -29,7 +29,26 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       codeCoverageEnabled = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3549BB7E1DA38B0000C63030"
+               BuildableName = "SlipTests-macOS.xctest"
+               BlueprintName = "SlipTests-macOS"
+               ReferencedContainer = "container:Slip.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "3549BB3A1DA389E800C63030"
+            BuildableName = "Slip.framework"
+            BlueprintName = "Slip-macOS"
+            ReferencedContainer = "container:Slip.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
