@@ -29,7 +29,26 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       codeCoverageEnabled = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3549BB6F1DA38AEF00C63030"
+               BuildableName = "SlipTests-tvOS.xctest"
+               BlueprintName = "SlipTests-tvOS"
+               ReferencedContainer = "container:Slip.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "3549BB471DA389F300C63030"
+            BuildableName = "Slip.framework"
+            BlueprintName = "Slip-tvOS"
+            ReferencedContainer = "container:Slip.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
