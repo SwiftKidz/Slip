@@ -1,12 +1,5 @@
 ## Slip
 
-[![Platforms](https://img.shields.io/cocoapods/p/Slip.svg)](https://cocoapods.org/pods/Slip)
-[![License](https://img.shields.io/cocoapods/l/Slip.svg)](https://raw.githubusercontent.com/SwiftKidz/Slip/master/LICENSE)
-
-[![Swift Package Manager](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
-[![CocoaPods compatible](https://img.shields.io/cocoapods/v/Slip.svg)](https://cocoapods.org/pods/Slip)
-
 [![Travis](https://img.shields.io/travis/SwiftKidz/Slip/master.svg)](https://travis-ci.org/SwiftKidz/Slip/branches)
 
 - [Requirements](#requirements)
