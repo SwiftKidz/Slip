@@ -71,7 +71,7 @@ To use Slip as a [Swift Package Manager](https://swift.org/package-manager/) pac
 import PackageDescription
 
 let package = Package(
-    name: "HelloSlip",
+    name: "Slip",
     dependencies: [
         .Package(url: "https://github.com/SwiftKidz/Slip.git", "0.0.1")
     ]
