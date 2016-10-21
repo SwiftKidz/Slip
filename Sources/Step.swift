@@ -27,20 +27,12 @@ import Foundation
 public final class Step {
 
     public typealias CodeBlock = (FlowController, Any?) -> ()
-    private let codeClosure: CodeBlock
-    private let runOnBackgroundThread: Bool
+    public typealias CodeBlockNoPreviousResult = (FlowController) -> ()
+    internal let codeClosure: CodeBlock
+    internal let runOnBackgroundThread: Bool
 
-    public init(onBackgroundThread: Bool = false, closure: @escaping CodeBlock) {
+    internal init(onBackgroundThread: Bool = false, closure: @escaping CodeBlock) {
         runOnBackgroundThread = onBackgroundThread
         codeClosure = closure
     }
-
-    public func runStep(flowController: FlowController, previousResult: Any?) {
-        guard runOnBackgroundThread else { codeClosure(flowController, previousResult); return }
-
-        DispatchQueue.global(qos: DispatchQoS.QoSClass.utility).async {
-            self.codeClosure(flowController, previousResult)
-        }
-    }
-
 }

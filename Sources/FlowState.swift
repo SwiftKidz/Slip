@@ -24,10 +24,30 @@
 
 import Foundation
 
-public enum FlowState<LastResult> {
+public enum FlowState<R> {
     case queued
-    case running(LastResult)
+    case running(R)
     case canceled
     case failed(Error)
-    case finished(LastResult)
+    case finished(R)
+
+    var value: R? {
+        switch self {
+        case .running(let r):
+            return r
+        case .finished(let r):
+            return r
+        default:
+            return nil
+        }
+    }
+
+    var error: Error? {
+        switch self {
+        case .failed(let e):
+            return e
+        default:
+            return nil
+        }
+    }
 }

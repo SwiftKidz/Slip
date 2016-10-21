@@ -22,41 +22,19 @@
  SOFTWARE.
  */
 
-import XCTest
-@testable import Slip
+import Foundation
 
-struct MockFlow: FlowController {
+extension Step {
 
-    func finish(_ error: Error) {
-
+    static public func waterfall(onBackgroundThread: Bool = false, closure: @escaping CodeBlock) -> Step {
+        return Step(onBackgroundThread: onBackgroundThread, closure: closure)
     }
 
-    func finish<T>(_ result: T) {
+    internal func runStep(flowController: FlowController, previousResult: Any?) {
+        guard runOnBackgroundThread else { codeClosure(flowController, previousResult); return }
 
-    }
-
-}
-
-class StepTests: XCTestCase {
-
-    func testStepOnCallingThread() {
-        let expectation = self.expectation(description: name ?? "Test")
-        let step = Step.waterfall { (stepFlow, result) -> (Void) in
-            XCTAssertNil(result)
-            expectation.fulfill()
+        DispatchQueue.global(qos: DispatchQoS.QoSClass.utility).async {
+            self.codeClosure(flowController, previousResult)
         }
-        step.runStep(flowController: MockFlow(), previousResult: nil)
-        waitForExpectations(timeout: 0.5, handler: nil)
     }
-
-    func testStepOnBackgroundThread() {
-        let expectation = self.expectation(description: name ?? "Test")
-        let step = Step.waterfall(onBackgroundThread: true) { (stepFlow, result) -> (Void) in
-            XCTAssertNil(result)
-            expectation.fulfill()
-        }
-        step.runStep(flowController: MockFlow(), previousResult: nil)
-        waitForExpectations(timeout: 0.5, handler: nil)
-    }
-
 }

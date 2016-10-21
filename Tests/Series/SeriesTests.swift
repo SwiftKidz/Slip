@@ -25,29 +25,23 @@
 import XCTest
 @testable import Slip
 
-enum MockErrors: Error {
-    case errorOnFlow
-}
-
-class FlowTests: XCTestCase {
+class SeriesTests: XCTestCase {
 
     func testInitWithArrayOfSteps() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let stepOne = Step.waterfall { flowController, previousResult in
-            XCTAssertNil(previousResult)
+        let stepOne = Step.series { flowController in
             flowController.finish("empty step")
         }
 
-        let stepTwo = Step.waterfall { flowController, previousResult in
-            XCTAssert("empty step" == previousResult as? String)
+        let stepTwo = Step.series { flowController in
             flowController.finish("empty step")
         }
 
-        Waterfall(steps: [stepOne, stepTwo]).onFinish { (state) in
+        Series(steps: [stepOne, stepTwo]).onFinish { (state) in
             if case .finished(_) = state {} else { XCTFail() }
             expectation.fulfill()
-            }.start()
+        }.start()
 
         waitForExpectations(timeout: 0.5, handler: nil)
     }
@@ -55,17 +49,14 @@ class FlowTests: XCTestCase {
     func testInitWithVariadicArrayOfSteps() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let stepOne = Step.waterfall { flowController, previousResult in
-            XCTAssertNil(previousResult)
+        let stepOne = Step.series { flowController in
             flowController.finish("empty step")
         }
 
-        let stepTwo = Step.waterfall { flowController, previousResult in
-            XCTAssert("empty step" == previousResult as? String)
+        let stepTwo = Step.series { flowController in
             flowController.finish("empty step")
         }
-
-        Waterfall(steps: stepOne, stepTwo).onFinish { (state) in
+        Series(steps: stepOne, stepTwo).onFinish { (state) in
             if case .finished(_) = state {} else { XCTFail() }
             expectation.fulfill()
             }.start()
@@ -76,19 +67,17 @@ class FlowTests: XCTestCase {
     func testCancelFlowFallbackToFinishBlock() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let stepOne = Step.waterfall(onBackgroundThread: true) { flowController, previousResult in
+        let stepOne = Step.series(onBackgroundThread: true) { flowController in
             XCTAssertFalse(Thread.current.isMainThread, "Should not be executing on main thread")
-            XCTAssertNil(previousResult)
             sleep(2)
             flowController.finish("empty step")
         }
 
-        let stepTwo = Step.waterfall { flowController, previousResult in
-            XCTAssert("empty step" == previousResult as? String)
+        let stepTwo = Step.series { flowController in
             flowController.finish("empty step")
         }
 
-        let flow = Waterfall(steps: stepOne, stepTwo).onFinish { (state) in
+        let flow = Series(steps: stepOne, stepTwo).onFinish { (state) in
             XCTAssertTrue(Thread.current.isMainThread, "Should be executing on main thread")
             if case .canceled = state {} else { XCTFail() }
             expectation.fulfill()
@@ -103,19 +92,17 @@ class FlowTests: XCTestCase {
     func testErrorOnFlowFallbackToFinishBlock() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let stepOne = Step.waterfall(onBackgroundThread: true) { flowController, previousResult in
+        let stepOne = Step.series(onBackgroundThread: true) { flowController in
             XCTAssertFalse(Thread.current.isMainThread, "Should not be executing on main thread")
-            XCTAssertNil(previousResult)
             sleep(2)
             flowController.finish("empty step")
         }
 
-        let stepTwo = Step.waterfall { flowController, previousResult in
-            XCTAssert("empty step" == previousResult as? String)
+        let stepTwo = Step.series { flowController in
             flowController.finish(MockErrors.errorOnFlow)
         }
 
-        Waterfall(steps: stepOne, stepTwo).onFinish { (state) in
+        Series(steps: stepOne, stepTwo).onFinish { (state) in
             XCTAssertTrue(Thread.current.isMainThread, "Should be executing on main thread")
             if case .failed = state {} else { XCTFail() }
             expectation.fulfill()
@@ -127,24 +114,22 @@ class FlowTests: XCTestCase {
     func testCancelFlowGoesToCancelBlock() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let stepOne = Step.waterfall(onBackgroundThread: true) { flowController, previousResult in
+        let stepOne = Step.series(onBackgroundThread: true) { flowController in
             XCTAssertFalse(Thread.current.isMainThread, "Should not be executing on main thread")
-            XCTAssertNil(previousResult)
             sleep(2)
             flowController.finish("empty step")
         }
 
-        let stepTwo = Step.waterfall { flowController, previousResult in
-            XCTAssert("empty step" == previousResult as? String)
+        let stepTwo = Step.series { flowController in
             flowController.finish("empty step")
         }
 
-        let flow = Waterfall(steps: stepOne, stepTwo).onFinish { (state) in
-            XCTFail()
+        let flow = Series(steps: stepOne, stepTwo).onFinish { (state) in
+                XCTFail()
             }.onCancel {
                 XCTAssertTrue(Thread.current.isMainThread, "Should be executing on main thread")
                 expectation.fulfill()
-        }
+            }
         flow.start()
         sleep(1)
         flow.cancel()
@@ -155,19 +140,17 @@ class FlowTests: XCTestCase {
     func testErrorOnFlowGoesToErrorBlock() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let stepOne = Step.waterfall(onBackgroundThread: true) { flowController, previousResult in
+        let stepOne = Step.series(onBackgroundThread: true) { flowController in
             XCTAssertFalse(Thread.current.isMainThread, "Should not be executing on main thread")
-            XCTAssertNil(previousResult)
             sleep(2)
             flowController.finish("empty step")
         }
 
-        let stepTwo = Step.waterfall { flowController, previousResult in
-            XCTAssert("empty step" == previousResult as? String)
+        let stepTwo = Step.series { flowController in
             flowController.finish(MockErrors.errorOnFlow)
         }
 
-        Waterfall(steps: stepOne, stepTwo).onFinish { (state) in
+        Series(steps: stepOne, stepTwo).onFinish { (state) in
             XCTFail()
             }.onError({ (error) in
                 XCTAssertTrue(Thread.current.isMainThread, "Should be executing on main thread")
@@ -179,22 +162,21 @@ class FlowTests: XCTestCase {
     }
 
     func testRunFlowWithoutSteps() {
-        let flow = Waterfall(steps: [])
+        let flow = Series(steps: [])
         flow.start()
         if case .queued = flow.state {} else { XCTFail() }
 
-        let flowVariadic = Waterfall()
+        let flowVariadic = Series()
         flowVariadic.start()
         if case .queued = flowVariadic.state {} else { XCTFail() }
     }
 
     func testTryStartAfterFlowBeginning() {
-        let stepOne = Step.waterfall(onBackgroundThread: true) { flowController, previousResult in
-            XCTAssertNil(previousResult)
+        let stepOne = Step.series(onBackgroundThread: true) { flowController in
             sleep(2)
             flowController.finish("empty step")
         }
-        let flow = Waterfall(steps: [stepOne])
+        let flow = Series(steps: [stepOne])
         flow.start()
         if case .running = flow.state {} else { XCTFail() }
         flow.start()
@@ -203,12 +185,11 @@ class FlowTests: XCTestCase {
 
     func testTryModifyingCancelBlockAfterStartingFlow() {
         let expectation = self.expectation(description: name ?? "Test")
-        let stepOne = Step.waterfall(onBackgroundThread: true) { flowController, previousResult in
-            XCTAssertNil(previousResult)
+        let stepOne = Step.series(onBackgroundThread: true) { flowController in
             sleep(2)
             flowController.finish("empty step")
         }
-        let flow = Waterfall(steps: [stepOne]).onCancel {
+        let flow = Series(steps: [stepOne]).onCancel {
             expectation.fulfill()
         }
         flow.start()
@@ -223,12 +204,11 @@ class FlowTests: XCTestCase {
 
     func testTryModifyingErrorBlockAfterStartingFlow() {
         let expectation = self.expectation(description: name ?? "Test")
-        let stepOne = Step.waterfall(onBackgroundThread: true) { flowController, previousResult in
-            XCTAssertNil(previousResult)
+        let stepOne = Step.series(onBackgroundThread: true) { flowController in
             sleep(2)
             flowController.finish(MockErrors.errorOnFlow)
         }
-        let flow = Waterfall(steps: [stepOne]).onError { _ in
+        let flow = Series(steps: [stepOne]).onError { _ in
             expectation.fulfill()
         }
         flow.start()
@@ -241,12 +221,11 @@ class FlowTests: XCTestCase {
 
     func testTryModifyingFinishBlockAfterStartingFlow() {
         let expectation = self.expectation(description: name ?? "Test")
-        let stepOne = Step.waterfall(onBackgroundThread: true) { flowController, previousResult in
-            XCTAssertNil(previousResult)
+        let stepOne = Step.series(onBackgroundThread: true) { flowController in
             sleep(2)
             flowController.finish(MockErrors.errorOnFlow)
         }
-        let flow = Waterfall(steps: [stepOne]).onFinish { _ in
+        let flow = Series(steps: [stepOne]).onFinish { _ in
             expectation.fulfill()
         }
         flow.start()
@@ -259,21 +238,19 @@ class FlowTests: XCTestCase {
 
     func testRunFlowWithNoFinishBlock() {
         let expectationOne = expectation(description: name ?? "Test")
-        let stepOne = Step.waterfall(onBackgroundThread: true) { flowController, previousResult in
-            XCTAssertNil(previousResult)
+        let stepOne = Step.series(onBackgroundThread: true) { flowController in
             flowController.finish("Finished")
             expectationOne.fulfill()
         }
-        Waterfall(steps: [stepOne]).start()
+        Series(steps: [stepOne]).start()
         waitForExpectations(timeout: 5.0, handler: nil)
 
         let expectationTwo = expectation(description: name ?? "Test")
-        let stepTwo = Step.waterfall(onBackgroundThread: true) { flowController, previousResult in
-            XCTAssertNil(previousResult)
+        let stepTwo = Step.series(onBackgroundThread: true) { flowController in
             flowController.finish("Finished")
             expectationTwo.fulfill()
         }
-        Waterfall(steps: stepTwo).start()
+        Series(steps: stepTwo).start()
         waitForExpectations(timeout: 5.0, handler: nil)
     }
 
