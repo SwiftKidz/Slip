@@ -24,122 +24,33 @@
 
 import Foundation
 
-public final class Waterfall {
-
-    fileprivate var steps: [Step]
-    public typealias FinishBlock = (FlowState<Any>) -> ()
-    public typealias ErrorBlock = (Error) -> ()
-    public typealias CancelBlock = () -> ()
-    fileprivate var finishBlock: FinishBlock = { _ in }
-    fileprivate var errorBlock: ErrorBlock?
-    fileprivate var cancelBlock: CancelBlock?
-    fileprivate var currentState: FlowState<Any> = .queued
-    fileprivate let syncQueue = DispatchQueue(label: "com.slip.flow.waterfall.syncQueue", attributes: DispatchQueue.Attributes.concurrent)
-
-    public var state: FlowState<Any> {
-        var val: FlowState<Any>?
-        syncQueue.sync {
-            val = self.currentState
-        }
-        return val!
-    }
+public final class Waterfall<T>: SerialFlow<T> {
 
     public init(steps: [Step]) {
-        self.steps = steps
-    }
-
-    public init(steps: Step...) {
-        self.steps = steps
-    }
-
-    public func onFinish(_ block: @escaping FinishBlock) -> Self {
-        guard case .queued = state else { print("Cannot modify flow after starting") ; return self }
-        finishBlock = block
-        return self
-    }
-
-    public func onError(_ block: @escaping ErrorBlock) -> Self {
-        guard case .queued = state else { print("Cannot modify flow after starting") ; return self }
-        errorBlock = block
-        return self
-    }
-
-    public func onCancel(_ block: @escaping CancelBlock) -> Self {
-        guard case .queued = state else { print("Cannot modify flow after starting") ; return self }
-        cancelBlock = block
-        return self
-    }
-
-    public func start() {
-        guard case .queued = state else { print("Cannot start flow twice") ; return }
-
-        if !steps.isEmpty {
-            currentState = .running(Void.self)
-            let step = steps.first
-            steps.removeFirst()
-            step?.runStep(flowController: self, previousResult: nil)
-        } else {
-            print("No steps to run")
+        let processBlock: CurrentStateResultBlock = { previousResult, newResult in
+            guard let previous = previousResult as? [Any] else { return [newResult] }
+            return previous + [newResult]
         }
+        super.init(steps: steps, process: processBlock, passToNext: { (current, _) in current })
     }
 
-    public func cancel() {
-        syncQueue.sync(flags: .barrier, execute: {
-            self.steps.removeAll()
-            self.currentState = .canceled
-        })
-        DispatchQueue.main.async {
-            guard let cancelBlock = self.cancelBlock else {
-                self.finishBlock(self.state)
-                return
-            }
-            cancelBlock()
-            self.cancelBlock = nil
-        }
-    }
-
-    deinit {
-        print("Will De Init Waterfall Flow Object")
+    public convenience init(steps: Step...) {
+        self.init(steps: steps)
     }
 }
 
-extension Waterfall: FlowController {
-
-    public func finish<T>(_ result: T) {
-        guard case .running = state else {
-            print("Step finished but flow will be interrupted due to state being : \(state) ")
-            return
-        }
-        guard !steps.isEmpty else {
-            syncQueue.sync(flags: .barrier, execute: {
-                self.currentState = .finished(result)
-            })
-            DispatchQueue.main.async {
-                self.finishBlock(self.state)
-            }
-            return
-        }
-        var step: Step?
-        syncQueue.sync(flags: .barrier, execute: {
-            self.currentState = .running(result)
-            step = self.steps.first
-            self.steps.removeFirst()
-        })
-        step?.runStep(flowController: self, previousResult: result)
-    }
-
-    public func finish(_ error: Error) {
-        syncQueue.sync(flags: .barrier, execute: {
-            self.steps.removeAll()
-            self.currentState = .failed(error)
-        })
-        DispatchQueue.main.async {
-            guard let errorBlock = self.errorBlock else {
-                self.finishBlock(self.state)
-                return
-            }
-            errorBlock(error)
-            self.errorBlock = nil
-        }
-    }
-}
+//public protocol Waterfall: FlowHandler {}
+//extension SerialFlow: Waterfall {}
+//
+//public func waterfall(steps: [Step]) -> Waterfall {
+//    //let processBlock: ProcessEachResultBlock = { _, newResult in return newResult }
+//    let processBlock: CurrentStateResultBlock = { previousResult, newResult in
+//        guard let previous = previousResult as? [Any] else { return [newResult] }
+//        return previous + [newResult]
+//    }
+//    return SerialFlow(steps: steps, process: processBlock, passToNext: { (current, _) in current })
+//}
+//
+//public func waterfall(steps: Step...) -> Waterfall {
+//    return waterfall(steps: steps)
+//}

@@ -23,12 +23,12 @@
  */
 
 import XCTest
-@testable import Slip
+import Slip
 
 class SeriesTests: XCTestCase {
 
-    func testInitWithArrayOfSteps() {
-        let expectation = self.expectation(description: name ?? "Test")
+    func testInitWithSteps() {
+        let expectationOne = self.expectation(description: name ?? "Test")
 
         let stepOne = Step.series { flowController in
             flowController.finish("empty step")
@@ -38,220 +38,44 @@ class SeriesTests: XCTestCase {
             flowController.finish("empty step")
         }
 
-        Series(steps: [stepOne, stepTwo]).onFinish { (state) in
-            if case .finished(_) = state {} else { XCTFail() }
-            expectation.fulfill()
+        Series<Any>(steps: [stepOne, stepTwo]).onFinish { (state) in
+            guard case .finished(_) = state else { XCTFail(); return }
+            expectationOne.fulfill()
+        }.start()
+
+        waitForExpectations(timeout: 0.5, handler: nil)
+
+        let expectationTwo = self.expectation(description: name ?? "Test")
+
+        Series<Any>(steps: stepOne, stepTwo).onFinish { (state) in
+            guard case .finished(_) = state else { XCTFail();  return }
+            expectationTwo.fulfill()
         }.start()
 
         waitForExpectations(timeout: 0.5, handler: nil)
     }
 
-    func testInitWithVariadicArrayOfSteps() {
+    func testResultsAreSerial() {
         let expectation = self.expectation(description: name ?? "Test")
 
         let stepOne = Step.series { flowController in
-            flowController.finish("empty step")
+            flowController.finish(0)
         }
 
         let stepTwo = Step.series { flowController in
-            flowController.finish("empty step")
+            flowController.finish(1)
         }
-        Series(steps: stepOne, stepTwo).onFinish { (state) in
-            if case .finished(_) = state {} else { XCTFail() }
+
+        Series<Any>(steps: stepOne, stepTwo).onFinish { (state) in
+            guard
+                case .finished(_) = state,
+                let result = state.value as? [Int]
+            else { XCTFail(); return }
+            if result != [0, 1] { XCTFail() }
             expectation.fulfill()
-            }.start()
+        }.start()
 
         waitForExpectations(timeout: 0.5, handler: nil)
-    }
-
-    func testCancelFlowFallbackToFinishBlock() {
-        let expectation = self.expectation(description: name ?? "Test")
-
-        let stepOne = Step.series(onBackgroundThread: true) { flowController in
-            XCTAssertFalse(Thread.current.isMainThread, "Should not be executing on main thread")
-            sleep(2)
-            flowController.finish("empty step")
-        }
-
-        let stepTwo = Step.series { flowController in
-            flowController.finish("empty step")
-        }
-
-        let flow = Series(steps: stepOne, stepTwo).onFinish { (state) in
-            XCTAssertTrue(Thread.current.isMainThread, "Should be executing on main thread")
-            if case .canceled = state {} else { XCTFail() }
-            expectation.fulfill()
-        }
-        flow.start()
-        sleep(1)
-        flow.cancel()
-
-        waitForExpectations(timeout: 5.0, handler: nil)
-    }
-
-    func testErrorOnFlowFallbackToFinishBlock() {
-        let expectation = self.expectation(description: name ?? "Test")
-
-        let stepOne = Step.series(onBackgroundThread: true) { flowController in
-            XCTAssertFalse(Thread.current.isMainThread, "Should not be executing on main thread")
-            sleep(2)
-            flowController.finish("empty step")
-        }
-
-        let stepTwo = Step.series { flowController in
-            flowController.finish(MockErrors.errorOnFlow)
-        }
-
-        Series(steps: stepOne, stepTwo).onFinish { (state) in
-            XCTAssertTrue(Thread.current.isMainThread, "Should be executing on main thread")
-            if case .failed = state {} else { XCTFail() }
-            expectation.fulfill()
-            }.start()
-
-        waitForExpectations(timeout: 5.0, handler: nil)
-    }
-
-    func testCancelFlowGoesToCancelBlock() {
-        let expectation = self.expectation(description: name ?? "Test")
-
-        let stepOne = Step.series(onBackgroundThread: true) { flowController in
-            XCTAssertFalse(Thread.current.isMainThread, "Should not be executing on main thread")
-            sleep(2)
-            flowController.finish("empty step")
-        }
-
-        let stepTwo = Step.series { flowController in
-            flowController.finish("empty step")
-        }
-
-        let flow = Series(steps: stepOne, stepTwo).onFinish { (state) in
-                XCTFail()
-            }.onCancel {
-                XCTAssertTrue(Thread.current.isMainThread, "Should be executing on main thread")
-                expectation.fulfill()
-            }
-        flow.start()
-        sleep(1)
-        flow.cancel()
-
-        waitForExpectations(timeout: 5.0, handler: nil)
-    }
-
-    func testErrorOnFlowGoesToErrorBlock() {
-        let expectation = self.expectation(description: name ?? "Test")
-
-        let stepOne = Step.series(onBackgroundThread: true) { flowController in
-            XCTAssertFalse(Thread.current.isMainThread, "Should not be executing on main thread")
-            sleep(2)
-            flowController.finish("empty step")
-        }
-
-        let stepTwo = Step.series { flowController in
-            flowController.finish(MockErrors.errorOnFlow)
-        }
-
-        Series(steps: stepOne, stepTwo).onFinish { (state) in
-            XCTFail()
-            }.onError({ (error) in
-                XCTAssertTrue(Thread.current.isMainThread, "Should be executing on main thread")
-                XCTAssert(error as? MockErrors == MockErrors.errorOnFlow)
-                expectation.fulfill()
-            }).start()
-
-        waitForExpectations(timeout: 5.0, handler: nil)
-    }
-
-    func testRunFlowWithoutSteps() {
-        let flow = Series(steps: [])
-        flow.start()
-        if case .queued = flow.state {} else { XCTFail() }
-
-        let flowVariadic = Series()
-        flowVariadic.start()
-        if case .queued = flowVariadic.state {} else { XCTFail() }
-    }
-
-    func testTryStartAfterFlowBeginning() {
-        let stepOne = Step.series(onBackgroundThread: true) { flowController in
-            sleep(2)
-            flowController.finish("empty step")
-        }
-        let flow = Series(steps: [stepOne])
-        flow.start()
-        if case .running = flow.state {} else { XCTFail() }
-        flow.start()
-        if case .running = flow.state {} else { XCTFail() }
-    }
-
-    func testTryModifyingCancelBlockAfterStartingFlow() {
-        let expectation = self.expectation(description: name ?? "Test")
-        let stepOne = Step.series(onBackgroundThread: true) { flowController in
-            sleep(2)
-            flowController.finish("empty step")
-        }
-        let flow = Series(steps: [stepOne]).onCancel {
-            expectation.fulfill()
-        }
-        flow.start()
-
-        _ = flow.onCancel {
-            XCTFail()
-        }
-        sleep(1)
-        flow.cancel()
-        waitForExpectations(timeout: 5.0, handler: nil)
-    }
-
-    func testTryModifyingErrorBlockAfterStartingFlow() {
-        let expectation = self.expectation(description: name ?? "Test")
-        let stepOne = Step.series(onBackgroundThread: true) { flowController in
-            sleep(2)
-            flowController.finish(MockErrors.errorOnFlow)
-        }
-        let flow = Series(steps: [stepOne]).onError { _ in
-            expectation.fulfill()
-        }
-        flow.start()
-
-        _ = flow.onError { _ in
-            XCTFail()
-        }
-        waitForExpectations(timeout: 5.0, handler: nil)
-    }
-
-    func testTryModifyingFinishBlockAfterStartingFlow() {
-        let expectation = self.expectation(description: name ?? "Test")
-        let stepOne = Step.series(onBackgroundThread: true) { flowController in
-            sleep(2)
-            flowController.finish(MockErrors.errorOnFlow)
-        }
-        let flow = Series(steps: [stepOne]).onFinish { _ in
-            expectation.fulfill()
-        }
-        flow.start()
-
-        _ = flow.onFinish { _ in
-            XCTFail()
-        }
-        waitForExpectations(timeout: 5.0, handler: nil)
-    }
-
-    func testRunFlowWithNoFinishBlock() {
-        let expectationOne = expectation(description: name ?? "Test")
-        let stepOne = Step.series(onBackgroundThread: true) { flowController in
-            flowController.finish("Finished")
-            expectationOne.fulfill()
-        }
-        Series(steps: [stepOne]).start()
-        waitForExpectations(timeout: 5.0, handler: nil)
-
-        let expectationTwo = expectation(description: name ?? "Test")
-        let stepTwo = Step.series(onBackgroundThread: true) { flowController in
-            flowController.finish("Finished")
-            expectationTwo.fulfill()
-        }
-        Series(steps: stepTwo).start()
-        waitForExpectations(timeout: 5.0, handler: nil)
     }
 
 }

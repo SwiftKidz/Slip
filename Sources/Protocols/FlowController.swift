@@ -24,30 +24,9 @@
 
 import Foundation
 
-public enum FlowState<R> {
-    case queued
-    case running(R)
-    case canceled
-    case failed(Error)
-    case finished(R)
-
-    var value: R? {
-        switch self {
-        case .running(let r):
-            return r
-        case .finished(let r):
-            return r
-        default:
-            return nil
-        }
-    }
-
-    var error: Error? {
-        switch self {
-        case .failed(let e):
-            return e
-        default:
-            return nil
-        }
-    }
+public protocol FlowControl {
+    func finish<R>(_ result: R)
+    func finish(_ error: Error)
 }
+
+public protocol FlowHandler: StepFlow, FlowControl {}

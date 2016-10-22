@@ -29,12 +29,4 @@ extension Step {
     static public func waterfall(onBackgroundThread: Bool = false, closure: @escaping CodeBlock) -> Step {
         return Step(onBackgroundThread: onBackgroundThread, closure: closure)
     }
-
-    internal func runStep(flowController: FlowController, previousResult: Any?) {
-        guard runOnBackgroundThread else { codeClosure(flowController, previousResult); return }
-
-        DispatchQueue.global(qos: DispatchQoS.QoSClass.utility).async {
-            self.codeClosure(flowController, previousResult)
-        }
-    }
 }

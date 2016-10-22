@@ -22,41 +22,47 @@
  SOFTWARE.
  */
 
-import XCTest
-@testable import Slip
+import Foundation
 
-struct MockFlow: FlowController {
+public enum FlowState<R> {
+    case queued
+    case running(R?)
+    case canceled
+    case failed(Error)
+    case finished(R?)
 
-    func finish(_ error: Error) {
-
-    }
-
-    func finish<T>(_ result: T) {
-
-    }
-
-}
-
-class StepTests: XCTestCase {
-
-    func testStepOnCallingThread() {
-        let expectation = self.expectation(description: name ?? "Test")
-        let step = Step.waterfall { (stepFlow, result) -> (Void) in
-            XCTAssertNil(result)
-            expectation.fulfill()
+    public var value: R? {
+        switch self {
+        case .running(let r):
+            return r ?? nil
+        case .finished(let r):
+            return r ?? nil
+        default:
+            return nil
         }
-        step.runStep(flowController: MockFlow(), previousResult: nil)
-        waitForExpectations(timeout: 0.5, handler: nil)
     }
 
-    func testStepOnBackgroundThread() {
-        let expectation = self.expectation(description: name ?? "Test")
-        let step = Step.waterfall(onBackgroundThread: true) { (stepFlow, result) -> (Void) in
-            XCTAssertNil(result)
-            expectation.fulfill()
+    public var error: Error? {
+        switch self {
+        case .failed(let e):
+            return e
+        default:
+            return nil
         }
-        step.runStep(flowController: MockFlow(), previousResult: nil)
-        waitForExpectations(timeout: 0.5, handler: nil)
     }
 
+    func convertType<T>() -> FlowState<T> {
+        switch self {
+        case .queued:
+            return FlowState<T>.queued
+        case .canceled:
+            return FlowState<T>.canceled
+        case .failed(let e):
+            return FlowState<T>.failed(e)
+        case .running(let r):
+            return FlowState<T>.running(r as? T)
+        case .finished(let f):
+            return FlowState<T>.finished(f as? T)
+        }
+    }
 }

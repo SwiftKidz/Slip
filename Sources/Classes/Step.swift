@@ -24,7 +24,22 @@
 
 import Foundation
 
-public protocol FlowController {
-    func finish<T>(_ result: T)
-    func finish(_ error: Error)
+public final class Step {
+    public typealias CodeBlock = (FlowControl, Any?) -> ()
+    public typealias CodeBlockNoPreviousResult = (FlowControl) -> ()
+    internal let codeClosure: CodeBlock
+    internal let runOnBackgroundThread: Bool
+
+    internal init(onBackgroundThread: Bool = false, closure: @escaping CodeBlock) {
+        runOnBackgroundThread = onBackgroundThread
+        codeClosure = closure
+    }
+
+    internal func runStep(flowController: FlowControl, previousResult: Any?) {
+        guard runOnBackgroundThread else { codeClosure(flowController, previousResult); return }
+
+        DispatchQueue.global(qos: DispatchQoS.QoSClass.utility).async {
+            self.codeClosure(flowController, previousResult)
+        }
+    }
 }

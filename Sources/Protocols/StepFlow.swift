@@ -24,15 +24,22 @@
 
 import Foundation
 
-public final class Step {
+public protocol StepFlow {
+    associatedtype T
 
-    public typealias CodeBlock = (FlowController, Any?) -> ()
-    public typealias CodeBlockNoPreviousResult = (FlowController) -> ()
-    internal let codeClosure: CodeBlock
-    internal let runOnBackgroundThread: Bool
+    var state: FlowState<T> { get }
 
-    internal init(onBackgroundThread: Bool = false, closure: @escaping CodeBlock) {
-        runOnBackgroundThread = onBackgroundThread
-        codeClosure = closure
-    }
+    typealias FinishBlock = (FlowState<T>) -> ()
+    typealias ErrorBlock = (Error) -> ()
+    typealias CancelBlock = () -> ()
+    typealias CodeBlock = (FlowControl, Any?) -> ()
+
+    func step(onBackgroundThread: Bool, closure: @escaping CodeBlock) -> Self
+
+    func onFinish(_ block: @escaping FinishBlock) -> Self
+    func onError(_ block: @escaping ErrorBlock) -> Self
+    func onCancel(_ block: @escaping CancelBlock) -> Self
+
+    func start()
+    func cancel()
 }
