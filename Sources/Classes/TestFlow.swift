@@ -84,7 +84,6 @@ extension TestFlow {
     func runTest(whenCompletedDo: @escaping ()->()) {
         runAfterTest = whenCompletedDo
         testBlock(self)
-
     }
 
     fileprivate var shouldBreakExecution: Bool {
@@ -182,7 +181,6 @@ extension TestFlow {
 extension TestFlow {
 
     fileprivate func run() {
-        //verifyTest()
         guard !shouldBreakExecution else { internalState = .finished(state.value); return }
 
         guard backgroundThread else { runBlock(self); return }
@@ -219,16 +217,15 @@ extension TestFlow {
     }
 
     fileprivate func finished() {
-        //verifyTest()
         guard shouldBreakExecution else { internalState = .running(state.value); return }
         DispatchQueue.main.async {
             self.finishBlock(self.state)
         }
     }
 
-    func verifyTest(runClosure: ()->()) {
-        guard shouldRunTestBlock(state) else { return }
-        //runTest()
+    func verifyTest(runClosure: @escaping ()->()) {
+        guard shouldRunTestBlock(state) else { runClosure(); return }
+        runTest(whenCompletedDo: runClosure)
     }
 }
 
