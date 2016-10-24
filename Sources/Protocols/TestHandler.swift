@@ -24,9 +24,12 @@
 
 import Foundation
 
-public protocol TestingFlow: Flow {
+public protocol TestHandler {
 
     typealias RunBlock = (FlowControl) -> ()
-    typealias TestBlock = (T?) -> (Bool)
+    typealias TestBlock = (TestHandler) -> ()
+
+    func testComplete(success: Bool, error: Error?)
+    var lastRunResult: Any { get }
 
 }

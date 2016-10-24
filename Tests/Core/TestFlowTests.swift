@@ -35,11 +35,10 @@ class TestFlowTests: XCTestCase {
         TestFlow<Int>(onBackgroundThread: false, whenToRunTest: { state in
             guard case .running(_) = state else { return false }
             return true
-            },
-                         test: { previous in
-                            print("previous result \(previous)")
-                            guard let n = previous, n > 5 else { return true }
-                            return false
+            }, test: { testHandler in
+                print("previous result \(testHandler.lastRunResult)")
+                guard let n = testHandler.lastRunResult as? Int, n > 5 else { return testHandler.testComplete(success: true, error: nil) }
+                testHandler.testComplete(success: false, error: nil)
         }) { controler in
             count += 1
             controler.finish(count)
@@ -60,9 +59,10 @@ class TestFlowTests: XCTestCase {
             guard case .running(_) = state else { return false }
             return true
             },
-                         test: { previous in
-                            guard let n = previous, n > 5 else { return true }
-                            return false
+                      test: { testHandler in
+                        print("previous result \(testHandler.lastRunResult)")
+                        guard let n = testHandler.lastRunResult as? Int, n > 5 else { return testHandler.testComplete(success: true, error: nil) }
+                        testHandler.testComplete(success: false, error: nil)
         }) { controler in
             count += 1
             controler.finish(MockErrors.errorOnFlow)
@@ -78,9 +78,10 @@ class TestFlowTests: XCTestCase {
         TestFlow<Int>(whenToRunTest: { state in
             guard case .running(_) = state else { return false }
             return true
-            }, test: { previous in
-                guard let n = previous, n > 5 else { return true }
-                return false
+            }, test: { testHandler in
+                print("previous result \(testHandler.lastRunResult)")
+                guard let n = testHandler.lastRunResult as? Int, n > 5 else { return testHandler.testComplete(success: true, error: nil) }
+                testHandler.testComplete(success: false, error: nil)
         }) { controler in
             count += 1
             controler.finish(MockErrors.errorOnFlow)
@@ -102,10 +103,10 @@ class TestFlowTests: XCTestCase {
             guard case .running(_) = state else { return false }
             return true
             },
-                                    test: { previous in
-                                        print("preivous result \(previous)")
-                                        guard let n = previous, n > 5 else { return true }
-                                        return false
+                                test: { testHandler in
+                                    print("previous result \(testHandler.lastRunResult)")
+                                    guard let n = testHandler.lastRunResult as? Int, n > 5 else { return testHandler.testComplete(success: true, error: nil) }
+                                    testHandler.testComplete(success: false, error: nil)
         }) { controler in
             count += 1
             sleep(1)
@@ -128,10 +129,10 @@ class TestFlowTests: XCTestCase {
                                         guard case .running(_) = state else { return false }
                                         return true
             },
-                                     test: { previous in
-                                        print("preivous result \(previous)")
-                                        guard let n = previous, n > 5 else { return true }
-                                        return false
+                                     test: { testHandler in
+                                        print("previous result \(testHandler.lastRunResult)")
+                                        guard let n = testHandler.lastRunResult as? Int, n > 5 else { return testHandler.testComplete(success: true, error: nil) }
+                                        testHandler.testComplete(success: false, error: nil)
         }) { controler in
             count += 1
             sleep(1)
@@ -155,11 +156,11 @@ class TestFlowTests: XCTestCase {
         let flow = TestFlow<Int>(whenToRunTest: { state in
             guard case .running(_) = state else { return false }
             return true
-            }, test: { previous in
-                print("preivous result \(previous)")
-                guard let n = previous, n > 5 else { return true }
-                return false
-        }) { controler in
+            }, test: { testHandler in
+                print("previous result \(testHandler.lastRunResult)")
+                guard let n = testHandler.lastRunResult as? Int, n > 5 else { return testHandler.testComplete(success: true, error: nil) }
+                testHandler.testComplete(success: false, error: nil)
+            }) { controler in
             count += 1
             sleep(1)
             controler.finish(MockErrors.errorOnFlow)
@@ -187,10 +188,10 @@ class TestFlowTests: XCTestCase {
         let flow = TestFlow<Int>(onBackgroundThread: true, whenToRunTest: { state in
             guard case .running(_) = state else { return false }
             return true
-            }, test: { previous in
-                print("preivous result \(previous)")
-                guard let n = previous, n > 5 else { return true }
-                return false
+            }, test: { testHandler in
+                print("previous result \(testHandler.lastRunResult)")
+                guard let n = testHandler.lastRunResult as? Int, n > 5 else { return testHandler.testComplete(success: true, error: nil) }
+                testHandler.testComplete(success: false, error: nil)
         }) { controler in
             count = 6
             controler.finish(count)
@@ -211,10 +212,10 @@ class TestFlowTests: XCTestCase {
             guard case .running(_) = state else { return false }
             return true
             },
-                                     test: { previous in
-                                        print("preivous result \(previous)")
-                                        guard let n = previous, n > 5 else { return true }
-                                        return false
+                                  test: { testHandler in
+                                    print("previous result \(testHandler.lastRunResult)")
+                                    guard let n = testHandler.lastRunResult as? Int, n > 5 else { return testHandler.testComplete(success: true, error: nil) }
+                                    testHandler.testComplete(success: false, error: nil)
         }) { controler in
             count += 1
             sleep(1)
@@ -239,7 +240,7 @@ class TestFlowTests: XCTestCase {
         let flow = TestFlow<Int>(whenToRunTest: { state in
             guard case .running(_) = state else { return true }
             return false
-        }, test: { _ in false }) { controler in
+        }, test: { handler in handler.testComplete(success: false, error: nil) }) { controler in
             count += 1
             print(count)
             controler.finish(1)
@@ -260,7 +261,7 @@ class TestFlowTests: XCTestCase {
         let flow = TestFlow<Int>(whenToRunTest: { state in
             guard case .running(_) = state else { return true }
             return false
-        }, test: { _ in return counter < 1 }) { controler in
+        }, test: { handler in handler.testComplete(success: counter > 1, error: nil) }) { controler in
             counter += 1
             controler.finish(1)
             expectation.fulfill()
