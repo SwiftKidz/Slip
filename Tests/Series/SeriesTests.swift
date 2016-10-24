@@ -23,25 +23,22 @@
  */
 
 import XCTest
-@testable import Slip
+import Slip
 
-class WaterfallTests: XCTestCase {
+class SeriesTests: XCTestCase {
 
-    func testInitWithArrayOfSteps() {
+    func testInitWithSteps() {
         let expectationOne = self.expectation(description: name ?? "Test")
 
-        let stepOne = Step.waterfall { flowController, previousResult in
-            XCTAssertNil(previousResult)
+        let stepOne = Step.series { flowController in
             flowController.finish("empty step")
         }
 
-        let stepTwo = Step.waterfall { flowController, previousResult in
-            let previous = previousResult as? [String]
-            XCTAssert(["empty step"] == previous ?? [])
+        let stepTwo = Step.series { flowController in
             flowController.finish("empty step")
         }
 
-        Waterfall<Any>(steps: [stepOne, stepTwo]).onFinish { (state) in
+        Series<Any>(steps: [stepOne, stepTwo]).onFinish { (state) in
             guard case .finished(_) = state else { XCTFail(); return }
             expectationOne.fulfill()
         }.start()
@@ -50,33 +47,31 @@ class WaterfallTests: XCTestCase {
 
         let expectationTwo = self.expectation(description: name ?? "Test")
 
-        Waterfall<Any>(steps: stepOne, stepTwo).onFinish { (state) in
-            guard case .finished(_) = state else { XCTFail(); return }
+        Series<Any>(steps: stepOne, stepTwo).onFinish { (state) in
+            guard case .finished(_) = state else { XCTFail();  return }
             expectationTwo.fulfill()
         }.start()
 
         waitForExpectations(timeout: 0.5, handler: nil)
     }
 
-    func testResultsAreWaterfall() {
+    func testResultsAreSerial() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let stepOne = Step.waterfall { flowController, previousResult in
-            print("previous result is \(previousResult)")
-            XCTAssertNil(previousResult)
+        let stepOne = Step.series { flowController in
+            flowController.finish(0)
+        }
+
+        let stepTwo = Step.series { flowController in
             flowController.finish(1)
         }
 
-        let stepTwo = Step.waterfall { flowController, previousResult in
-            let previous = previousResult as? [Int]
-            XCTAssertEqual(previous ?? [], [1])
-            flowController.finish(2)
-        }
-
-        Waterfall<[Int]>(steps: stepOne, stepTwo).onFinish { (state) in
-            guard case .finished(_) = state else { XCTFail(); return }
-            let previous = state.value
-            XCTAssert([1, 2] == previous ?? [])
+        Series<Any>(steps: stepOne, stepTwo).onFinish { (state) in
+            guard
+                case .finished(_) = state,
+                let result = state.value as? [Int]
+            else { XCTFail(); return }
+            if result != [0, 1] { XCTFail() }
             expectation.fulfill()
         }.start()
 

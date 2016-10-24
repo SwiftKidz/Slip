@@ -22,16 +22,17 @@
  SOFTWARE.
  */
 
+
 import Foundation
 
-public final class Waterfall<T>: SerialFlow<T> {
+public final class Series<T>: SerialFlow<T> {
 
     public init(steps: [Step]) {
         let processBlock: CurrentStateResultBlock = { previousResult, newResult in
             guard let previous = previousResult as? [Any] else { return [newResult] }
             return previous + [newResult]
         }
-        super.init(steps: steps, process: processBlock, passToNext: { (current, _) in current })
+        super.init(steps: steps, process: processBlock, passToNext: { _ in nil })
     }
 
     public convenience init(steps: Step...) {

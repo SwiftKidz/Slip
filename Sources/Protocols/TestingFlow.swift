@@ -24,10 +24,9 @@
 
 import Foundation
 
-public enum FlowState<LastResult> {
-    case queued
-    case running(LastResult)
-    case canceled
-    case failed(Error)
-    case finished(LastResult)
+public protocol TestingFlow: Flow {
+
+    typealias RunBlock = (FlowControl) -> ()
+    typealias TestBlock = (T?) -> (Bool)
+
 }

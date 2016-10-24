@@ -22,19 +22,29 @@
  SOFTWARE.
  */
 
-import Foundation
+import XCTest
+@testable import Slip
 
-public final class Waterfall<T>: SerialFlow<T> {
+class StepTests: XCTestCase {
 
-    public init(steps: [Step]) {
-        let processBlock: CurrentStateResultBlock = { previousResult, newResult in
-            guard let previous = previousResult as? [Any] else { return [newResult] }
-            return previous + [newResult]
+    func testStepOnCallingThread() {
+        let expectation = self.expectation(description: name ?? "Test")
+        let step = Step { (stepFlow, result) -> (Void) in
+            XCTAssertNil(result)
+            expectation.fulfill()
         }
-        super.init(steps: steps, process: processBlock, passToNext: { (current, _) in current })
+        step.runStep(flowController: MockFlow(), previousResult: nil)
+        waitForExpectations(timeout: 0.5, handler: nil)
     }
 
-    public convenience init(steps: Step...) {
-        self.init(steps: steps)
+    func testStepOnBackgroundThread() {
+        let expectation = self.expectation(description: name ?? "Test")
+        let step = Step(onBackgroundThread: true) { (stepFlow, result) -> (Void) in
+            XCTAssertNil(result)
+            expectation.fulfill()
+        }
+        step.runStep(flowController: MockFlow(), previousResult: nil)
+        waitForExpectations(timeout: 0.5, handler: nil)
     }
+
 }

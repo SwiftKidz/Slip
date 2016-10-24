@@ -127,6 +127,8 @@ $ git submodule update --init --recursive
 
 ## Usage
 
+[Examples](Examples/Examples.md)
+
 ## License
 
 Slip is released under the MIT license. See [LICENSE](https://github.com/SwiftKidz/Slip/blob/master/LICENSE) for details.

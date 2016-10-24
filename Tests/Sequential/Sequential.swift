@@ -25,60 +25,63 @@
 import XCTest
 @testable import Slip
 
-class WaterfallTests: XCTestCase {
+class SequentialTests: XCTestCase {
 
     func testInitWithArrayOfSteps() {
         let expectationOne = self.expectation(description: name ?? "Test")
 
-        let stepOne = Step.waterfall { flowController, previousResult in
+        let stepOne = Step.sequential { flowController, previousResult in
             XCTAssertNil(previousResult)
             flowController.finish("empty step")
         }
 
-        let stepTwo = Step.waterfall { flowController, previousResult in
-            let previous = previousResult as? [String]
-            XCTAssert(["empty step"] == previous ?? [])
+        let stepTwo = Step.sequential { flowController, previousResult in
+            let previous = previousResult as? String
+            XCTAssert("empty step" == previous)
             flowController.finish("empty step")
         }
 
-        Waterfall<Any>(steps: [stepOne, stepTwo]).onFinish { (state) in
+        Sequential<Any>(steps: [stepOne, stepTwo]).onFinish { (state) in
             guard case .finished(_) = state else { XCTFail(); return }
             expectationOne.fulfill()
-        }.start()
+            }.start()
 
         waitForExpectations(timeout: 0.5, handler: nil)
 
         let expectationTwo = self.expectation(description: name ?? "Test")
 
-        Waterfall<Any>(steps: stepOne, stepTwo).onFinish { (state) in
+        Sequential<Any>(steps: stepOne, stepTwo).onFinish { (state) in
             guard case .finished(_) = state else { XCTFail(); return }
             expectationTwo.fulfill()
-        }.start()
+            }.start()
 
         waitForExpectations(timeout: 0.5, handler: nil)
     }
 
-    func testResultsAreWaterfall() {
+    func testResultsAreSequential() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let stepOne = Step.waterfall { flowController, previousResult in
+        let stepOne = Step.sequential { flowController, previousResult in
             print("previous result is \(previousResult)")
             XCTAssertNil(previousResult)
             flowController.finish(1)
         }
 
-        let stepTwo = Step.waterfall { flowController, previousResult in
-            let previous = previousResult as? [Int]
-            XCTAssertEqual(previous ?? [], [1])
+        let stepTwo = Step.sequential { flowController, previousResult in
+            XCTAssertEqual(previousResult as? Int, 1)
             flowController.finish(2)
         }
 
-        Waterfall<[Int]>(steps: stepOne, stepTwo).onFinish { (state) in
+        let stepThree = Step.sequential { flowController, previousResult in
+            XCTAssertEqual(previousResult as? Int, 2)
+            flowController.finish(3)
+        }
+
+        Sequential<Int>(steps: stepOne, stepTwo, stepThree).onFinish { (state) in
             guard case .finished(_) = state else { XCTFail(); return }
-            let previous = state.value
-            XCTAssert([1, 2] == previous ?? [])
+            XCTAssert(3 == state.value)
             expectation.fulfill()
-        }.start()
+            }.start()
 
         waitForExpectations(timeout: 0.5, handler: nil)
     }

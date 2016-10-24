@@ -24,7 +24,9 @@
 
 import Foundation
 
-public protocol FlowController {
-    func finish<T>(_ result: T)
+public protocol FlowControl {
+    func finish<R>(_ result: R)
     func finish(_ error: Error)
 }
+
+public protocol FlowHandler: StepFlow, FlowControl {}

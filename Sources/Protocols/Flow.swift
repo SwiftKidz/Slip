@@ -24,17 +24,20 @@
 
 import Foundation
 
-public final class Waterfall<T>: SerialFlow<T> {
+public protocol Flow {
+    associatedtype T
 
-    public init(steps: [Step]) {
-        let processBlock: CurrentStateResultBlock = { previousResult, newResult in
-            guard let previous = previousResult as? [Any] else { return [newResult] }
-            return previous + [newResult]
-        }
-        super.init(steps: steps, process: processBlock, passToNext: { (current, _) in current })
-    }
+    var state: FlowState<T> { get }
 
-    public convenience init(steps: Step...) {
-        self.init(steps: steps)
-    }
+    typealias FinishBlock = (FlowState<T>) -> ()
+    typealias ErrorBlock = (Error) -> ()
+    typealias CancelBlock = () -> ()
+    typealias CodeBlock = (FlowControl, Any?) -> ()
+
+    func onFinish(_ block: @escaping FinishBlock) -> Self
+    func onError(_ block: @escaping ErrorBlock) -> Self
+    func onCancel(_ block: @escaping CancelBlock) -> Self
+
+    func start()
+    func cancel()
 }

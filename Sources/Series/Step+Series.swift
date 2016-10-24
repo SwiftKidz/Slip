@@ -22,41 +22,13 @@
  SOFTWARE.
  */
 
-import XCTest
-import Slip
+import Foundation
 
-struct MockFlow: FlowController {
+extension Step {
 
-    func finish(_ error: Error) {
-
-    }
-
-    func finish<T>(_ result: T) {
-
-    }
-
-}
-
-class StepTests: XCTestCase {
-
-    func testStepOnCallingThread() {
-        let expectation = self.expectation(description: name ?? "Test")
-        let step = Step { (stepFlow, result) -> (Void) in
-            XCTAssertNil(result)
-            expectation.fulfill()
+    static public func series(onBackgroundThread: Bool = false, closure: @escaping CodeBlockNoPreviousResult) -> Step {
+        return Step(onBackgroundThread: onBackgroundThread) { (flowController, _) in
+            closure(flowController)
         }
-        step.runStep(flowController: MockFlow(), previousResult: nil)
-        waitForExpectations(timeout: 0.5, handler: nil)
     }
-
-    func testStepOnBackgroundThread() {
-        let expectation = self.expectation(description: name ?? "Test")
-        let step = Step(onBackgroundThread: true) { (stepFlow, result) -> (Void) in
-            XCTAssertNil(result)
-            expectation.fulfill()
-        }
-        step.runStep(flowController: MockFlow(), previousResult: nil)
-        waitForExpectations(timeout: 0.5, handler: nil)
-    }
-
 }

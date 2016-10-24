@@ -24,17 +24,15 @@
 
 import Foundation
 
-public final class Waterfall<T>: SerialFlow<T> {
+public final class Whilst<T>: TestFlow<T> {
 
-    public init(steps: [Step]) {
-        let processBlock: CurrentStateResultBlock = { previousResult, newResult in
-            guard let previous = previousResult as? [Any] else { return [newResult] }
-            return previous + [newResult]
-        }
-        super.init(steps: steps, process: processBlock, passToNext: { (current, _) in current })
-    }
+    public typealias RunBlock = (FlowControl) -> ()
+    public typealias TestBlock = (T?) -> (Bool)
 
-    public convenience init(steps: Step...) {
-        self.init(steps: steps)
+    public init(onBackgroundThread: Bool = true, test: @escaping TestBlock, run: @escaping RunBlock) {
+        super.init(onBackgroundThread: onBackgroundThread, whenToRunTest: { state in
+                    guard case .running(_) = state else { return false }
+                    return true
+                }, test: test, run: run)
     }
 }

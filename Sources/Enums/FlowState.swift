@@ -24,23 +24,45 @@
 
 import Foundation
 
-public final class Step {
+public enum FlowState<R> {
+    case queued
+    case running(R?)
+    case canceled
+    case failed(Error)
+    case finished(R?)
 
-    public typealias CodeBlock = (FlowController, Any?) -> ()
-    private let codeClosure: CodeBlock
-    private let runOnBackgroundThread: Bool
-
-    public init(onBackgroundThread: Bool = false, closure: @escaping CodeBlock) {
-        runOnBackgroundThread = onBackgroundThread
-        codeClosure = closure
-    }
-
-    public func runStep(flowController: FlowController, previousResult: Any?) {
-        guard runOnBackgroundThread else { codeClosure(flowController, previousResult); return }
-
-        DispatchQueue.global(qos: DispatchQoS.QoSClass.utility).async {
-            self.codeClosure(flowController, previousResult)
+    public var value: R? {
+        switch self {
+        case .running(let r):
+            return r ?? nil
+        case .finished(let r):
+            return r ?? nil
+        default:
+            return nil
         }
     }
 
+    public var error: Error? {
+        switch self {
+        case .failed(let e):
+            return e
+        default:
+            return nil
+        }
+    }
+
+    func convertType<T>() -> FlowState<T> {
+        switch self {
+        case .queued:
+            return FlowState<T>.queued
+        case .canceled:
+            return FlowState<T>.canceled
+        case .failed(let e):
+            return FlowState<T>.failed(e)
+        case .running(let r):
+            return FlowState<T>.running(r as? T)
+        case .finished(let f):
+            return FlowState<T>.finished(f as? T)
+        }
+    }
 }

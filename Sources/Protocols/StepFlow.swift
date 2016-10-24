@@ -24,17 +24,9 @@
 
 import Foundation
 
-public final class Waterfall<T>: SerialFlow<T> {
+public protocol StepFlow: Flow {
 
-    public init(steps: [Step]) {
-        let processBlock: CurrentStateResultBlock = { previousResult, newResult in
-            guard let previous = previousResult as? [Any] else { return [newResult] }
-            return previous + [newResult]
-        }
-        super.init(steps: steps, process: processBlock, passToNext: { (current, _) in current })
-    }
+    typealias CodeBlock = (FlowControl, Any?) -> ()
+    func step(onBackgroundThread: Bool, closure: @escaping CodeBlock) -> Self
 
-    public convenience init(steps: Step...) {
-        self.init(steps: steps)
-    }
 }

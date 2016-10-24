@@ -24,17 +24,22 @@
 
 import Foundation
 
-public final class Waterfall<T>: SerialFlow<T> {
+public final class Step {
+    public typealias CodeBlock = (FlowControl, Any?) -> ()
+    public typealias CodeBlockNoPreviousResult = (FlowControl) -> ()
+    internal let codeClosure: CodeBlock
+    internal let runOnBackgroundThread: Bool
 
-    public init(steps: [Step]) {
-        let processBlock: CurrentStateResultBlock = { previousResult, newResult in
-            guard let previous = previousResult as? [Any] else { return [newResult] }
-            return previous + [newResult]
-        }
-        super.init(steps: steps, process: processBlock, passToNext: { (current, _) in current })
+    internal init(onBackgroundThread: Bool = false, closure: @escaping CodeBlock) {
+        runOnBackgroundThread = onBackgroundThread
+        codeClosure = closure
     }
 
-    public convenience init(steps: Step...) {
-        self.init(steps: steps)
+    internal func runStep(flowController: FlowControl, previousResult: Any?) {
+        guard runOnBackgroundThread else { codeClosure(flowController, previousResult); return }
+
+        DispatchQueue.global(qos: DispatchQoS.QoSClass.utility).async {
+            self.codeClosure(flowController, previousResult)
+        }
     }
 }
