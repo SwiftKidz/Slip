@@ -77,7 +77,8 @@ extension SerialFlow {
         }
         set {
             syncQueue.sync(flags: .barrier) {
-                self.currentInternalState = newValue            }
+                self.currentInternalState = newValue
+            }
         }
     }
 

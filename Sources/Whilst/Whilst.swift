@@ -35,11 +35,7 @@ public final class Whilst<T> {
     fileprivate var finishBlock: FinishBlock
     fileprivate var errorBlock: ErrorBlock?
     fileprivate var cancelBlock: CancelBlock?
-    fileprivate var currentInternalState: FlowState<Any> {
-        didSet {
-           stateChanged()
-        }
-    }
+    fileprivate var currentInternalState: FlowState<Any>
 
     fileprivate var runBlock: RunBlock
     fileprivate var testBlock: TestBlock
@@ -47,8 +43,8 @@ public final class Whilst<T> {
     fileprivate var backgroundThread: Bool
 
     fileprivate let syncQueue = DispatchQueue(label: "com.slip.flow.syncQueue", attributes: DispatchQueue.Attributes.concurrent)
-    
-    public init(onBackgroundThread: Bool = false, test: @escaping TestBlock, run: @escaping RunBlock) {
+
+    public init(onBackgroundThread: Bool = true, test: @escaping TestBlock, run: @escaping RunBlock) {
         runBlock = run
         testBlock = test
         finishBlock = { _ in }
@@ -58,7 +54,7 @@ public final class Whilst<T> {
 }
 
 extension Whilst {
-    
+
     fileprivate var internalState: FlowState<Any> {
         get {
             var val: FlowState<Any>!
@@ -71,15 +67,16 @@ extension Whilst {
             syncQueue.sync(flags: .barrier) {
                 self.currentInternalState = newValue
             }
+            stateChanged()
         }
     }
 
     public var state: FlowState<T> {
-        return currentInternalState.convertType()
+        return internalState.convertType()
     }
 
     internal func stateChanged() {
-        switch currentInternalState {
+        switch internalState {
         case .running:
             run()
         case .canceled:
@@ -88,8 +85,8 @@ extension Whilst {
             failed()
         case .finished:
             finished()
-        default:
-            break
+        case .queued:
+            print("Flow is in queue state")
         }
     }
 }
@@ -97,19 +94,19 @@ extension Whilst {
 extension Whilst {
 
     public func onFinish(_ block: @escaping FinishBlock) -> Self {
-        guard case .queued = currentInternalState else { print("Cannot modify flow after starting") ; return self }
+        guard case .queued = internalState else { print("Cannot modify flow after starting") ; return self }
         finishBlock = block
         return self
     }
 
     public func onError(_ block: @escaping ErrorBlock) -> Self {
-        guard case .queued = currentInternalState else { print("Cannot modify flow after starting") ; return self }
+        guard case .queued = internalState else { print("Cannot modify flow after starting") ; return self }
         errorBlock = block
         return self
     }
 
     public func onCancel(_ block: @escaping CancelBlock) -> Self {
-        guard case .queued = currentInternalState else { print("Cannot modify flow after starting") ; return self }
+        guard case .queued = internalState else { print("Cannot modify flow after starting") ; return self }
         cancelBlock = block
         return self
     }
@@ -118,20 +115,20 @@ extension Whilst {
 extension Whilst {
 
     public func start() {
-        guard case .queued = currentInternalState else { print("Cannot start flow twice") ; return }
-        currentInternalState = .running(nil)
+        guard case .queued = internalState else { print("Cannot start flow twice") ; return }
+        internalState = .running(nil)
     }
 
     public func cancel() {
-        currentInternalState = .canceled
+        internalState = .canceled
     }
 }
 
 extension Whilst {
 
     fileprivate func run() {
-        guard case .running(_) = currentInternalState else { return }
-        guard testBlock(state.value) else { currentInternalState = .finished(state.value); return }
+        guard case .running(_) = internalState else { return }
+        guard verifyTest() else { internalState = .finished(state.value); return }
 
         guard backgroundThread else { runBlock(self); return }
         DispatchQueue.global(qos: DispatchQoS.QoSClass.utility).async {
@@ -167,28 +164,32 @@ extension Whilst {
     }
 
     fileprivate func finished() {
+        guard !verifyTest() else { internalState = .running(state.value); return }
         DispatchQueue.main.async {
             self.finishBlock(self.state)
         }
     }
 
+    private func verifyTest() -> Bool {
+        return testBlock(state.value)
+    }
 }
 
 extension Whilst: FlowControl {
 
     public func finish<R>(_ result: R) {
-        guard case .running = currentInternalState else {
-            print("Step finished but flow will be interrupted due to internalState being : \(currentInternalState) ")
+        guard case .running = internalState else {
+            print("Step finished but flow will be interrupted due to internalState being : \(internalState) ")
             return
         }
-        currentInternalState = .running(result)
+        internalState = .finished(result)
     }
 
     public func finish(_ error: Error) {
-        guard case .running = currentInternalState else {
-            print("Step finished but flow will be interrupted due to internalState being : \(currentInternalState) ")
+        guard case .running = internalState else {
+            print("Step finished but flow will be interrupted due to internalState being : \(internalState) ")
             return
         }
-        currentInternalState = .failed(error)
+        internalState = .failed(error)
     }
 }

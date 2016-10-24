@@ -32,8 +32,8 @@ class WhilstTests: XCTestCase {
 
         var count: Int = 0
 
-        Whilst<Int>(test: { previous in
-            print("preivous result \(previous)")
+        Whilst<Int>(onBackgroundThread: false, test: { previous in
+            print("previous result \(previous)")
             guard let n = previous, n > 5 else { return true }
             return false
         }) { controler in
@@ -103,13 +103,126 @@ class WhilstTests: XCTestCase {
         }
 
         flow.start()
+        flow.cancel()
+
+        waitForExpectations(timeout: 5, handler: nil)
+
+        let expectationNoCancelBlock = self.expectation(description: name ?? "Test")
+
+        let flow2 = Whilst<Int>(onBackgroundThread: true,
+                               test: { previous in
+                                print("preivous result \(previous)")
+                                guard let n = previous, n > 5 else { return true }
+                                return false
+        }) { controler in
+            count += 1
+            sleep(1)
+            controler.finish(1)
+            }.onFinish { state in
+                expectationNoCancelBlock.fulfill()
+        }
+
+        flow2.start()
+        flow2.cancel()
+        flow2.start()
+
+        waitForExpectations(timeout: 5, handler: nil)
+    }
+
+    func testWhilstModifyBlocksAfterStartAndNoFinishBlock() {
+        let expectation = self.expectation(description: name ?? "Test")
+
+        var count: Int = 0
+
+        let flow = Whilst<Int>(test: { previous in
+                    print("preivous result \(previous)")
+                    guard let n = previous, n > 5 else { return true }
+                    return false
+            }) { controler in
+                count += 1
+                sleep(1)
+                controler.finish(MockErrors.errorOnFlow)
+            }.onCancel {
+                expectation.fulfill()
+        }
+
+        flow.start()
+        _ = flow.onCancel {
+            XCTFail("Should not be able to change state blocks after starting")
+        }.onError { _ in
+            XCTFail("Should not be able to change state blocks after starting")
+        }.onFinish { _ in
+            XCTFail("Should not be able to change state blocks after starting")
+        }
         sleep(1)
         flow.cancel()
         waitForExpectations(timeout: 0.5, handler: nil)
     }
 
+    func testWhilstFinishOnlyOnce() {
+        let expectation = self.expectation(description: name ?? "Test")
 
+        var count = 0
 
+        let flow = Whilst<Int>(onBackgroundThread: true,
+                                test: { previous in
+                                    print("preivous result \(previous)")
+                                    guard let n = previous, n > 5 else { return true }
+                                    return false
+        }) { controler in
+            count = 6
+            controler.finish(count)
+            controler.finish(MockErrors.errorOnFlow)
+        }.onFinish { state in
+                expectation.fulfill()
+        }.onError { _ in
+                XCTFail("Should not be called the error block")
+        }
+
+        flow.start()
+
+        waitForExpectations(timeout: 5, handler: nil)
+
+        let expectation2 = self.expectation(description: name ?? "Test")
+
+        let flow2 = Whilst<Int>(onBackgroundThread: true,
+                               test: { previous in
+                                print("preivous result \(previous)")
+                                guard let n = previous, n > 5 else { return true }
+                                return false
+        }) { controler in
+            count += 1
+            sleep(1)
+            controler.finish(MockErrors.errorOnFlow)
+            controler.finish(1)
+        }.onFinish { state in
+                XCTFail("Should not be called the finish block")
+        }.onError { _ in
+                expectation2.fulfill()
+        }
+
+        flow2.start()
+
+        waitForExpectations(timeout: 5, handler: nil)
+    }
+
+    func testWhilstAlwaysFalseTest() {
+        let expectation = self.expectation(description: name ?? "Test")
+
+        var count: Int = 0
+
+        let flow = Whilst<Int>(test: { _ in false }) { controler in
+            count += 1
+            print(count)
+            controler.finish(1)
+        }.onCancel {
+            expectation.fulfill()
+        }
+
+        flow.start()
+        flow.cancel()
+        waitForExpectations(timeout: 0.5, handler: nil)
+    }
 
 
 }
