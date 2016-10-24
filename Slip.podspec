@@ -9,6 +9,6 @@ Pod::Spec.new do |s|
  s.source = { :git => "https://github.com/SwiftKidz/Slip.git", :tag => s.version.to_s }
  s.platforms     = { :ios => "8.0", :osx => "10.10", :tvos => "9.0", :watchos => "2.0" }
  s.requires_arc = true
- s.source_files  = "Sources/*"
+ s.source_files  = "Sources/*/*.swift"
  s.module_name = 'Slip'
 end
