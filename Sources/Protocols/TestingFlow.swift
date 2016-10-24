@@ -24,15 +24,9 @@
 
 import Foundation
 
-public final class Whilst<T>: TestFlow<T> {
+public protocol TestingFlow: Flow {
 
-    public typealias RunBlock = (FlowControl) -> ()
-    public typealias TestBlock = (T?) -> (Bool)
+    typealias RunBlock = (FlowControl) -> ()
+    typealias TestBlock = (T?) -> (Bool)
 
-    public init(onBackgroundThread: Bool = true, test: @escaping TestBlock, run: @escaping RunBlock) {
-        super.init(onBackgroundThread: onBackgroundThread, whenToRunTest: { state in
-                    guard case .running(_) = state else { return false }
-                    return true
-                }, test: test, run: run)
-    }
 }
