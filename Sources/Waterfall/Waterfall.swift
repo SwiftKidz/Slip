@@ -38,19 +38,3 @@ public final class Waterfall<T>: SerialFlow<T> {
         self.init(steps: steps)
     }
 }
-
-//public protocol Waterfall: FlowHandler {}
-//extension SerialFlow: Waterfall {}
-//
-//public func waterfall(steps: [Step]) -> Waterfall {
-//    //let processBlock: ProcessEachResultBlock = { _, newResult in return newResult }
-//    let processBlock: CurrentStateResultBlock = { previousResult, newResult in
-//        guard let previous = previousResult as? [Any] else { return [newResult] }
-//        return previous + [newResult]
-//    }
-//    return SerialFlow(steps: steps, process: processBlock, passToNext: { (current, _) in current })
-//}
-//
-//public func waterfall(steps: Step...) -> Waterfall {
-//    return waterfall(steps: steps)
-//}

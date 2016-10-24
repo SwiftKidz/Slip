@@ -24,9 +24,20 @@
 
 import Foundation
 
-public protocol StepFlow: Flow {
+public protocol Flow {
+    associatedtype T
 
+    var state: FlowState<T> { get }
+
+    typealias FinishBlock = (FlowState<T>) -> ()
+    typealias ErrorBlock = (Error) -> ()
+    typealias CancelBlock = () -> ()
     typealias CodeBlock = (FlowControl, Any?) -> ()
-    func step(onBackgroundThread: Bool, closure: @escaping CodeBlock) -> Self
 
+    func onFinish(_ block: @escaping FinishBlock) -> Self
+    func onError(_ block: @escaping ErrorBlock) -> Self
+    func onCancel(_ block: @escaping CancelBlock) -> Self
+
+    func start()
+    func cancel()
 }

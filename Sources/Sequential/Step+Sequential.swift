@@ -24,9 +24,9 @@
 
 import Foundation
 
-public protocol StepFlow: Flow {
+extension Step {
 
-    typealias CodeBlock = (FlowControl, Any?) -> ()
-    func step(onBackgroundThread: Bool, closure: @escaping CodeBlock) -> Self
-
+    static public func sequential(onBackgroundThread: Bool = false, closure: @escaping CodeBlock) -> Step {
+        return Step(onBackgroundThread: onBackgroundThread, closure: closure)
+    }
 }

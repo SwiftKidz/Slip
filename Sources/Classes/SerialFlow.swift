@@ -32,7 +32,7 @@ internal class SerialFlow<T>: StepFlow {
     typealias ErrorBlock = (Error) -> ()
     typealias CancelBlock = () -> ()
 
-    fileprivate let syncQueue = DispatchQueue(label: "com.slip.flow.series.syncQueue", attributes: DispatchQueue.Attributes.concurrent)
+    fileprivate let syncQueue = DispatchQueue(label: "com.slip.flow.syncQueue", attributes: DispatchQueue.Attributes.concurrent)
     fileprivate var steps: [Step]
     fileprivate var finishBlock: FinishBlock
     fileprivate var errorBlock: ErrorBlock?
@@ -50,7 +50,7 @@ internal class SerialFlow<T>: StepFlow {
     }
 
     deinit {
-        print("Will De Init Waterfall Flow Object")
+        print("Will De Init Flow Object")
     }
 }
 

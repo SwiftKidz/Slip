@@ -24,9 +24,14 @@
 
 import Foundation
 
-public protocol StepFlow: Flow {
+public final class Sequential<T>: SerialFlow<T> {
 
-    typealias CodeBlock = (FlowControl, Any?) -> ()
-    func step(onBackgroundThread: Bool, closure: @escaping CodeBlock) -> Self
+    public init(steps: [Step]) {
+        let processBlock: CurrentStateResultBlock = { _, newResult in return newResult }
+        super.init(steps: steps, process: processBlock, passToNext: { (current, _) in current })
+    }
 
+    public convenience init(steps: Step...) {
+        self.init(steps: steps)
+    }
 }
