@@ -23,18 +23,13 @@
  */
 
 import Foundation
-import Slip
 
-struct MockFlow: FlowControl {
+public protocol TestHandler {
 
-    func finish(_ error: Error) {
+    typealias RunBlock = (FlowControl) -> ()
+    typealias TestBlock = (TestHandler) -> ()
 
-    }
-    func finish<T>(_ result: T) {
+    func testComplete(success: Bool, error: Error?)
+    var lastRunResult: Any { get }
 
-    }
-}
-
-enum MockErrors: Error {
-    case errorOnFlow, errorOnTest
 }

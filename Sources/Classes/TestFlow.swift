@@ -24,10 +24,10 @@
 
 import Foundation
 
-internal class TestFlow<T>: TestingFlow {
+internal class TestFlow<T>: Flow {
 
     typealias RunBlock = (FlowControl) -> ()
-    typealias TestBlock = (T?) -> (Bool)
+    typealias TestBlock = (TestHandler) -> ()
     typealias FinishBlock = (FlowState<T>) -> ()
     typealias ErrorBlock = (Error) -> ()
     typealias CancelBlock = () -> ()
@@ -43,6 +43,7 @@ internal class TestFlow<T>: TestingFlow {
 
     fileprivate var runBlock: RunBlock
     fileprivate var testBlock: TestBlock
+    fileprivate var runAfterTest: (() -> ())?
 
     fileprivate var backgroundThread: Bool
 
@@ -55,16 +56,17 @@ internal class TestFlow<T>: TestingFlow {
         runBlock = run
         testBlock = test
         finishBlock = { _ in }
-        currentInternalState = .queued
         backgroundThread = onBackgroundThread
         shouldRunTestBlock = whenToRunTest
         testResult = true
+        currentInternalState = .queued
+        stateChanged()
     }
 }
 
 extension TestFlow {
 
-    private var testLastResult: Bool {
+    fileprivate var testLastResult: Bool {
         get {
             var result: Bool!
             syncQueue.sync(flags: .barrier) {
@@ -79,12 +81,29 @@ extension TestFlow {
         }
     }
 
-    func runTest() {
-        testLastResult = filterTestResult(testBlock(state.value))
+    func runTest(whenCompletedDo: @escaping ()->()) {
+        runAfterTest = whenCompletedDo
+        testBlock(self)
     }
 
     fileprivate var shouldBreakExecution: Bool {
         return !testLastResult
+    }
+}
+
+extension TestFlow: TestHandler {
+
+    var lastRunResult: Any {
+        return state.value
+    }
+
+    func testComplete(success: Bool, error: Error?) {
+        guard error == nil else {
+            finish(error!)
+            return
+        }
+        testLastResult = filterTestResult(success)
+        runAfterTest?()
     }
 }
 
@@ -113,13 +132,13 @@ extension TestFlow {
     internal func stateChanged() {
         switch internalState {
         case .running:
-            run()
+            verifyTest(runClosure: run)
         case .canceled:
             canceled()
         case .failed:
             failed()
         case .finished:
-            finished()
+            verifyTest(runClosure: finished)
         case .queued:
             print("Flow is in queue state")
         }
@@ -162,7 +181,6 @@ extension TestFlow {
 extension TestFlow {
 
     fileprivate func run() {
-        verifyTest()
         guard !shouldBreakExecution else { internalState = .finished(state.value); return }
 
         guard backgroundThread else { runBlock(self); return }
@@ -199,16 +217,15 @@ extension TestFlow {
     }
 
     fileprivate func finished() {
-        verifyTest()
         guard shouldBreakExecution else { internalState = .running(state.value); return }
         DispatchQueue.main.async {
             self.finishBlock(self.state)
         }
     }
 
-    private func verifyTest() {
-        guard shouldRunTestBlock(state) else { return }
-        runTest()
+    func verifyTest(runClosure: @escaping ()->()) {
+        guard shouldRunTestBlock(state) else { runClosure(); return }
+        runTest(whenCompletedDo: runClosure)
     }
 }
 

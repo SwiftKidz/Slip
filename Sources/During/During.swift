@@ -23,18 +23,16 @@
  */
 
 import Foundation
-import Slip
 
-struct MockFlow: FlowControl {
+public final class During<T>: TestFlow<T> {
 
-    func finish(_ error: Error) {
+    public typealias RunBlock = (FlowControl) -> ()
+    public typealias TestingBlock = (TestHandler) -> ()
 
+    public init(onBackgroundThread: Bool = true, test: @escaping TestingBlock, run: @escaping RunBlock) {
+        super.init(onBackgroundThread: onBackgroundThread, whenToRunTest: { state in
+            guard case .running(_) = state else { return false }
+            return true
+        }, test: test, run: run)
     }
-    func finish<T>(_ result: T) {
-
-    }
-}
-
-enum MockErrors: Error {
-    case errorOnFlow, errorOnTest
 }

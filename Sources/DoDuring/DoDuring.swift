@@ -24,9 +24,15 @@
 
 import Foundation
 
-public protocol TestingFlow: Flow {
+public final class DoDuring<T>: TestFlow<T> {
 
-    typealias RunBlock = (FlowControl) -> ()
-    typealias TestBlock = (T?) -> (Bool)
+    public typealias RunBlock = (FlowControl) -> ()
+    public typealias TestingBlock = (TestHandler) -> ()
 
+    public init(onBackgroundThread: Bool = true, run: @escaping RunBlock, test: @escaping TestingBlock) {
+        super.init(onBackgroundThread: onBackgroundThread, whenToRunTest: { state in
+            guard case .finished(_) = state else { return false }
+            return true
+            }, test: test, run: run)
+    }
 }

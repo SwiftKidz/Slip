@@ -27,12 +27,14 @@ import Foundation
 public final class Whilst<T>: TestFlow<T> {
 
     public typealias RunBlock = (FlowControl) -> ()
-    public typealias TestBlock = (T?) -> (Bool)
+    public typealias TestingBlock = (T?) -> (Bool)
 
-    public init(onBackgroundThread: Bool = true, test: @escaping TestBlock, run: @escaping RunBlock) {
+    public init(onBackgroundThread: Bool = true, test: @escaping TestingBlock, run: @escaping RunBlock) {
         super.init(onBackgroundThread: onBackgroundThread, whenToRunTest: { state in
                     guard case .running(_) = state else { return false }
                     return true
-                }, test: test, run: run)
+            }, test: { testHandler in
+                testHandler.testComplete(success: test(testHandler.lastRunResult as? T), error: nil)
+            }, run: run)
     }
 }

@@ -147,7 +147,7 @@ extension SerialFlow: FlowControl {
             print("Step finished but flow will be interrupted due to internalState being : \(internalState) ")
             return
         }
-        let nextResult = processResult(internalState.value, result) ?? nil // Result is either Any or nil
+        let nextResult = processResult(internalState.value, result)
         guard !steps.isEmpty else {
             internalState = .finished(nextResult)
             DispatchQueue.main.async {
