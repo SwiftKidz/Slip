@@ -259,20 +259,66 @@ class TestFlowTests: XCTestCase {
 
         var count: Int = 0
 
-        let flow = TestFlow<Int>(whenToRunTest: { state in
-            guard case .running(_) = state else { return true }
-            return false
-        }, test: { handler in handler.testComplete(success: false, error: nil) }) { controler in
+        let flow = TestFlow<Int>(onBackgroundThread: true) { controler in
             count += 1
             print(count)
             controler.finish(1)
-            }.onCancel {
-                expectation.fulfill()
+        }.whenToRun { state in
+            guard case .running(_) = state else { return true }
+            return false
+        }.onTest { handler in
+            handler.testComplete(success: false, error: nil)
+        }.onCancel {
+            expectation.fulfill()
         }
 
         flow.start()
-        flow.cancel()
+        DispatchQueue.global().asyncAfter(deadline: .now() + 1.0) {
+            flow.cancel()
+        }
+        waitForExpectations(timeout: 2.5, handler: nil)
+    }
+
+    func testTestFlowAlwaysTrueTest() {
+        let expectation = self.expectation(description: name ?? "Test")
+
+        var count: Int = 0
+
+        let flow = TestFlow<Int>(onBackgroundThread: false).whenToRun { state in
+            guard case .running(_) = state else { return true }
+            return false
+        }.onRun { controler in
+            guard count < 5 else { controler.finish(MockErrors.errorOnFlow); return }
+            count += 1
+            controler.finish(count)
+        }.onError { _ in
+            expectation.fulfill()
+        }
+        flow.start()
         waitForExpectations(timeout: 0.5, handler: nil)
+    }
+
+    func testTestFlowNoParametersTest() {
+        let expectation = self.expectation(description: name ?? "Test")
+
+        let flow = TestFlow<Int>().onCancel {
+            expectation.fulfill()
+        }
+
+        flow.start()
+
+        _ = flow.whenToRun { state in
+            XCTFail()
+            return false
+        }.onTest { handler in
+            XCTFail()
+        }.onRun { controler in
+            XCTFail()
+        }
+        DispatchQueue.global().asyncAfter(deadline: .now() + 1.0) {
+           flow.cancel()
+        }
+        waitForExpectations(timeout: 5.0, handler: nil)
     }
 
     func testTestFlowNoFinishBlock() {
@@ -289,6 +335,7 @@ class TestFlowTests: XCTestCase {
             expectation.fulfill()
         }
         flow.start()
+
         waitForExpectations(timeout: 0.5, handler: nil)
 
     }

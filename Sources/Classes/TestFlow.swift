@@ -24,7 +24,7 @@
 
 import Foundation
 
-internal class TestFlow<T>: Flow {
+internal class TestFlow<T>: TestingFlow {
 
     typealias RunBlock = (FlowControl) -> ()
     typealias TestBlock = (TestHandler) -> ()
@@ -52,12 +52,24 @@ internal class TestFlow<T>: Flow {
 
     fileprivate let syncQueue = DispatchQueue(label: "com.slip.flow.syncQueue", attributes: DispatchQueue.Attributes.concurrent)
 
-    public init(onBackgroundThread: Bool = true, whenToRunTest: @escaping ConditionTestBlock, test: @escaping TestBlock, run: @escaping RunBlock) {
+    init(onBackgroundThread: Bool = true, whenToRunTest: @escaping ConditionTestBlock, test: @escaping TestBlock, run: @escaping RunBlock) {
         runBlock = run
         testBlock = test
         finishBlock = { _ in }
         backgroundThread = onBackgroundThread
         shouldRunTestBlock = whenToRunTest
+        testResult = true
+        currentInternalState = .queued
+        stateChanged()
+    }
+
+    init(onBackgroundThread: Bool = true,
+                     run: @escaping RunBlock = { $0.finish() }) {
+        runBlock = run
+        testBlock = { $0.testComplete(success: true, error: nil) }
+        finishBlock = { _ in }
+        backgroundThread = onBackgroundThread
+        shouldRunTestBlock = { $0 == FlowState.queued }
         testResult = true
         currentInternalState = .queued
         stateChanged()
@@ -132,7 +144,7 @@ extension TestFlow {
     internal func stateChanged() {
         switch internalState {
         case .running:
-            verifyTest(runClosure: run)
+            verifyTest(runClosure: running)
         case .canceled:
             canceled()
         case .failed:
@@ -143,6 +155,28 @@ extension TestFlow {
             print("Flow is in queue state")
         }
     }
+}
+
+extension TestFlow {
+
+    public func onRun(_ block: @escaping RunBlock) -> Self {
+        guard case .queued = internalState else { print("Cannot modify flow after starting") ; return self }
+        runBlock = block
+        return self
+    }
+
+    public func onTest(_ block: @escaping TestBlock) -> Self {
+        guard case .queued = internalState else { print("Cannot modify flow after starting") ; return self }
+        testBlock = block
+        return self
+    }
+
+    internal func whenToRun(_ block: @escaping ConditionTestBlock) -> Self {
+        guard case .queued = internalState else { print("Cannot modify flow after starting") ; return self }
+        shouldRunTestBlock = block
+        return self
+    }
+
 }
 
 extension TestFlow {
@@ -180,7 +214,7 @@ extension TestFlow {
 
 extension TestFlow {
 
-    fileprivate func run() {
+    fileprivate func running() {
         guard !shouldBreakExecution else { internalState = .finished(state.value); return }
 
         guard backgroundThread else { runBlock(self); return }

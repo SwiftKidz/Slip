@@ -66,3 +66,16 @@ public enum FlowState<R> {
         }
     }
 }
+
+extension FlowState: Equatable {
+    public static func==(lhs: FlowState, rhs: FlowState) -> Bool {
+        switch (lhs, rhs) {
+        case (.queued, .queued): return true
+        case (.canceled, .canceled): return true
+        case (.failed, .failed): return true
+        case (.running, .running): return true
+        case (.finished, .finished): return true
+        default: return false
+        }
+    }
+}
