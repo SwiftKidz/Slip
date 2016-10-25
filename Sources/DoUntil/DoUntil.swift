@@ -23,18 +23,22 @@
  */
 
 import Foundation
-import Slip
 
-struct MockFlow: FlowControl {
+public final class DoUntil<T>: TestFlow<T> {
 
-    func finish(_ error: Error) {
+    public typealias RunBlock = (FlowControl) -> ()
+    public typealias TestingBlock = (T?) -> (Bool)
 
+    public init(onBackgroundThread: Bool = true, run: @escaping RunBlock, test: @escaping TestingBlock) {
+        super.init(onBackgroundThread: onBackgroundThread,
+                   whenToRunTest: { state in
+                guard case .finished(_) = state else { return false }
+                return true
+            }, test: { testHandler in
+                testHandler.testComplete(success: test(testHandler.lastRunResult as? T), error: nil)
+            }, run: run)
+
+        filterTestResult = { !$0 }
+        testResult = true
     }
-    func finish<T>(_ result: T) {
-
-    }
-}
-
-enum MockErrors: Error {
-    case errorOnFlow, errorOnTest
 }

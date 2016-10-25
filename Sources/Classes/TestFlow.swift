@@ -43,7 +43,7 @@ internal class TestFlow<T>: Flow {
 
     fileprivate var runBlock: RunBlock
     fileprivate var testBlock: TestBlock
-    fileprivate var runAfterTest: () -> ()
+    fileprivate var runAfterTest: (() -> ())?
 
     fileprivate var backgroundThread: Bool
 
@@ -56,11 +56,11 @@ internal class TestFlow<T>: Flow {
         runBlock = run
         testBlock = test
         finishBlock = { _ in }
-        currentInternalState = .queued
         backgroundThread = onBackgroundThread
         shouldRunTestBlock = whenToRunTest
         testResult = true
-        runAfterTest = {}
+        currentInternalState = .queued
+        stateChanged()
     }
 }
 
@@ -103,7 +103,7 @@ extension TestFlow: TestHandler {
             return
         }
         testLastResult = filterTestResult(success)
-        runAfterTest()
+        runAfterTest?()
     }
 }
 

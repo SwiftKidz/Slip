@@ -50,6 +50,28 @@ class TestFlowTests: XCTestCase {
         waitForExpectations(timeout: 0.5, handler: nil)
     }
 
+    func testTestFlowAsyncTestFailsWithError() {
+        let expectation = self.expectation(description: name ?? "Test")
+
+        var count: Int = 0
+
+        TestFlow<Int>(onBackgroundThread: false, whenToRunTest: { state in
+            guard case .running(_) = state else { return false }
+            return true
+        }, test: { testHandler in
+            testHandler.testComplete(success: false, error: MockErrors.errorOnTest)
+        }) { controler in
+            count += 1
+            controler.finish(count)
+        }.onFinish { state in
+            expectation.fulfill()
+            XCTAssertNil(state.value)
+            XCTAssertNotNil(state.error)
+        }.start()
+
+        waitForExpectations(timeout: 0.5, handler: nil)
+    }
+
     func testTestFlowEndWithError() {
         let expectation = self.expectation(description: name ?? "Test")
 

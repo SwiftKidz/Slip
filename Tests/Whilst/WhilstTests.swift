@@ -23,6 +23,7 @@
  */
 
 import XCTest
+
 @testable import Slip
 
 class WhilstTests: XCTestCase {

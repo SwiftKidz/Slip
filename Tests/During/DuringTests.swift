@@ -26,33 +26,38 @@ import XCTest
 
 import Slip
 
-class UntilTests: XCTestCase {
+class DuringTests: XCTestCase {
 
-    func testUntilFunctionality() {
+    func testDuringFunctionality() {
         let expectationRun = self.expectation(description: name ?? "Test")
 
         var count: Int = 0
 
-        Until<Int>(test: { previous in
-            guard count > 5 else { return false }
-            return true
+        During<Int>(test: { testHandler in
+            DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
+                guard count > 5 else { testHandler.testComplete(success: true, error: nil); return }
+                testHandler.testComplete(success: false, error: nil)
+            }
         }) { controler in
             count += 1
             controler.finish(count)
-        }.onFinish { state in
+            }.onFinish { state in
                 expectationRun.fulfill()
                 XCTAssertNotNil(state.value)
                 print(state)
                 XCTAssert(state.value == 6)
-        }.start()
+
+            }.start()
 
         waitForExpectations(timeout: 0.5, handler: nil)
 
         let expectationNotRun = self.expectation(description: name ?? "Test")
 
-        Until<Int>(test: { previous in
-            guard count > 5 else { return false }
-            return true
+        During<Int>(test: { testHandler in
+            DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
+                guard count > 5 else { testHandler.testComplete(success: true, error: nil); return }
+                testHandler.testComplete(success: false, error: nil)
+            }
         }) { controler in
             count += 1
             controler.finish(count)
