@@ -24,7 +24,7 @@
 
 import Foundation
 
-public protocol TestingFlow: Flow {
+public protocol TestingFlow {
 
     typealias RunBlock = (FlowControl) -> ()
     typealias TestBlock = (TestHandler) -> ()

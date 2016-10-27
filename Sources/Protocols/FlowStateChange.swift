@@ -1,18 +1,18 @@
 /*
  MIT License
-
+ 
  Copyright (c) 2016 SwiftKidz
-
+ 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
-
+ 
  The above copyright notice and this permission notice shall be included in all
  copies or substantial portions of the Software.
-
+ 
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -24,20 +24,42 @@
 
 import Foundation
 
-public protocol Flow {
-    associatedtype T
+protocol FlowStateChanged: class, Flow, FlowHandlerBlocks {}
 
-    typealias FinishBlock = (FlowState<T>) -> ()
-    typealias ErrorBlock = (Error) -> ()
-    typealias CancelBlock = () -> ()
-    typealias CodeBlock = (FlowControl, Any?) -> ()
+extension FlowStateChanged {
 
-    var state: FlowState<T> { get }
-
-    func onFinish(_ block: @escaping FinishBlock) -> Self
-    func onError(_ block: @escaping ErrorBlock) -> Self
-    func onCancel(_ block: @escaping CancelBlock) -> Self
-
-    func start()
-    func cancel()
+    func failed() {
+        guard
+            let failBlock = errorBlock,
+            let error = state.error
+            else {
+                DispatchQueue.main.async {
+                    self.finishBlock(self.state)
+                }
+                return
+        }
+        DispatchQueue.main.async {
+            failBlock(error)
+        }
+    }
+    
+    fileprivate func canceled() {
+        guard let cancelBlock = cancelBlock else {
+            DispatchQueue.main.async {
+                self.finishBlock(self.state)
+            }
+            return
+        }
+        DispatchQueue.main.async {
+            cancelBlock()
+        }
+    }
+    
+    func finished() {
+        
+    }
+    
+    func started() {
+        
+    }
 }

@@ -77,6 +77,13 @@ internal class RepeatFlow<T> {
     fileprivate let onBackgroundThread: Bool
     fileprivate var parallelExecutionStarted: Bool
 
+    fileprivate lazy var opQueue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = self.limitOfSimultaneousOps
+        queue.qualityOfService = .background
+        return queue
+    }()
+
     init(onBackground: Bool = true, number: Int, limit: Int = 1, run: @escaping RunBlock) {
         numberOfTimes = number
         runBlock = run
@@ -102,8 +109,8 @@ extension RepeatFlow {
     }
 
     fileprivate func appendNewResult(_ result: Any) {
-        syncQueue.sync(flags: .barrier) {
-            results.append(result)
+        syncQueue.async(flags: .barrier) {
+            self.results.append(result)
         }
     }
 
@@ -117,10 +124,23 @@ extension RepeatFlow {
         }
     }
 
-    fileprivate func appendNewParalellResult(_ result: BlockResult) {
+    @discardableResult
+    fileprivate func appendNewParalellResult(_ result: BlockResult) -> Bool {
+        var finished: Bool!
         syncQueue.sync(flags: .barrier) {
             parallelResults.append(result)
+            finished = parallelResults.count == numberOfTimes
         }
+        return finished
+    }
+
+    fileprivate var parallelExecutionShouldFinish: Bool {
+        guard limitOfSimultaneousOps > 1 else { return false }
+        var val: Bool!
+        syncQueue.sync {
+            val = self.parallelIterationResults.count == numberOfTimes
+        }
+        return val
     }
 }
 
@@ -215,6 +235,7 @@ extension RepeatFlow {
     }
 
     private func noOrderRequired() {
+        currentIteration = 1
         parallelQueue.async { [weak self] in
             DispatchQueue.concurrentPerform(iterations: self?.numberOfTimes ?? 0) { [weak self] i in
                 guard let weakSelf = self else { return }
@@ -224,17 +245,28 @@ extension RepeatFlow {
         }
     }
 
+    private func usingQueue() {
+        let ops = [Int](0..<numberOfTimes).map { n in
+           BlockOperation {
+            self.runBlock(n, ParallelStep(orderNumber: n, flowHandler: self))
+           }
+//           FlowOp {
+//            self.runBlock(n, ParallelStep(orderNumber: n, flowHandler: self))
+//           }
+        }
+        opQueue.addOperations(ops, waitUntilFinished: false)
+    }
+
     private func runParallel() {
         guard !parallelExecutionStarted else { return }
         parallelExecutionStarted = true
-        noOrderRequired()
+        //noOrderRequired()
+        usingQueue()
     }
 
     fileprivate func runIterations() {
-//        guard !parallelExecutionStarted else { return }
         guard iterationNumber < numberOfTimes else { finished(); return }
-
-        limitOfSimultaneousOps == 1 ? runSeries() : runParallel()
+        limitOfSimultaneousOps == 1 ? usingQueue() : runParallel()
     }
 }
 
@@ -291,10 +323,22 @@ extension RepeatFlow: FlowControl, ParallelFlowControl {
             print("Step finished but flow will be interrupted due to internalState being : \(internalState) ")
             return
         }
-        if limitOfSimultaneousOps > 1 { increaseIteration() }
-        appendNewParalellResult(BlockResult(order: iteration, result: result))
-        runIterations()
-    }
+
+
+
+       let shouldFinish = appendNewParalellResult(BlockResult(order: iteration, result: result))
+        //increaseIteration()
+//        print("\n\n-------")
+//        print("parallel results count \(parallelIterationResults.count)")
+//        print("current iteration \(currentIteration)")
+//        print("block iteration number \(iteration)")
+//        print("-------")
+
+        //runIterations()
+        //print("Should finish \(shouldFinish)")
+        guard shouldFinish else { return }
+        finished()
+     }
 
     public func finish<R>(_ result: R) {
         guard case .running = internalState else {

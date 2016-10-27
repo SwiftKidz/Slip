@@ -149,6 +149,42 @@
 		C46ED5321DBA257600D26944 /* WaterfallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46ED5311DBA257600D26944 /* WaterfallTests.swift */; };
 		C46ED5331DBA257600D26944 /* WaterfallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46ED5311DBA257600D26944 /* WaterfallTests.swift */; };
 		C46ED5341DBA257600D26944 /* WaterfallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46ED5311DBA257600D26944 /* WaterfallTests.swift */; };
+		C4851AF51DC221B700CE614E /* FlowOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4851AF41DC221B700CE614E /* FlowOp.swift */; };
+		C4851AF61DC221B700CE614E /* FlowOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4851AF41DC221B700CE614E /* FlowOp.swift */; };
+		C4851AF71DC221B700CE614E /* FlowOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4851AF41DC221B700CE614E /* FlowOp.swift */; };
+		C4851AF81DC221B700CE614E /* FlowOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4851AF41DC221B700CE614E /* FlowOp.swift */; };
+		C4851AFA1DC222DA00CE614E /* Safe.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4851AF91DC222DA00CE614E /* Safe.swift */; };
+		C4851AFB1DC222DA00CE614E /* Safe.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4851AF91DC222DA00CE614E /* Safe.swift */; };
+		C4851AFC1DC222DA00CE614E /* Safe.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4851AF91DC222DA00CE614E /* Safe.swift */; };
+		C4851AFD1DC222DA00CE614E /* Safe.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4851AF91DC222DA00CE614E /* Safe.swift */; };
+		C4C4D9E41DC25A5800CB8A30 /* FlowHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9E31DC25A5800CB8A30 /* FlowHandler.swift */; };
+		C4C4D9E51DC25A5800CB8A30 /* FlowHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9E31DC25A5800CB8A30 /* FlowHandler.swift */; };
+		C4C4D9E61DC25A5800CB8A30 /* FlowHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9E31DC25A5800CB8A30 /* FlowHandler.swift */; };
+		C4C4D9E71DC25A5800CB8A30 /* FlowHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9E31DC25A5800CB8A30 /* FlowHandler.swift */; };
+		C4C4D9E91DC2620400CB8A30 /* FlowHandlerBlocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9E81DC2620400CB8A30 /* FlowHandlerBlocks.swift */; };
+		C4C4D9EA1DC2620400CB8A30 /* FlowHandlerBlocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9E81DC2620400CB8A30 /* FlowHandlerBlocks.swift */; };
+		C4C4D9EB1DC2620400CB8A30 /* FlowHandlerBlocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9E81DC2620400CB8A30 /* FlowHandlerBlocks.swift */; };
+		C4C4D9EC1DC2620400CB8A30 /* FlowHandlerBlocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9E81DC2620400CB8A30 /* FlowHandlerBlocks.swift */; };
+		C4C4D9EE1DC2631A00CB8A30 /* SafeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9ED1DC2631A00CB8A30 /* SafeState.swift */; };
+		C4C4D9EF1DC2631A00CB8A30 /* SafeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9ED1DC2631A00CB8A30 /* SafeState.swift */; };
+		C4C4D9F01DC2631A00CB8A30 /* SafeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9ED1DC2631A00CB8A30 /* SafeState.swift */; };
+		C4C4D9F11DC2631A00CB8A30 /* SafeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9ED1DC2631A00CB8A30 /* SafeState.swift */; };
+		C4C4D9F41DC2650C00CB8A30 /* FlowOpResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9F31DC2650C00CB8A30 /* FlowOpResult.swift */; };
+		C4C4D9F51DC2650C00CB8A30 /* FlowOpResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9F31DC2650C00CB8A30 /* FlowOpResult.swift */; };
+		C4C4D9F61DC2650C00CB8A30 /* FlowOpResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9F31DC2650C00CB8A30 /* FlowOpResult.swift */; };
+		C4C4D9F71DC2650C00CB8A30 /* FlowOpResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9F31DC2650C00CB8A30 /* FlowOpResult.swift */; };
+		C4C4D9F91DC265F000CB8A30 /* FlowOpHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9F81DC265F000CB8A30 /* FlowOpHandler.swift */; };
+		C4C4D9FA1DC265F000CB8A30 /* FlowOpHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9F81DC265F000CB8A30 /* FlowOpHandler.swift */; };
+		C4C4D9FB1DC265F000CB8A30 /* FlowOpHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9F81DC265F000CB8A30 /* FlowOpHandler.swift */; };
+		C4C4D9FC1DC265F000CB8A30 /* FlowOpHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9F81DC265F000CB8A30 /* FlowOpHandler.swift */; };
+		C4C4D9FE1DC267E400CB8A30 /* FlowResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9FD1DC267E400CB8A30 /* FlowResults.swift */; };
+		C4C4D9FF1DC267E400CB8A30 /* FlowResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9FD1DC267E400CB8A30 /* FlowResults.swift */; };
+		C4C4DA001DC267E400CB8A30 /* FlowResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9FD1DC267E400CB8A30 /* FlowResults.swift */; };
+		C4C4DA011DC267E400CB8A30 /* FlowResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4D9FD1DC267E400CB8A30 /* FlowResults.swift */; };
+		C4C4DA031DC26BC700CB8A30 /* FlowStateChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4DA021DC26BC700CB8A30 /* FlowStateChange.swift */; };
+		C4C4DA041DC26BC700CB8A30 /* FlowStateChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4DA021DC26BC700CB8A30 /* FlowStateChange.swift */; };
+		C4C4DA051DC26BC700CB8A30 /* FlowStateChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4DA021DC26BC700CB8A30 /* FlowStateChange.swift */; };
+		C4C4DA061DC26BC700CB8A30 /* FlowStateChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4DA021DC26BC700CB8A30 /* FlowStateChange.swift */; };
 		C4F02D381DBFA939002909B1 /* TestingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4F02D371DBFA939002909B1 /* TestingFlow.swift */; };
 		C4F02D391DBFA939002909B1 /* TestingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4F02D371DBFA939002909B1 /* TestingFlow.swift */; };
 		C4F02D3A1DBFA939002909B1 /* TestingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4F02D371DBFA939002909B1 /* TestingFlow.swift */; };
@@ -235,6 +271,15 @@
 		C46ED5191DBA218100D26944 /* FlowControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowControl.swift; sourceTree = "<group>"; };
 		C46ED5231DBA22B000D26944 /* Waterfall.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Waterfall.swift; sourceTree = "<group>"; };
 		C46ED5311DBA257600D26944 /* WaterfallTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaterfallTests.swift; sourceTree = "<group>"; };
+		C4851AF41DC221B700CE614E /* FlowOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowOp.swift; sourceTree = "<group>"; };
+		C4851AF91DC222DA00CE614E /* Safe.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Safe.swift; sourceTree = "<group>"; };
+		C4C4D9E31DC25A5800CB8A30 /* FlowHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowHandler.swift; sourceTree = "<group>"; };
+		C4C4D9E81DC2620400CB8A30 /* FlowHandlerBlocks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowHandlerBlocks.swift; sourceTree = "<group>"; };
+		C4C4D9ED1DC2631A00CB8A30 /* SafeState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SafeState.swift; sourceTree = "<group>"; };
+		C4C4D9F31DC2650C00CB8A30 /* FlowOpResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowOpResult.swift; sourceTree = "<group>"; };
+		C4C4D9F81DC265F000CB8A30 /* FlowOpHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowOpHandler.swift; sourceTree = "<group>"; };
+		C4C4D9FD1DC267E400CB8A30 /* FlowResults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowResults.swift; sourceTree = "<group>"; };
+		C4C4DA021DC26BC700CB8A30 /* FlowStateChange.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowStateChange.swift; sourceTree = "<group>"; };
 		C4F02D371DBFA939002909B1 /* TestingFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestingFlow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -452,11 +497,17 @@
 		81F1C05F1DBAAD04009D82CE /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
-				C46ED5191DBA218100D26944 /* FlowControl.swift */,
-				81C140191DBD65B400E4CF80 /* Flow.swift */,
 				81F1C0601DBAAD2A009D82CE /* StepFlow.swift */,
 				C42D69391DBE3F500074CE5A /* TestHandler.swift */,
 				C4F02D371DBFA939002909B1 /* TestingFlow.swift */,
+				C4851AF91DC222DA00CE614E /* Safe.swift */,
+				81C140191DBD65B400E4CF80 /* Flow.swift */,
+				C46ED5191DBA218100D26944 /* FlowControl.swift */,
+				C4C4D9E81DC2620400CB8A30 /* FlowHandlerBlocks.swift */,
+				C4C4D9F81DC265F000CB8A30 /* FlowOpHandler.swift */,
+				C4C4D9FD1DC267E400CB8A30 /* FlowResults.swift */,
+				C4C4DA021DC26BC700CB8A30 /* FlowStateChange.swift */,
+				C4C4D9ED1DC2631A00CB8A30 /* SafeState.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -476,6 +527,8 @@
 				81F1C0721DBAAE92009D82CE /* SerialFlow.swift */,
 				C42D69341DBE314E0074CE5A /* TestFlow.swift */,
 				C46E31551DBFC75900FE5F49 /* RepeatFlow.swift */,
+				C4851AF41DC221B700CE614E /* FlowOp.swift */,
+				C4C4D9E31DC25A5800CB8A30 /* FlowHandler.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -484,6 +537,7 @@
 			isa = PBXGroup;
 			children = (
 				81F1C0661DBAADE0009D82CE /* Classes */,
+				C4C4D9F21DC264E700CB8A30 /* Structs */,
 				81F1C05F1DBAAD04009D82CE /* Protocols */,
 				81F1C0651DBAAD8C009D82CE /* Enums */,
 				3549BB541DA38A4000C63030 /* Supporting Files */,
@@ -628,6 +682,14 @@
 				C46ED5311DBA257600D26944 /* WaterfallTests.swift */,
 			);
 			path = Waterfall;
+			sourceTree = "<group>";
+		};
+		C4C4D9F21DC264E700CB8A30 /* Structs */ = {
+			isa = PBXGroup;
+			children = (
+				C4C4D9F31DC2650C00CB8A30 /* FlowOpResult.swift */,
+			);
+			path = Structs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -983,12 +1045,20 @@
 				C42D69251DBA6FE40074CE5A /* Step+Waterfall.swift in Sources */,
 				C4653AD01DBFA4C400AF9B35 /* Forever.swift in Sources */,
 				81C140151DBC597600E4CF80 /* Whilst.swift in Sources */,
+				C4C4D9E91DC2620400CB8A30 /* FlowHandlerBlocks.swift in Sources */,
 				C4F02D381DBFA939002909B1 /* TestingFlow.swift in Sources */,
+				C4C4D9EE1DC2631A00CB8A30 /* SafeState.swift in Sources */,
 				C46E55261DBE5D85008800B4 /* Until.swift in Sources */,
 				C46E55421DBF7C6A008800B4 /* DoUntil.swift in Sources */,
+				C4C4D9F41DC2650C00CB8A30 /* FlowOpResult.swift in Sources */,
+				C4C4D9FE1DC267E400CB8A30 /* FlowResults.swift in Sources */,
+				C4C4D9E41DC25A5800CB8A30 /* FlowHandler.swift in Sources */,
 				81F1C0681DBAAE00009D82CE /* Step.swift in Sources */,
+				C4851AFA1DC222DA00CE614E /* Safe.swift in Sources */,
 				81F1C07B1DBAB3AF009D82CE /* FlowControl.swift in Sources */,
+				C4C4DA031DC26BC700CB8A30 /* FlowStateChange.swift in Sources */,
 				C46ED5241DBA22B000D26944 /* Waterfall.swift in Sources */,
+				C4851AF51DC221B700CE614E /* FlowOp.swift in Sources */,
 				81F1C06D1DBAAE26009D82CE /* FlowState.swift in Sources */,
 				C42D69351DBE314E0074CE5A /* TestFlow.swift in Sources */,
 				C42D692A1DBA70AB0074CE5A /* Step+Series.swift in Sources */,
@@ -1002,6 +1072,7 @@
 				81C140061DBC525600E4CF80 /* Sequential.swift in Sources */,
 				C42D69201DBA68480074CE5A /* Series.swift in Sources */,
 				C46E55471DBF7CC7008800B4 /* DoWhilst.swift in Sources */,
+				C4C4D9F91DC265F000CB8A30 /* FlowOpHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1013,12 +1084,20 @@
 				C42D69281DBA6FE40074CE5A /* Step+Waterfall.swift in Sources */,
 				C4653AD31DBFA4C400AF9B35 /* Forever.swift in Sources */,
 				81C140181DBC597600E4CF80 /* Whilst.swift in Sources */,
+				C4C4D9EC1DC2620400CB8A30 /* FlowHandlerBlocks.swift in Sources */,
 				C4F02D3B1DBFA939002909B1 /* TestingFlow.swift in Sources */,
+				C4C4D9F11DC2631A00CB8A30 /* SafeState.swift in Sources */,
 				C46E55291DBE5D85008800B4 /* Until.swift in Sources */,
 				C46E55451DBF7C6A008800B4 /* DoUntil.swift in Sources */,
+				C4C4D9F71DC2650C00CB8A30 /* FlowOpResult.swift in Sources */,
+				C4C4DA011DC267E400CB8A30 /* FlowResults.swift in Sources */,
+				C4C4D9E71DC25A5800CB8A30 /* FlowHandler.swift in Sources */,
 				81F1C06B1DBAAE00009D82CE /* Step.swift in Sources */,
+				C4851AFD1DC222DA00CE614E /* Safe.swift in Sources */,
 				81F1C0781DBAB3AB009D82CE /* FlowControl.swift in Sources */,
+				C4C4DA061DC26BC700CB8A30 /* FlowStateChange.swift in Sources */,
 				C46ED5271DBA22B000D26944 /* Waterfall.swift in Sources */,
+				C4851AF81DC221B700CE614E /* FlowOp.swift in Sources */,
 				81F1C0701DBAAE26009D82CE /* FlowState.swift in Sources */,
 				C42D69381DBE314E0074CE5A /* TestFlow.swift in Sources */,
 				C42D692D1DBA70AB0074CE5A /* Step+Series.swift in Sources */,
@@ -1032,6 +1111,7 @@
 				81C140091DBC525600E4CF80 /* Sequential.swift in Sources */,
 				C42D69231DBA68480074CE5A /* Series.swift in Sources */,
 				C46E554A1DBF7CC7008800B4 /* DoWhilst.swift in Sources */,
+				C4C4D9FC1DC265F000CB8A30 /* FlowOpHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1043,12 +1123,20 @@
 				C42D69261DBA6FE40074CE5A /* Step+Waterfall.swift in Sources */,
 				C4653AD11DBFA4C400AF9B35 /* Forever.swift in Sources */,
 				81C140161DBC597600E4CF80 /* Whilst.swift in Sources */,
+				C4C4D9EA1DC2620400CB8A30 /* FlowHandlerBlocks.swift in Sources */,
 				C4F02D391DBFA939002909B1 /* TestingFlow.swift in Sources */,
+				C4C4D9EF1DC2631A00CB8A30 /* SafeState.swift in Sources */,
 				C46E55271DBE5D85008800B4 /* Until.swift in Sources */,
 				C46E55431DBF7C6A008800B4 /* DoUntil.swift in Sources */,
+				C4C4D9F51DC2650C00CB8A30 /* FlowOpResult.swift in Sources */,
+				C4C4D9FF1DC267E400CB8A30 /* FlowResults.swift in Sources */,
+				C4C4D9E51DC25A5800CB8A30 /* FlowHandler.swift in Sources */,
 				81F1C0691DBAAE00009D82CE /* Step.swift in Sources */,
+				C4851AFB1DC222DA00CE614E /* Safe.swift in Sources */,
 				81F1C07A1DBAB3AE009D82CE /* FlowControl.swift in Sources */,
+				C4C4DA041DC26BC700CB8A30 /* FlowStateChange.swift in Sources */,
 				C46ED5251DBA22B000D26944 /* Waterfall.swift in Sources */,
+				C4851AF61DC221B700CE614E /* FlowOp.swift in Sources */,
 				81F1C06E1DBAAE26009D82CE /* FlowState.swift in Sources */,
 				C42D69361DBE314E0074CE5A /* TestFlow.swift in Sources */,
 				C42D692B1DBA70AB0074CE5A /* Step+Series.swift in Sources */,
@@ -1062,6 +1150,7 @@
 				81C140071DBC525600E4CF80 /* Sequential.swift in Sources */,
 				C42D69211DBA68480074CE5A /* Series.swift in Sources */,
 				C46E55481DBF7CC7008800B4 /* DoWhilst.swift in Sources */,
+				C4C4D9FA1DC265F000CB8A30 /* FlowOpHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1073,12 +1162,20 @@
 				C42D69271DBA6FE40074CE5A /* Step+Waterfall.swift in Sources */,
 				C4653AD21DBFA4C400AF9B35 /* Forever.swift in Sources */,
 				81C140171DBC597600E4CF80 /* Whilst.swift in Sources */,
+				C4C4D9EB1DC2620400CB8A30 /* FlowHandlerBlocks.swift in Sources */,
 				C4F02D3A1DBFA939002909B1 /* TestingFlow.swift in Sources */,
+				C4C4D9F01DC2631A00CB8A30 /* SafeState.swift in Sources */,
 				C46E55281DBE5D85008800B4 /* Until.swift in Sources */,
 				C46E55441DBF7C6A008800B4 /* DoUntil.swift in Sources */,
+				C4C4D9F61DC2650C00CB8A30 /* FlowOpResult.swift in Sources */,
+				C4C4DA001DC267E400CB8A30 /* FlowResults.swift in Sources */,
+				C4C4D9E61DC25A5800CB8A30 /* FlowHandler.swift in Sources */,
 				81F1C06A1DBAAE00009D82CE /* Step.swift in Sources */,
+				C4851AFC1DC222DA00CE614E /* Safe.swift in Sources */,
 				81F1C0791DBAB3AD009D82CE /* FlowControl.swift in Sources */,
+				C4C4DA051DC26BC700CB8A30 /* FlowStateChange.swift in Sources */,
 				C46ED5261DBA22B000D26944 /* Waterfall.swift in Sources */,
+				C4851AF71DC221B700CE614E /* FlowOp.swift in Sources */,
 				81F1C06F1DBAAE26009D82CE /* FlowState.swift in Sources */,
 				C42D69371DBE314E0074CE5A /* TestFlow.swift in Sources */,
 				C42D692C1DBA70AB0074CE5A /* Step+Series.swift in Sources */,
@@ -1092,6 +1189,7 @@
 				81C140081DBC525600E4CF80 /* Sequential.swift in Sources */,
 				C42D69221DBA68480074CE5A /* Series.swift in Sources */,
 				C46E55491DBF7CC7008800B4 /* DoWhilst.swift in Sources */,
+				C4C4D9FB1DC265F000CB8A30 /* FlowOpHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

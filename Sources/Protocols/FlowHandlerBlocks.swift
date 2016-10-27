@@ -24,20 +24,31 @@
 
 import Foundation
 
-public protocol Flow {
-    associatedtype T
+protocol FlowHandlerBlocks: class, Flow {
 
-    typealias FinishBlock = (FlowState<T>) -> ()
-    typealias ErrorBlock = (Error) -> ()
-    typealias CancelBlock = () -> ()
-    typealias CodeBlock = (FlowControl, Any?) -> ()
+    var finishBlock: FinishBlock { get set }
+    var errorBlock: ErrorBlock? { get set }
+    var cancelBlock: CancelBlock? { get set }
 
-    var state: FlowState<T> { get }
+}
 
-    func onFinish(_ block: @escaping FinishBlock) -> Self
-    func onError(_ block: @escaping ErrorBlock) -> Self
-    func onCancel(_ block: @escaping CancelBlock) -> Self
+extension FlowHandlerBlocks {
 
-    func start()
-    func cancel()
+    func onFinish(_ block: @escaping FinishBlock) -> Self {
+        guard case .queued = state else { print("Cannot modify flow after starting") ; return self }
+        finishBlock = block
+        return self
+    }
+
+    func onError(_ block: @escaping ErrorBlock) -> Self {
+        guard case .queued = state else { print("Cannot modify flow after starting") ; return self }
+        errorBlock = block
+        return self
+    }
+
+    func onCancel(_ block: @escaping CancelBlock) -> Self {
+        guard case .queued = state else { print("Cannot modify flow after starting") ; return self }
+        cancelBlock = block
+        return self
+    }
 }

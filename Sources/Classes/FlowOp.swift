@@ -24,20 +24,37 @@
 
 import Foundation
 
-public protocol Flow {
-    associatedtype T
+final class FlowOp {
 
-    typealias FinishBlock = (FlowState<T>) -> ()
-    typealias ErrorBlock = (Error) -> ()
-    typealias CancelBlock = () -> ()
-    typealias CodeBlock = (FlowControl, Any?) -> ()
+    typealias RunBlock = (Int, FlowControl) -> ()
 
-    var state: FlowState<T> { get }
+    fileprivate let order: Int
+    fileprivate let flow: FlowOpHandler
+    fileprivate let runBlock: RunBlock
 
-    func onFinish(_ block: @escaping FinishBlock) -> Self
-    func onError(_ block: @escaping ErrorBlock) -> Self
-    func onCancel(_ block: @escaping CancelBlock) -> Self
+    init(orderNumber: Int, flowHandler: FlowOpHandler, run: @escaping RunBlock) {
+        order = orderNumber
+        flow = flowHandler
+        runBlock = run
+    }
+}
 
-    func start()
-    func cancel()
+extension FlowOp {
+
+    var operation: Operation {
+        return BlockOperation {
+            self.runBlock(self.order, self)
+        }
+    }
+}
+
+extension FlowOp: FlowControl {
+
+    func finish<R>(_ result: R) {
+        flow.finished(with: FlowOpResult(order: order, result: result, error: nil))
+    }
+
+    func finish(_ error: Error) {
+        flow.finished(with: FlowOpResult(order: order, result: nil, error: error))
+    }
 }

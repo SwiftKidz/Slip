@@ -76,24 +76,19 @@ class RepeatFlowTests: XCTestCase {
 
     func testRepeatFlowFunctionalityParallelMaxConcurrent() {
         let expectation = self.expectation(description: name ?? "Test")
-        let flow = RepeatFlow<Int>(number: 10, limit: 2) { n, flow in
-            print(n)
-            print("-")
+
+        let flow = RepeatFlow<Int>(number: 50, limit: 100) { n, flow in
             sleep(1)
             flow.finish(n)
         }
         flow.onFinish { state in
-            print("Finished")
-//            print(flow.results)
-//            print("-----------")
-//            print(flow.orderedResults)
-
-            //XCTAssertNotNil(state.value)
-            //XCTAssert(state.value?.count == 100)
+            print(state.value)
+            print(flow.results)
+            print(flow.orderedResults)
             expectation.fulfill()
         }.start()
 
-        waitForExpectations(timeout: 5000, handler: nil)
+        waitForExpectations(timeout: 500, handler: nil)
     }
 
     func testRepeatFlowFinishWithError() {

@@ -24,20 +24,24 @@
 
 import Foundation
 
-public protocol Flow {
-    associatedtype T
+protocol SafeState: class, Safe {
+    var rawState: FlowState<Any> { get set }
+}
 
-    typealias FinishBlock = (FlowState<T>) -> ()
-    typealias ErrorBlock = (Error) -> ()
-    typealias CancelBlock = () -> ()
-    typealias CodeBlock = (FlowControl, Any?) -> ()
+extension SafeState {
 
-    var state: FlowState<T> { get }
-
-    func onFinish(_ block: @escaping FinishBlock) -> Self
-    func onError(_ block: @escaping ErrorBlock) -> Self
-    func onCancel(_ block: @escaping CancelBlock) -> Self
-
-    func start()
-    func cancel()
+    var safeState: FlowState<Any> {
+        get {
+            var val: FlowState<Any>!
+            read {
+                val = self.rawState
+            }
+            return val
+        }
+        set {
+            write {
+                self.rawState = newValue
+            }
+        }
+    }
 }

@@ -24,20 +24,19 @@
 
 import Foundation
 
-public protocol Flow {
-    associatedtype T
+protocol Safe {
 
-    typealias FinishBlock = (FlowState<T>) -> ()
-    typealias ErrorBlock = (Error) -> ()
-    typealias CancelBlock = () -> ()
-    typealias CodeBlock = (FlowControl, Any?) -> ()
+    var safeQueue: DispatchQueue { get }
+}
 
-    var state: FlowState<T> { get }
+extension Safe {
 
-    func onFinish(_ block: @escaping FinishBlock) -> Self
-    func onError(_ block: @escaping ErrorBlock) -> Self
-    func onCancel(_ block: @escaping CancelBlock) -> Self
+    func read(_ block: ()->()) {
+        safeQueue.sync { block() }
+    }
 
-    func start()
-    func cancel()
+    func write(_ block: @escaping ()->()) {
+        safeQueue.async(flags: .barrier, execute: block)
+    }
+
 }

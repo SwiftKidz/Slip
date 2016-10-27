@@ -22,22 +22,11 @@
  SOFTWARE.
  */
 
+
 import Foundation
 
-public protocol Flow {
-    associatedtype T
-
-    typealias FinishBlock = (FlowState<T>) -> ()
-    typealias ErrorBlock = (Error) -> ()
-    typealias CancelBlock = () -> ()
-    typealias CodeBlock = (FlowControl, Any?) -> ()
-
-    var state: FlowState<T> { get }
-
-    func onFinish(_ block: @escaping FinishBlock) -> Self
-    func onError(_ block: @escaping ErrorBlock) -> Self
-    func onCancel(_ block: @escaping CancelBlock) -> Self
-
-    func start()
-    func cancel()
+struct FlowOpResult {
+    let order: Int
+    let result: Any?
+    let error: Error?
 }
