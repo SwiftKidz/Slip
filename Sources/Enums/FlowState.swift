@@ -79,3 +79,10 @@ extension FlowState: Equatable {
         }
     }
 }
+//
+//extension FlowState {
+//
+//    func sorted<R: Collection>(by orderingBlock: (R.Iterator.Element,R.Iterator.Element)->(Bool)) -> R? {
+//
+//    }
+//}

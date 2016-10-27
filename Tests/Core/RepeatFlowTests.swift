@@ -12,7 +12,7 @@ import XCTest
 
 class RepeatFlowTests: XCTestCase {
 
-    func testRepeatFlowFunctionality() {
+    func testRepeatFlowFunctionalitySeries() {
         let expectation = self.expectation(description: name ?? "Test")
 
         RepeatFlow<Int>(number: 5) { n, flow in
@@ -39,6 +39,61 @@ class RepeatFlowTests: XCTestCase {
             XCTFail()
             return
         }
+    }
+
+    func testRepeatFlowFunctionalityParallel() {
+        let expectation = self.expectation(description: name ?? "Test")
+
+        RepeatFlow<Int>(number: 5, limit: 2) { n, flow in
+            print(n)
+            print("Going to sleep")
+            sleep(1)
+            flow.finish(n)
+        }.onFinish { state in
+            print(state.value)
+                XCTAssertNotNil(state.value)
+                XCTAssert(state.value! == [1, 2, 3, 4, 5])
+                expectation.fulfill()
+        }.start()
+
+        waitForExpectations(timeout: 5, handler: nil)
+
+
+        let syncFlow = RepeatFlow<Int>(onBackground: false, number: 5, limit: 2) { n, flow in
+            flow.finish(n)
+        }.onFinish { state in
+            XCTAssertNotNil(state.value)
+            XCTAssert(state.value! == [1, 2, 3, 4, 5])
+        }
+
+        syncFlow.start()
+
+        guard case .finished(_) = syncFlow.state else {
+            XCTFail()
+            return
+        }
+    }
+
+    func testRepeatFlowFunctionalityParallelMaxConcurrent() {
+        let expectation = self.expectation(description: name ?? "Test")
+        let flow = RepeatFlow<Int>(number: 10, limit: 2) { n, flow in
+            print(n)
+            print("-")
+            sleep(1)
+            flow.finish(n)
+        }
+        flow.onFinish { state in
+            print("Finished")
+//            print(flow.results)
+//            print("-----------")
+//            print(flow.orderedResults)
+
+            //XCTAssertNotNil(state.value)
+            //XCTAssert(state.value?.count == 100)
+            expectation.fulfill()
+        }.start()
+
+        waitForExpectations(timeout: 5000, handler: nil)
     }
 
     func testRepeatFlowFinishWithError() {

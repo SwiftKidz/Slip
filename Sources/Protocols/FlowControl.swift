@@ -29,4 +29,4 @@ public protocol FlowControl {
     func finish(_ error: Error)
 }
 
-public protocol FlowHandler: StepFlow, FlowControl {}
+//public protocol FlowHandler: StepFlow, FlowControl {}
