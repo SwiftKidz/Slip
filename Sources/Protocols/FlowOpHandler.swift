@@ -25,5 +25,7 @@
 import Foundation
 
 protocol FlowOpHandler {
+    var isCanceled: Bool { get }
+    var currentResults: Any? { get }
     func finished(with: FlowOpResult)
 }

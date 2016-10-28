@@ -36,7 +36,7 @@ extension Safe {
     }
 
     func write(_ block: @escaping ()->()) {
-        safeQueue.async(flags: .barrier, execute: block)
+        safeQueue.sync(flags: .barrier, execute: block)
     }
 
 }

@@ -24,11 +24,15 @@
 
 import Foundation
 
-protocol FlowHandlerBlocks: class, Flow {
+protocol FlowHandlerBlocks: class, FlowCore {
 
     var finishBlock: FinishBlock { get set }
     var errorBlock: ErrorBlock? { get set }
     var cancelBlock: CancelBlock? { get set }
+
+
+    var runBlock: RunBlock
+    var testBlock: TestBlock
 
 }
 

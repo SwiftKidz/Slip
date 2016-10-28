@@ -24,14 +24,21 @@
 
 import Foundation
 
-func test() {
-    
-}
+//    func onFinish(_ block: @escaping FinishBlock) -> Self
+//    func onError(_ block: @escaping ErrorBlock) -> Self
+//    func onCancel(_ block: @escaping CancelBlock) -> Self
 
-internal class FlowHandler<T>: Safe {
+protocol FlowCore {
 
-    let safeQueue: DispatchQueue = DispatchQueue(label: "com.slip.flow.safeQueue", attributes: DispatchQueue.Attributes.concurrent)
+    associatedtype T
 
-    
-    
+    typealias FinishBlock = (FlowState<[T]>) -> ()
+    typealias ErrorBlock = (Error) -> ()
+    typealias CancelBlock = () -> ()
+    typealias CodeBlock = (FlowControl, Any?) -> ()
+
+    var state: FlowState<[T]> { get }
+
+    func start()
+    func cancel()
 }

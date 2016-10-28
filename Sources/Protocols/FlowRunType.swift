@@ -24,11 +24,30 @@
 
 import Foundation
 
-public protocol TestHandler {
-
-    typealias RunBlock = (FlowControl) -> ()
+protocol FlowRunType {
+    typealias RunBlock = (Flow, Int, Any?) -> ()
     typealias TestBlock = (TestHandler) -> ()
+
+    var testFlow: Bool { get }
+    var opQueue: OperationQueue { get }
+    var blocks: [RunBlock] { get }
 
     func testComplete(success: Bool, error: Error?)
     var lastRunResult: Any { get }
+}
+
+extension FlowRunType where Self: FlowOpHandler {
+
+    func checkFlowTypeAndRun() {
+        testFlow ? runFlowOfTests() : runFlowOfBlocks()
+    }
+
+    func runFlowOfTests() {
+
+    }
+
+    func runFlowOfBlocks() {
+        let ops = [Int](0..<blocks.count).map { FlowOp(orderNumber: $0, flowHandler: self, run: blocks[$0]) }.map { $0.operation }
+        opQueue.addOperations(ops, waitUntilFinished: false)
+    }
 }

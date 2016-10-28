@@ -28,5 +28,3 @@ public protocol FlowControl {
     func finish<R>(_ result: R)
     func finish(_ error: Error)
 }
-
-//public protocol FlowHandler: StepFlow, FlowControl {}
