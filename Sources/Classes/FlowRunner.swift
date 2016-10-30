@@ -42,7 +42,10 @@ internal class FlowRunner<T> {
     let limitOfSimultaneousOps: Int
     let qos: QualityOfService
     let synchronous: Bool
-    let testFlow: Bool = false
+
+    var testFlow: Bool = false
+    var testAtBeginning: Bool = true
+    var runAfterTest: (() -> ())?
 
     let safeQueue: DispatchQueue = DispatchQueue(label: "com.slip.flow.safeQueue", attributes: DispatchQueue.Attributes.concurrent)
 
@@ -84,7 +87,7 @@ internal class FlowRunner<T> {
                  limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
                  runQoS: QualityOfService = .background,
                  sync: Bool = false) {
-        rawState = .queued
+        rawState = .ready
         finishBlock = { _ in }
         blocks = runBlocks
         runBlock = run
@@ -125,14 +128,19 @@ extension FlowRunner: FlowOpHandler {
 
         let shouldFinish = addNewResult(res)
         guard shouldFinish else { return }
-        finished()
+        safeState = .finished(safeResults.map { $0.result })
     }
 }
 
 extension FlowRunner: FlowRunType {
 
-    var lastRunResult
+    var lastRunResult: Any {
+        return safeResults
+    }
 
+    func testComplete(success: Bool, error: Error?) {
+
+    }
 }
 
 extension FlowRunner: FlowCore {
@@ -142,14 +150,14 @@ extension FlowRunner: FlowCore {
     }
 
     func start() {
-        guard case .queued = safeState else { print("Cannot start flow twice") ; return }
-        safeState = .running(safeResults)
-        checkFlowTypeAndRun()
+        guard case .ready = safeState else { print("Cannot start flow twice") ; return }
+        safeState = .queued
+        //safeState = .running(outputResults)
+        //checkFlowTypeAndRun()
     }
 
     func cancel() {
         guard case .running = safeState else { print("Cannot cancel a flow that is not running") ; return }
         safeState = .canceled
-        canceled()
     }
 }

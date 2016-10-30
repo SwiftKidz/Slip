@@ -153,6 +153,7 @@ extension TestFlow {
             verifyTest(runClosure: finished)
         case .queued:
             print("Flow is in queue state")
+        default: break
         }
     }
 }

@@ -47,5 +47,11 @@ extension FlowResults where Self: Safe {
         }
         return finished
     }
+}
 
+extension FlowResults where Self: Safe & FlowRunType {
+
+    var outputResults: Any {
+        return safeResults
+    }
 }

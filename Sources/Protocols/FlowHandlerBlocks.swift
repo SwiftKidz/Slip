@@ -24,35 +24,57 @@
 
 import Foundation
 
-protocol FlowHandlerBlocks: class, FlowCore {
+protocol FlowHandlerBlocks: class, FlowCore, FlowRunType {
 
     var finishBlock: FinishBlock { get set }
     var errorBlock: ErrorBlock? { get set }
     var cancelBlock: CancelBlock? { get set }
 
 
-    var runBlock: RunBlock
-    var testBlock: TestBlock
+    var runBlock: RunBlock { get set }
+    var testBlock: TestBlock { get set }
 
 }
 
 extension FlowHandlerBlocks {
 
     func onFinish(_ block: @escaping FinishBlock) -> Self {
-        guard case .queued = state else { print("Cannot modify flow after starting") ; return self }
+        guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
         finishBlock = block
         return self
     }
 
     func onError(_ block: @escaping ErrorBlock) -> Self {
-        guard case .queued = state else { print("Cannot modify flow after starting") ; return self }
+        guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
         errorBlock = block
         return self
     }
 
     func onCancel(_ block: @escaping CancelBlock) -> Self {
-        guard case .queued = state else { print("Cannot modify flow after starting") ; return self }
+        guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
         cancelBlock = block
         return self
     }
+}
+
+extension FlowHandlerBlocks {
+
+    func onRun(_ block: @escaping RunBlock) -> Self {
+        guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
+        runBlock = block
+        return self
+    }
+
+    func onTest(_ block: @escaping TestBlock) -> Self {
+        guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
+        testBlock = block
+        return self
+    }
+
+//    internal func whenToRun(_ block: @escaping ConditionTestBlock) -> Self {
+//        guard case .queued = internalState else { print("Cannot modify flow after starting") ; return self }
+//        shouldRunTestBlock = block
+//        return self
+//    }
+
 }

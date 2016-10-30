@@ -25,7 +25,9 @@
 import Foundation
 
 public enum FlowState<R> {
+    case ready
     case queued
+    case testing
     case running(R?)
     case canceled
     case failed(Error)
@@ -53,8 +55,12 @@ public enum FlowState<R> {
 
     func convertType<T>() -> FlowState<T> {
         switch self {
+        case .ready:
+            return FlowState<T>.ready
         case .queued:
             return FlowState<T>.queued
+        case .testing:
+            return FlowState<T>.testing
         case .canceled:
             return FlowState<T>.canceled
         case .failed(let e):
@@ -70,7 +76,9 @@ public enum FlowState<R> {
 extension FlowState: Equatable {
     public static func==(lhs: FlowState, rhs: FlowState) -> Bool {
         switch (lhs, rhs) {
+        case (.ready, .ready): return true
         case (.queued, .queued): return true
+        case (.testing, .testing): return true
         case (.canceled, .canceled): return true
         case (.failed, .failed): return true
         case (.running, .running): return true

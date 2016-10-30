@@ -17,16 +17,15 @@ class FlowRunnerTests: XCTestCase {
 
         let blocks: [FlowRunner.RunBlock] = [Int](0..<1000).map { n in
             return { (f: Flow, i: Int, r: Any?) in
-                f.finish(n)
+                f.finish()
             }
         }
 
-        print(blocks.count)
-
-        let flowRunner = FlowRunner<Int>(runBlocks: blocks)
+        let flowRunner = FlowRunner<Void>(runBlocks: blocks)
 
         flowRunner.onFinish { state in
             print(state.value?.count)
+            print(state.value)
             expectation.fulfill()
         }.start()
 

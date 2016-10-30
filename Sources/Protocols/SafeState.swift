@@ -28,7 +28,7 @@ protocol SafeState: class, Safe {
     var rawState: FlowState<Any> { get set }
 }
 
-extension SafeState {
+extension SafeState where Self: FlowStateChanged & FlowOpHandler {
 
     var safeState: FlowState<Any> {
         get {
@@ -42,6 +42,7 @@ extension SafeState {
             write {
                 self.rawState = newValue
             }
+            stateChanged()
         }
     }
 }

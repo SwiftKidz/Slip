@@ -24,7 +24,51 @@
 
 import Foundation
 
-protocol FlowStateChanged: class, FlowCore, FlowHandlerBlocks, SafeState, FlowResults {}
+protocol FlowStateChanged: class, FlowCore, FlowHandlerBlocks, SafeState, FlowResults, FlowRunType {}
+
+extension FlowStateChanged where Self: FlowRunType {
+
+    func verifyTest(runClosure: @escaping ()->()) {
+        guard testFlow else { runClosure(); return }
+
+//        guard shouldRunTestBlock(state) else { runClosure(); return }
+//        runTest(whenCompletedDo: runClosure)
+    }
+}
+
+extension FlowStateChanged where Self: FlowRunType & FlowOpHandler {
+
+    func stateChanged() {
+        switch safeState {
+        case .testing:
+            testing()
+        case .running:
+            running()
+        case .canceled:
+            canceled()
+        case .failed:
+            failed()
+        case .finished:
+            finished()
+        case .queued:
+            queued()
+        case .ready:
+            print("Flow is ready to begin")
+        }
+    }
+
+    func testing() {
+        
+    }
+
+    func running() {
+        testFlow ? runFlowOfTests() : runFlowOfBlocks()
+    }
+
+    func queued() {
+        safeState = testFlow ? .testing : .running(outputResults)
+    }
+}
 
 extension FlowStateChanged {
 
@@ -44,12 +88,13 @@ extension FlowStateChanged {
     }
 
     func finished() {
-        safeState = .finished(safeResults.map { $0.result })
         finishBlock(state)
     }
 }
 
-extension FlowStateChanged where Self: FlowRunType {
+
+
+extension FlowStateChanged {
 
     func canceled() {
         if !testFlow { opQueue.cancelAllOperations() }

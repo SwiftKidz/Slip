@@ -25,22 +25,22 @@
 import Foundation
 
 protocol FlowRunType {
-    typealias RunBlock = (Flow, Int, Any?) -> ()
+    typealias RunBlock = (Flow, Int, Any) -> ()
     typealias TestBlock = (TestHandler) -> ()
 
     var testFlow: Bool { get }
+    var testAtBeginning: Bool { get }
+    var runAfterTest: (() -> ())? { get set }
+
     var opQueue: OperationQueue { get }
     var blocks: [RunBlock] { get }
 
     func testComplete(success: Bool, error: Error?)
     var lastRunResult: Any { get }
+
 }
 
 extension FlowRunType where Self: FlowOpHandler {
-
-    func checkFlowTypeAndRun() {
-        testFlow ? runFlowOfTests() : runFlowOfBlocks()
-    }
 
     func runFlowOfTests() {
 
