@@ -24,11 +24,14 @@
 
 import Foundation
 
-public protocol TestHandler {
+public protocol TestFlowApi {
 
-    typealias RunBlock = (FlowControl) -> ()
-    typealias TestBlock = (TestHandler) -> ()
+    typealias RunBlock = (BlockOp, Int, Any?) -> ()
+    typealias TestBlock = (Test) -> ()
 
-    func testComplete(success: Bool, error: Error?)
-    var lastRunResult: Any { get }
+    var testAtBeginning: Bool { get set }
+    var testPassResult: Bool { get set }
+
+    func onRun(_ block: @escaping RunBlock) -> Self
+    func onTest(_ block: @escaping TestBlock) -> Self
 }

@@ -24,27 +24,39 @@
 
 import Foundation
 
-public enum FlowState {
-    case ready
-    case queued
-    case testing
-    case running
-    case canceled
-    case failed
-    case finished
+final class FlowTest {
+
+    fileprivate let flow: FlowTestHandler
+    fileprivate let testBlock: FlowTypeTests.TestBlock
+
+    init(flowHandler: FlowTestHandler, test: @escaping FlowTypeTests.TestBlock) {
+        flow = flowHandler
+        testBlock = test
+    }
 }
 
-extension FlowState: Equatable {
-    public static func==(lhs: FlowState, rhs: FlowState) -> Bool {
-        switch (lhs, rhs) {
-        case (.ready, .ready): return true
-        case (.queued, .queued): return true
-        case (.testing, .testing): return true
-        case (.canceled, .canceled): return true
-        case (.failed, .failed): return true
-        case (.running, .running): return true
-        case (.finished, .finished): return true
-        default: return false
+extension FlowTest {
+
+    var operation: Operation {
+        let t: Test = self
+        return BlockOperation { [weak self] in
+            guard
+                let strongSelf = self,
+                !strongSelf.flow.isCanceled
+                else { return }
+
+            strongSelf.testBlock(t)
         }
+    }
+}
+
+extension FlowTest: Test {
+
+    func complete(success: Bool, error: Error?) {
+        guard !flow.isCanceled else {
+            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
+            return
+        }
+        flow.finished(with: FlowTestResult(success: success, error: error))
     }
 }

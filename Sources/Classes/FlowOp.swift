@@ -26,7 +26,7 @@ import Foundation
 
 final class FlowOp {
 
-    typealias RunBlock = (Flow, Int, Any?) -> ()
+    typealias RunBlock = (Op, Int, Any?) -> ()
 
     fileprivate let order: Int
     fileprivate let flow: FlowOpHandler
@@ -42,7 +42,7 @@ final class FlowOp {
 extension FlowOp {
 
     var operation: Operation {
-        let f: Flow = self
+        let f: Op = self
         let o: Int = order
         let r: Any? = flow.currentResults
         return BlockOperation { [weak self] in
@@ -56,15 +56,21 @@ extension FlowOp {
     }
 }
 
-extension FlowOp: Flow {
+extension FlowOp: Op {
 
     func finish<R>(_ result: R) {
-        guard !flow.isCanceled else { print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation"); return }
+        guard !flow.isCanceled else {
+            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
+            return
+        }
         flow.finished(with: FlowOpResult(order: order, result: result, error: nil))
     }
 
     func finish(_ error: Error) {
-        guard !flow.isCanceled else { print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation"); return }
+        guard !flow.isCanceled else {
+            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
+            return
+        }
         flow.finished(with: FlowOpResult(order: order, result: nil, error: error))
     }
 }

@@ -29,3 +29,32 @@ protocol FlowOpHandler {
     var currentResults: Any? { get }
     func finished(with: FlowOpResult)
 }
+
+extension FlowOpHandler where Self: SafeState & FlowTypeBlocks & FlowStateChanged & FlowTestHandler & FlowOutcome {
+
+    var isCanceled: Bool {
+        return !(safeState == FlowState.running || safeState == FlowState.testing)
+    }
+
+    var currentResults: Any? {
+        return safeResults.map { $0.result }
+    }
+
+    func finished(with res: FlowOpResult) {
+        guard res.error == nil else {
+            safeError = res.error!
+            safeState = .failed
+            return
+        }
+
+        let shouldFinish = addNewResult(res)
+
+        guard !testFlow else {
+            safeState = .testing
+            return
+        }
+
+        guard shouldFinish else { return }
+        safeState = .finished
+    }
+}

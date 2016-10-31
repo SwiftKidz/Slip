@@ -24,20 +24,15 @@
 
 import Foundation
 
-//    func onFinish(_ block: @escaping FinishBlock) -> Self
-//    func onError(_ block: @escaping ErrorBlock) -> Self
-//    func onCancel(_ block: @escaping CancelBlock) -> Self
-
 protocol FlowCore {
 
     associatedtype T
 
-    typealias FinishBlock = (FlowState<[T]>) -> ()
+    typealias FinishBlock = (FlowState, Result<[T]>) -> ()
     typealias ErrorBlock = (Error) -> ()
     typealias CancelBlock = () -> ()
-    typealias CodeBlock = (FlowControl, Any?) -> ()
 
-    var state: FlowState<[T]> { get }
+    var state: FlowState { get }
 
     func start()
     func cancel()

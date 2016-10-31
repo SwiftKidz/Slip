@@ -24,30 +24,20 @@
 
 import Foundation
 
-protocol FlowRunType {
-    typealias RunBlock = (Flow, Int, Any) -> ()
-    typealias TestBlock = (TestHandler) -> ()
-
-    var testFlow: Bool { get }
-    var testAtBeginning: Bool { get }
-    var runAfterTest: (() -> ())? { get set }
-
-    var opQueue: OperationQueue { get }
-    var blocks: [RunBlock] { get }
-
-    func testComplete(success: Bool, error: Error?)
-    var lastRunResult: Any { get }
-
+public enum Result<T> {
+    case success(T)
+    case failure(Error)
 }
 
-extension FlowRunType where Self: FlowOpHandler {
+extension Result {
 
-    func runFlowOfTests() {
-
+    public var value: T? {
+        guard case .success(let r) = self else { return nil }
+        return r
     }
 
-    func runFlowOfBlocks() {
-        let ops = [Int](0..<blocks.count).map { FlowOp(orderNumber: $0, flowHandler: self, run: blocks[$0]) }.map { $0.operation }
-        opQueue.addOperations(ops, waitUntilFinished: false)
+    public var error: Error? {
+        guard case .failure(let e) = self else { return nil }
+        return e
     }
 }

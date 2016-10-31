@@ -24,22 +24,23 @@
 
 import Foundation
 
-public final class Step {
-    public typealias CodeBlock = (FlowControl, Any?) -> ()
-    public typealias CodeBlockNoPreviousResult = (FlowControl) -> ()
-    internal let codeClosure: CodeBlock
-    internal let runOnBackgroundThread: Bool
+protocol FlowTypeBlocks {
+    typealias RunBlock = (Op, Int, Any?) -> ()
 
-    internal init(onBackgroundThread: Bool = false, closure: @escaping CodeBlock) {
-        runOnBackgroundThread = onBackgroundThread
-        codeClosure = closure
+    var blocks: [RunBlock] { get }
+    var runBlock: RunBlock { get }
+
+}
+
+extension FlowTypeBlocks where Self: FlowRun & FlowOpHandler & FlowResults & Safe {
+
+    func runClosure() {
+        let run = FlowOp(orderNumber: safeResults.count, flowHandler: self, run: runBlock).operation
+        opQueue.addOperation(run)
     }
 
-    internal func runStep(flowController: FlowControl, previousResult: Any?) {
-        guard runOnBackgroundThread else { codeClosure(flowController, previousResult); return }
-
-        DispatchQueue.global(qos: DispatchQoS.QoSClass.utility).async {
-            self.codeClosure(flowController, previousResult)
-        }
+    func runFlowOfBlocks() {
+        let ops = [Int](0..<blocks.count).map { FlowOp(orderNumber: $0, flowHandler: self, run: blocks[$0]) }.map { $0.operation }
+        opQueue.addOperations(ops, waitUntilFinished: false)
     }
 }

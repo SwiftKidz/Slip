@@ -24,12 +24,11 @@
 
 import Foundation
 
-protocol FlowHandlerBlocks: class, FlowCore, FlowRunType {
+protocol FlowHandlerBlocks: class, FlowCore, FlowTypeBlocks, FlowTypeTests {
 
     var finishBlock: FinishBlock { get set }
     var errorBlock: ErrorBlock? { get set }
     var cancelBlock: CancelBlock? { get set }
-
 
     var runBlock: RunBlock { get set }
     var testBlock: TestBlock { get set }
@@ -38,19 +37,19 @@ protocol FlowHandlerBlocks: class, FlowCore, FlowRunType {
 
 extension FlowHandlerBlocks {
 
-    func onFinish(_ block: @escaping FinishBlock) -> Self {
+    public func onFinish(_ block: @escaping FinishBlock) -> Self {
         guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
         finishBlock = block
         return self
     }
 
-    func onError(_ block: @escaping ErrorBlock) -> Self {
+    public func onError(_ block: @escaping ErrorBlock) -> Self {
         guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
         errorBlock = block
         return self
     }
 
-    func onCancel(_ block: @escaping CancelBlock) -> Self {
+    public func onCancel(_ block: @escaping CancelBlock) -> Self {
         guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
         cancelBlock = block
         return self
@@ -59,22 +58,15 @@ extension FlowHandlerBlocks {
 
 extension FlowHandlerBlocks {
 
-    func onRun(_ block: @escaping RunBlock) -> Self {
+    public func onRun(_ block: @escaping RunBlock) -> Self {
         guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
         runBlock = block
         return self
     }
 
-    func onTest(_ block: @escaping TestBlock) -> Self {
+    public func onTest(_ block: @escaping TestBlock) -> Self {
         guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
         testBlock = block
         return self
     }
-
-//    internal func whenToRun(_ block: @escaping ConditionTestBlock) -> Self {
-//        guard case .queued = internalState else { print("Cannot modify flow after starting") ; return self }
-//        shouldRunTestBlock = block
-//        return self
-//    }
-
 }

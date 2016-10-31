@@ -24,12 +24,6 @@
 
 import Foundation
 
-public protocol TestingFlow {
-
-    typealias RunBlock = (FlowControl) -> ()
-    typealias TestBlock = (TestHandler) -> ()
-
-    func onRun(_ block: @escaping RunBlock) -> Self
-    func onTest(_ block: @escaping TestBlock) -> Self
-
+protocol FlowRun {
+    var opQueue: OperationQueue { get }
 }

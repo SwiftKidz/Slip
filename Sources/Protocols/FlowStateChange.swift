@@ -24,19 +24,9 @@
 
 import Foundation
 
-protocol FlowStateChanged: class, FlowCore, FlowHandlerBlocks, SafeState, FlowResults, FlowRunType {}
+protocol FlowStateChanged: class, FlowCore, FlowHandlerBlocks, SafeState, FlowResults, FlowError, FlowRun {}
 
-extension FlowStateChanged where Self: FlowRunType {
-
-    func verifyTest(runClosure: @escaping ()->()) {
-        guard testFlow else { runClosure(); return }
-
-//        guard shouldRunTestBlock(state) else { runClosure(); return }
-//        runTest(whenCompletedDo: runClosure)
-    }
-}
-
-extension FlowStateChanged where Self: FlowRunType & FlowOpHandler {
+extension FlowStateChanged where Self: FlowOpHandler & FlowTestHandler & FlowTypeTests & FlowTypeBlocks & FlowOutcome {
 
     func stateChanged() {
         switch safeState {
@@ -58,27 +48,27 @@ extension FlowStateChanged where Self: FlowRunType & FlowOpHandler {
     }
 
     func testing() {
-        
+        runTest()
     }
 
     func running() {
-        testFlow ? runFlowOfTests() : runFlowOfBlocks()
+        testFlow ? runClosure() : runFlowOfBlocks()
     }
 
     func queued() {
-        safeState = testFlow ? .testing : .running(outputResults)
+        guard testFlow else { safeState = .running; return }
+        guard testAtBeginning else { safeState = .running; return }
+        safeState = .testing
     }
-}
-
-extension FlowStateChanged {
 
     func failed() {
+        if !testFlow { opQueue.cancelAllOperations() }
         guard
             let failBlock = errorBlock,
-            let error = state.error
+            let error = safeError
             else {
                 DispatchQueue.main.async {
-                    self.finishBlock(self.state)
+                    self.finishBlock(self.safeState, self.flowEndResult)
                 }
                 return
         }
@@ -87,25 +77,20 @@ extension FlowStateChanged {
         }
     }
 
-    func finished() {
-        finishBlock(state)
-    }
-}
-
-
-
-extension FlowStateChanged {
-
     func canceled() {
         if !testFlow { opQueue.cancelAllOperations() }
         guard let cancelBlock = cancelBlock else {
             DispatchQueue.main.async {
-                self.finishBlock(self.state)
+                 self.finishBlock(self.safeState, self.flowEndResult)
             }
             return
         }
         DispatchQueue.main.async {
             cancelBlock()
         }
+    }
+
+    func finished() {
+        self.finishBlock(self.safeState, self.flowEndResult)
     }
 }

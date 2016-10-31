@@ -24,27 +24,24 @@
 
 import Foundation
 
-public enum FlowState {
-    case ready
-    case queued
-    case testing
-    case running
-    case canceled
-    case failed
-    case finished
+protocol FlowError: class {
+    var rawError: Error? { get set }
 }
 
-extension FlowState: Equatable {
-    public static func==(lhs: FlowState, rhs: FlowState) -> Bool {
-        switch (lhs, rhs) {
-        case (.ready, .ready): return true
-        case (.queued, .queued): return true
-        case (.testing, .testing): return true
-        case (.canceled, .canceled): return true
-        case (.failed, .failed): return true
-        case (.running, .running): return true
-        case (.finished, .finished): return true
-        default: return false
+extension FlowError where Self: Safe {
+
+    var safeError: Error? {
+        get {
+            var val: Error?
+            read {
+                val = self.rawError
+            }
+            return val
+        }
+        set {
+            write {
+                self.rawError = newValue
+            }
         }
     }
 }

@@ -49,9 +49,9 @@ extension FlowResults where Self: Safe {
     }
 }
 
-extension FlowResults where Self: Safe & FlowRunType {
+extension FlowResults where Self: FlowTypeBlocks {
 
-    var outputResults: Any {
-        return safeResults
+    var numberOfRunningBlocks: Int {
+        return blocks.count
     }
 }

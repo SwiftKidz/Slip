@@ -25,14 +25,14 @@
 import Foundation
 
 protocol SafeState: class, Safe {
-    var rawState: FlowState<Any> { get set }
+    var rawState: FlowState { get set }
 }
 
-extension SafeState where Self: FlowStateChanged & FlowOpHandler {
+extension SafeState where Self: FlowStateChanged & FlowOpHandler & FlowTestHandler & FlowOutcome {
 
-    var safeState: FlowState<Any> {
+    var safeState: FlowState {
         get {
-            var val: FlowState<Any>!
+            var val: FlowState!
             read {
                 val = self.rawState
             }

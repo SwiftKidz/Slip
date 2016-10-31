@@ -24,9 +24,14 @@
 
 import Foundation
 
-public protocol StepFlow {
+protocol FlowOutcome: class, FlowCore {}
 
-    typealias CodeBlock = (FlowControl, Any?) -> ()
-    func step(onBackgroundThread: Bool, closure: @escaping CodeBlock) -> Self
+extension FlowOutcome where Self: Safe & FlowError & FlowResults {
 
+    var flowEndResult: Result<[T]> {
+        let error = safeError
+        guard error == nil else { return Result.failure(error!) }
+
+        return Result.success(safeResults.flatMap { $0.result as? T })
+    }
 }

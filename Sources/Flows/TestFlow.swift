@@ -24,27 +24,19 @@
 
 import Foundation
 
-public enum FlowState {
-    case ready
-    case queued
-    case testing
-    case running
-    case canceled
-    case failed
-    case finished
-}
+public final class TestFlow<T>: FlowRunner<T>, TestFlowApi, FlowCoreApi {
 
-extension FlowState: Equatable {
-    public static func==(lhs: FlowState, rhs: FlowState) -> Bool {
-        switch (lhs, rhs) {
-        case (.ready, .ready): return true
-        case (.queued, .queued): return true
-        case (.testing, .testing): return true
-        case (.canceled, .canceled): return true
-        case (.failed, .failed): return true
-        case (.running, .running): return true
-        case (.finished, .finished): return true
-        default: return false
-        }
+    public init(run: @escaping TestFlowApi.RunBlock = {_ in},
+         test: @escaping TestFlowApi.TestBlock = {_ in},
+         limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
+         runQoS: QualityOfService = .background,
+         sync: Bool = false) {
+        super.init(runBlocks: [],
+                  run: run,
+                  test: test,
+                  limit: limit,
+                  runQoS: runQoS,
+                  sync: sync)
+        testFlow = true
     }
 }

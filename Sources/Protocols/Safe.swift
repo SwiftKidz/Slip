@@ -25,7 +25,6 @@
 import Foundation
 
 protocol Safe {
-
     var safeQueue: DispatchQueue { get }
 }
 

@@ -26,26 +26,27 @@ import Foundation
 
 internal class FlowRunner<T> {
 
-    typealias FinishBlock = (FlowState<[T]>) -> ()
+    public typealias FinishBlock = (FlowState, Result<[T]>) -> ()
 
     var finishBlock: FinishBlock
     var errorBlock: FlowCore.ErrorBlock?
     var cancelBlock: FlowCore.CancelBlock?
 
-    var runBlock: FlowRunType.RunBlock
-    var testBlock: FlowRunType.TestBlock
+    var runBlock: FlowTypeBlocks.RunBlock
+    var testBlock: FlowTypeTests.TestBlock
 
-    var rawState: FlowState<Any>
+    var rawState: FlowState
     var rawResults: [FlowOpResult]
+    var rawError: Error?
 
-    let blocks: [FlowRunType.RunBlock]
+    let blocks: [FlowTypeBlocks.RunBlock]
     let limitOfSimultaneousOps: Int
     let qos: QualityOfService
     let synchronous: Bool
 
     var testFlow: Bool = false
-    var testAtBeginning: Bool = true
-    var runAfterTest: (() -> ())?
+    public var testAtBeginning: Bool = true
+    public var testPassResult: Bool = true
 
     let safeQueue: DispatchQueue = DispatchQueue(label: "com.slip.flow.safeQueue", attributes: DispatchQueue.Attributes.concurrent)
 
@@ -56,7 +57,7 @@ internal class FlowRunner<T> {
         return queue
     }()
 
-    convenience init(runBlocks: [FlowRunType.RunBlock],
+    convenience init(runBlocks: [FlowTypeBlocks.RunBlock],
          limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
          runQoS: QualityOfService = .background,
          sync: Bool = false) {
@@ -68,8 +69,8 @@ internal class FlowRunner<T> {
                   sync: sync)
     }
 
-    convenience init(run: @escaping FlowRunType.RunBlock,
-                     test: @escaping FlowRunType.TestBlock,
+    convenience init(run: @escaping FlowTypeBlocks.RunBlock,
+                     test: @escaping FlowTypeTests.TestBlock,
                      limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
                      runQoS: QualityOfService = .background,
                      sync: Bool = false) {
@@ -79,11 +80,12 @@ internal class FlowRunner<T> {
                   limit: limit,
                   runQoS: runQoS,
                   sync: sync)
+        testFlow = true
     }
 
-    private init(runBlocks: [FlowRunType.RunBlock],
-                 run: @escaping FlowRunType.RunBlock,
-                 test: @escaping FlowRunType.TestBlock,
+    init(runBlocks: [FlowTypeBlocks.RunBlock],
+                 run: @escaping FlowTypeBlocks.RunBlock,
+                 test: @escaping FlowTypeTests.TestBlock,
                  limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
                  runQoS: QualityOfService = .background,
                  sync: Bool = false) {
@@ -96,68 +98,46 @@ internal class FlowRunner<T> {
         qos = runQoS
         synchronous = sync
         rawResults = []
+        stateChanged()
     }
 
-}
-
-extension FlowRunner: FlowHandlerBlocks {}
-
-extension FlowRunner: Safe, SafeState {}
-
-extension FlowRunner: FlowResults {
-
-    var numberOfRunningBlocks: Int {
-        return blocks.count
-    }
-}
-
-extension FlowRunner: FlowStateChanged {}
-
-extension FlowRunner: FlowOpHandler {
-
-    var isCanceled: Bool {
-        return !(safeState == FlowState.running(nil))
-    }
-
-    var currentResults: Any? {
-        return safeResults.map { $0.result }
-    }
-
-    func finished(with res: FlowOpResult) {
-        guard !testFlow else { return }
-
-        let shouldFinish = addNewResult(res)
-        guard shouldFinish else { return }
-        safeState = .finished(safeResults.map { $0.result })
-    }
-}
-
-extension FlowRunner: FlowRunType {
-
-    var lastRunResult: Any {
-        return safeResults
-    }
-
-    func testComplete(success: Bool, error: Error?) {
-
-    }
 }
 
 extension FlowRunner: FlowCore {
 
-    var state: FlowState<[T]> {
-        return safeState.convertType()
+    var state: FlowState {
+        return safeState
     }
 
-    func start() {
+    public func start() {
         guard case .ready = safeState else { print("Cannot start flow twice") ; return }
         safeState = .queued
-        //safeState = .running(outputResults)
-        //checkFlowTypeAndRun()
     }
 
-    func cancel() {
+    public func cancel() {
         guard case .running = safeState else { print("Cannot cancel a flow that is not running") ; return }
         safeState = .canceled
     }
 }
+
+extension FlowRunner: SafeState {}
+
+extension FlowRunner: FlowRun {}
+
+extension FlowRunner: FlowTypeBlocks {}
+
+extension FlowRunner: FlowTypeTests {}
+
+extension FlowRunner: FlowHandlerBlocks {}
+
+extension FlowRunner: FlowError {}
+
+extension FlowRunner: FlowResults {}
+
+extension FlowRunner: FlowOutcome {}
+
+extension FlowRunner: FlowStateChanged {}
+
+extension FlowRunner: FlowOpHandler {}
+
+extension FlowRunner: FlowTestHandler {}
