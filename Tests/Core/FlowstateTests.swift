@@ -45,5 +45,4 @@ class FlowstateTests: XCTestCase {
         XCTAssertTrue(state == FlowState.finished)
         XCTAssertTrue(state != FlowState.failed)
     }
-
 }

@@ -24,13 +24,13 @@
 
 import Foundation
 
-internal class FlowRunner<T> {
+internal class FlowRunner<T>: FlowCoreApi {
 
     public typealias FinishBlock = (FlowState, Result<[T]>) -> ()
 
     var finishBlock: FinishBlock
-    var errorBlock: FlowCore.ErrorBlock?
-    var cancelBlock: FlowCore.CancelBlock?
+    var errorBlock: FlowCoreApi.ErrorBlock?
+    var cancelBlock: FlowCoreApi.CancelBlock?
 
     var runBlock: FlowTypeBlocks.RunBlock
     var testBlock: FlowTypeTests.TestBlock
@@ -45,8 +45,8 @@ internal class FlowRunner<T> {
     let synchronous: Bool
 
     var testFlow: Bool = false
-    public var testAtBeginning: Bool = true
-    public var testPassResult: Bool = true
+    var testAtBeginning: Bool = true
+    var testPassResult: Bool = true
 
     let safeQueue: DispatchQueue = DispatchQueue(label: "com.slip.flow.safeQueue", attributes: DispatchQueue.Attributes.concurrent)
 
@@ -57,43 +57,15 @@ internal class FlowRunner<T> {
         return queue
     }()
 
-    convenience init(runBlocks: [FlowTypeBlocks.RunBlock],
+    init(runBlocks: [FlowTypeBlocks.RunBlock],
          limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
          runQoS: QualityOfService = .background,
          sync: Bool = false) {
-        self.init(runBlocks: runBlocks,
-                  run: { _ in },
-                  test: { _ in },
-                  limit: limit,
-                  runQoS: runQoS,
-                  sync: sync)
-    }
-
-    convenience init(run: @escaping FlowTypeBlocks.RunBlock,
-                     test: @escaping FlowTypeTests.TestBlock,
-                     limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
-                     runQoS: QualityOfService = .background,
-                     sync: Bool = false) {
-        self.init(runBlocks: [],
-                  run: run,
-                  test: test,
-                  limit: limit,
-                  runQoS: runQoS,
-                  sync: sync)
-        testFlow = true
-    }
-
-    init(runBlocks: [FlowTypeBlocks.RunBlock],
-                 run: @escaping FlowTypeBlocks.RunBlock,
-                 test: @escaping FlowTypeTests.TestBlock,
-                 limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
-                 runQoS: QualityOfService = .background,
-                 sync: Bool = false) {
         rawState = .ready
         finishBlock = { _ in }
         blocks = runBlocks
-        runBlock = run
-        testBlock = test
+        runBlock = { $0.0.finish() }
+        testBlock = { $0.complete(success: false, error: nil) }
         limitOfSimultaneousOps = limit
         qos = runQoS
         synchronous = sync
@@ -101,6 +73,41 @@ internal class FlowRunner<T> {
         stateChanged()
     }
 
+    init(run: @escaping FlowTypeBlocks.RunBlock,
+                     test: @escaping FlowTypeTests.TestBlock,
+                     limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
+                     runQoS: QualityOfService = .background,
+                     sync: Bool = false) {
+        rawState = .ready
+        finishBlock = { _ in }
+        blocks = []
+        runBlock = run
+        testBlock = test
+        limitOfSimultaneousOps = limit
+        qos = runQoS
+        synchronous = sync
+        rawResults = []
+        stateChanged()
+        testFlow = true
+    }
+
+//    init(runBlocks: [FlowTypeBlocks.RunBlock],
+//                 run: @escaping FlowTypeBlocks.RunBlock,
+//                 test: @escaping FlowTypeTests.TestBlock,
+//                 limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
+//                 runQoS: QualityOfService = .background,
+//                 sync: Bool = false) {
+//        rawState = .ready
+//        finishBlock = { _ in }
+//        blocks = runBlocks
+//        runBlock = run
+//        testBlock = test
+//        limitOfSimultaneousOps = limit
+//        qos = runQoS
+//        synchronous = sync
+//        rawResults = []
+//        stateChanged()
+//    }
 }
 
 extension FlowRunner: FlowCore {
@@ -120,6 +127,29 @@ extension FlowRunner: FlowCore {
     }
 }
 
+extension FlowRunner: FlowHandlerBlocks {
+
+    public func onFinish(_ block: @escaping FinishBlock) -> Self {
+        guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
+        finishBlock = block
+        return self
+    }
+
+    public func onError(_ block: @escaping FlowCoreApi.ErrorBlock) -> Self {
+        guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
+        errorBlock = block
+        return self
+    }
+
+    public func onCancel(_ block: @escaping FlowCoreApi.CancelBlock) -> Self {
+        guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
+        cancelBlock = block
+        return self
+    }
+}
+
+extension FlowRunner: FlowOutcome {}
+
 extension FlowRunner: SafeState {}
 
 extension FlowRunner: FlowRun {}
@@ -128,13 +158,9 @@ extension FlowRunner: FlowTypeBlocks {}
 
 extension FlowRunner: FlowTypeTests {}
 
-extension FlowRunner: FlowHandlerBlocks {}
-
 extension FlowRunner: FlowError {}
 
 extension FlowRunner: FlowResults {}
-
-extension FlowRunner: FlowOutcome {}
 
 extension FlowRunner: FlowStateChanged {}
 

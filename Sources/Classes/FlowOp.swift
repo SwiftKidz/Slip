@@ -26,7 +26,7 @@ import Foundation
 
 final class FlowOp {
 
-    typealias RunBlock = (Op, Int, Any?) -> ()
+    typealias RunBlock = (BlockOp, Int, Any?) -> ()
 
     fileprivate let order: Int
     fileprivate let flow: FlowOpHandler
@@ -42,7 +42,7 @@ final class FlowOp {
 extension FlowOp {
 
     var operation: Operation {
-        let f: Op = self
+        let f: BlockOp = self
         let o: Int = order
         let r: Any? = flow.currentResults
         return BlockOperation { [weak self] in
@@ -56,7 +56,7 @@ extension FlowOp {
     }
 }
 
-extension FlowOp: Op {
+extension FlowOp: BlockOp {
 
     func finish<R>(_ result: R) {
         guard !flow.isCanceled else {

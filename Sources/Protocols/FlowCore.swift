@@ -26,14 +26,14 @@ import Foundation
 
 protocol FlowCore {
 
-    associatedtype T
-
-    typealias FinishBlock = (FlowState, Result<[T]>) -> ()
-    typealias ErrorBlock = (Error) -> ()
-    typealias CancelBlock = () -> ()
-
-    var state: FlowState { get }
-
-    func start()
-    func cancel()
+//    associatedtype T
+//
+//    typealias FinishBlock = (Flow) -> ()//(FlowState, Result<[T]>) -> ()//
+//    typealias ErrorBlock = (Error) -> ()
+//    typealias CancelBlock = () -> ()
+//
+//    var state: FlowState { get }
+//
+//    func start()
+//    func cancel()
 }

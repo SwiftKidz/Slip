@@ -9,14 +9,18 @@
 import Foundation
 
 public protocol FlowCoreApi {
-    
-    typealias FinishBlock = (Flow) -> ()
+
+    associatedtype T
+
+    typealias FinishBlock = (FlowState, Result<[T]>) -> ()//(Flow) -> ()
     typealias ErrorBlock = (Error) -> ()
     typealias CancelBlock = () -> ()
 
     func onFinish(_ block: @escaping FinishBlock) -> Self
     func onError(_ block: @escaping ErrorBlock) -> Self
     func onCancel(_ block: @escaping CancelBlock) -> Self
+
+    var state: FlowState { get }
 
     func start()
     func cancel()

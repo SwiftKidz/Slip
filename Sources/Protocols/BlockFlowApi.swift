@@ -24,14 +24,6 @@
 
 import Foundation
 
-public protocol TestFlowApi {
-
+public protocol BlockFlowApi {
     typealias RunBlock = (BlockOp, Int, Any?) -> ()
-    typealias TestBlock = (Test) -> ()
-
-    var testBeforeRun: Bool { get set }
-    var testPassingResult: Bool { get set }
-
-    func onRun(_ block: @escaping RunBlock) -> Self
-    func onTest(_ block: @escaping TestBlock) -> Self
 }

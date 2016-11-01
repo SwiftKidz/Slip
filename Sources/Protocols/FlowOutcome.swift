@@ -24,11 +24,11 @@
 
 import Foundation
 
-protocol FlowOutcome: class, FlowCore {}
+protocol FlowOutcome: class, FlowCoreApi {}
 
 extension FlowOutcome where Self: Safe & FlowError & FlowResults {
 
-    var flowEndResult: Result<[T]> {
+    var endResult: Result<[T]> {
         let error = safeError
         guard error == nil else { return Result.failure(error!) }
 

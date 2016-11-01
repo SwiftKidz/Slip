@@ -68,7 +68,7 @@ extension FlowStateChanged where Self: FlowOpHandler & FlowTestHandler & FlowTyp
             let error = safeError
             else {
                 DispatchQueue.main.async {
-                    self.finishBlock(self.safeState, self.flowEndResult)
+                    self.finishBlock(self.safeState, self.endResult)
                 }
                 return
         }
@@ -81,7 +81,7 @@ extension FlowStateChanged where Self: FlowOpHandler & FlowTestHandler & FlowTyp
         if !testFlow { opQueue.cancelAllOperations() }
         guard let cancelBlock = cancelBlock else {
             DispatchQueue.main.async {
-                 self.finishBlock(self.safeState, self.flowEndResult)
+                 self.finishBlock(self.safeState, self.endResult)
             }
             return
         }
@@ -91,6 +91,6 @@ extension FlowStateChanged where Self: FlowOpHandler & FlowTestHandler & FlowTyp
     }
 
     func finished() {
-        self.finishBlock(self.safeState, self.flowEndResult)
+        self.finishBlock(self.safeState, self.endResult)
     }
 }

@@ -33,14 +33,16 @@ class TestFlowTests: XCTestCase {
         var count: Int = 0
 
         let flow = TestFlow<Int>()
+        .onFinish { state, result in
+            print(state)
+            print(result)
+            expectation.fulfill()
+        }
         flow.onCancel {
 
-        }.onError{ _ in
-                
-        }.onFinish { state, result in
+        }.onError { _ in
 
-        }
-        flow.onRun { flow, iteration, results in
+        }.onRun { flow, iteration, results in
             count += 1
             flow.finish(iteration)
         }.onTest { test in
@@ -50,4 +52,24 @@ class TestFlowTests: XCTestCase {
         waitForExpectations(timeout: 5, handler: nil)
     }
 
+    func testNoBlocksFunctionality() {
+        let expectation = self.expectation(description: name ?? "Test")
+
+        let test = TestFlow<Int>()
+        .onFinish { state, result in
+            print(state)
+            print(result)
+            expectation.fulfill()
+        }
+
+        test.testBeforeRun = false
+        test.testPassingResult = true
+
+        XCTAssertFalse(test.testBeforeRun)
+        XCTAssertTrue(test.testPassingResult)
+
+        test.start()
+
+        waitForExpectations(timeout: 5, handler: nil)
+    }
 }

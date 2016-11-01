@@ -25,14 +25,14 @@
 import Foundation
 
 protocol FlowTypeBlocks {
-    typealias RunBlock = (Op, Int, Any?) -> ()
+    typealias RunBlock = (BlockOp, Int, Any?) -> ()
 
     var blocks: [RunBlock] { get }
     var runBlock: RunBlock { get }
 
 }
 
-extension FlowTypeBlocks where Self: FlowRun & FlowOpHandler & FlowResults & Safe {
+extension FlowTypeBlocks where Self: FlowRun & FlowOpHandler & FlowResults & Safe & SafeState & FlowOutcome & FlowStateChanged & FlowTestHandler {
 
     func runClosure() {
         let run = FlowOp(orderNumber: safeResults.count, flowHandler: self, run: runBlock).operation
@@ -40,6 +40,7 @@ extension FlowTypeBlocks where Self: FlowRun & FlowOpHandler & FlowResults & Saf
     }
 
     func runFlowOfBlocks() {
+        guard !blocks.isEmpty else { safeState = .finished; return }
         let ops = [Int](0..<blocks.count).map { FlowOp(orderNumber: $0, flowHandler: self, run: blocks[$0]) }.map { $0.operation }
         opQueue.addOperations(ops, waitUntilFinished: false)
     }

@@ -24,19 +24,35 @@
 
 import Foundation
 
-public final class TestFlow<T>: FlowRunner<T>, TestFlowApi, FlowCoreApi {
+public final class TestFlow<T>: FlowRunner<T>, TestFlowApi {
 
-    public init(run: @escaping TestFlowApi.RunBlock = {_ in},
-         test: @escaping TestFlowApi.TestBlock = {_ in},
+    public var testBeforeRun: Bool {
+        get {
+            return testAtBeginning
+        }
+        set {
+            testAtBeginning = newValue
+        }
+    }
+
+    public var testPassingResult: Bool {
+        get {
+            return testPassResult
+        }
+        set {
+            testPassResult = newValue
+        }
+    }
+
+    public override init(run: @escaping TestFlowApi.RunBlock = { $0.0.finish() },
+         test: @escaping TestFlowApi.TestBlock = { $0.complete(success: false, error: nil) },
          limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
          runQoS: QualityOfService = .background,
          sync: Bool = false) {
-        super.init(runBlocks: [],
-                  run: run,
+        super.init(run: run,
                   test: test,
                   limit: limit,
                   runQoS: runQoS,
                   sync: sync)
-        testFlow = true
     }
 }

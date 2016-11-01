@@ -22,29 +22,14 @@
  SOFTWARE.
  */
 
-import XCTest
-@testable import Slip
+import Foundation
 
-class StepTests: XCTestCase {
+public final class BlockFlow<T>: FlowRunner<T>, BlockFlowApi {
 
-    func testStepOnCallingThread() {
-        let expectation = self.expectation(description: name ?? "Test")
-        let step = Step { (stepFlow, result) -> (Void) in
-            XCTAssertNil(result)
-            expectation.fulfill()
-        }
-        step.runStep(flowController: MockFlow(), previousResult: nil)
-        waitForExpectations(timeout: 0.5, handler: nil)
+    public override init(runBlocks: [BlockFlowApi.RunBlock],
+         limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
+         runQoS: QualityOfService = .background,
+         sync: Bool = false) {
+        super.init(runBlocks: runBlocks, limit: limit, runQoS: runQoS, sync: sync)
     }
-
-    func testStepOnBackgroundThread() {
-        let expectation = self.expectation(description: name ?? "Test")
-        let step = Step(onBackgroundThread: true) { (stepFlow, result) -> (Void) in
-            XCTAssertNil(result)
-            expectation.fulfill()
-        }
-        step.runStep(flowController: MockFlow(), previousResult: nil)
-        waitForExpectations(timeout: 0.5, handler: nil)
-    }
-
 }

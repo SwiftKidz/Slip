@@ -13,6 +13,23 @@
 		3549BB661DA38ADB00C63030 /* Slip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3549BB211DA389CD00C63030 /* Slip.framework */; };
 		3549BB751DA38AEF00C63030 /* Slip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3549BB481DA389F300C63030 /* Slip.framework */; };
 		3549BB841DA38B0000C63030 /* Slip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3549BB3B1DA389E800C63030 /* Slip.framework */; };
+		8101291F1DC91AB200A7807F /* FlowOpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8101291E1DC91AB200A7807F /* FlowOpTests.swift */; };
+		810129201DC91AB200A7807F /* FlowOpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8101291E1DC91AB200A7807F /* FlowOpTests.swift */; };
+		810129211DC91AB200A7807F /* FlowOpTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8101291E1DC91AB200A7807F /* FlowOpTests.swift */; };
+		810129231DC920CC00A7807F /* FlowTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810129221DC920CC00A7807F /* FlowTestTests.swift */; };
+		810129241DC920CC00A7807F /* FlowTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810129221DC920CC00A7807F /* FlowTestTests.swift */; };
+		810129251DC920CC00A7807F /* FlowTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810129221DC920CC00A7807F /* FlowTestTests.swift */; };
+		810129271DC927E200A7807F /* BlockFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810129261DC927E200A7807F /* BlockFlow.swift */; };
+		810129281DC927E200A7807F /* BlockFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810129261DC927E200A7807F /* BlockFlow.swift */; };
+		810129291DC927E200A7807F /* BlockFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810129261DC927E200A7807F /* BlockFlow.swift */; };
+		8101292A1DC927E200A7807F /* BlockFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810129261DC927E200A7807F /* BlockFlow.swift */; };
+		8101292C1DC953CA00A7807F /* BlockFlowApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8101292B1DC953CA00A7807F /* BlockFlowApi.swift */; };
+		8101292D1DC953CA00A7807F /* BlockFlowApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8101292B1DC953CA00A7807F /* BlockFlowApi.swift */; };
+		8101292E1DC953CA00A7807F /* BlockFlowApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8101292B1DC953CA00A7807F /* BlockFlowApi.swift */; };
+		8101292F1DC953CA00A7807F /* BlockFlowApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8101292B1DC953CA00A7807F /* BlockFlowApi.swift */; };
+		810129311DC954DB00A7807F /* BlockFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810129301DC954DB00A7807F /* BlockFlowTests.swift */; };
+		810129321DC954DB00A7807F /* BlockFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810129301DC954DB00A7807F /* BlockFlowTests.swift */; };
+		810129331DC954DB00A7807F /* BlockFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810129301DC954DB00A7807F /* BlockFlowTests.swift */; };
 		81212FAB1DBB7862005F550B /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81212FAA1DBB7862005F550B /* Mocks.swift */; };
 		81212FAC1DBB7862005F550B /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81212FAA1DBB7862005F550B /* Mocks.swift */; };
 		81212FAD1DBB7862005F550B /* Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81212FAA1DBB7862005F550B /* Mocks.swift */; };
@@ -177,9 +194,12 @@
 		357D954E1DA3F2E000AEC55F /* Quick.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quick.framework; path = Carthage/Build/Mac/Quick.framework; sourceTree = "<group>"; };
 		357D95571DA3F32600AEC55F /* Nimble.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Nimble.framework; path = Carthage/Build/tvOS/Nimble.framework; sourceTree = "<group>"; };
 		357D95581DA3F32600AEC55F /* Quick.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quick.framework; path = Carthage/Build/tvOS/Quick.framework; sourceTree = "<group>"; };
+		8101291E1DC91AB200A7807F /* FlowOpTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowOpTests.swift; sourceTree = "<group>"; };
+		810129221DC920CC00A7807F /* FlowTestTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowTestTests.swift; sourceTree = "<group>"; };
+		810129261DC927E200A7807F /* BlockFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockFlow.swift; sourceTree = "<group>"; };
+		8101292B1DC953CA00A7807F /* BlockFlowApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockFlowApi.swift; sourceTree = "<group>"; };
+		810129301DC954DB00A7807F /* BlockFlowTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockFlowTests.swift; sourceTree = "<group>"; };
 		81212FAA1DBB7862005F550B /* Mocks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mocks.swift; sourceTree = "<group>"; };
-		81752CBF1DBB6FBF00C64D2A /* StepTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StepTests.swift; sourceTree = "<group>"; };
-		81752CC41DBB6FD600C64D2A /* SerialFlowTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerialFlowTests.swift; sourceTree = "<group>"; };
 		81C140041DBC525600E4CF80 /* Sequential.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sequential.swift; sourceTree = "<group>"; };
 		81C140051DBC525600E4CF80 /* Step+Sequential.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Step+Sequential.swift"; sourceTree = "<group>"; };
 		81C1400F1DBC528A00E4CF80 /* Sequential.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sequential.swift; sourceTree = "<group>"; };
@@ -199,7 +219,6 @@
 		C4653ACF1DBFA4C400AF9B35 /* Forever.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Forever.swift; sourceTree = "<group>"; };
 		C46E314C1DBFB40400FE5F49 /* FlowstateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowstateTests.swift; sourceTree = "<group>"; };
 		C46E31511DBFC47B00FE5F49 /* ForeverTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ForeverTests.swift; sourceTree = "<group>"; };
-		C46E315A1DBFD2B600FE5F49 /* RepeatFlowTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RepeatFlowTests.swift; sourceTree = "<group>"; };
 		C46E55251DBE5D85008800B4 /* Until.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Until.swift; sourceTree = "<group>"; };
 		C46E552B1DBE5F99008800B4 /* UntilTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UntilTests.swift; sourceTree = "<group>"; };
 		C46E55351DBF6E54008800B4 /* DuringTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DuringTests.swift; sourceTree = "<group>"; };
@@ -333,6 +352,7 @@
 			children = (
 				81212FA91DBB783C005F550B /* Helpers */,
 				81752CBE1DBB6F7A00C64D2A /* Core */,
+				810129341DC954E400A7807F /* Flows */,
 				C46E554E1DBF7E58008800B4 /* Operations */,
 				3549BB5B1DA38A8C00C63030 /* Supporting Files */,
 			);
@@ -370,6 +390,16 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		810129341DC954E400A7807F /* Flows */ = {
+			isa = PBXGroup;
+			children = (
+				C49492211DC7BFB800E0D525 /* TestFlowTests.swift */,
+				810129301DC954DB00A7807F /* BlockFlowTests.swift */,
+			);
+			name = Flows;
+			path = Core;
+			sourceTree = "<group>";
+		};
 		81212FA91DBB783C005F550B /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
@@ -381,10 +411,10 @@
 		81752CBE1DBB6F7A00C64D2A /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				C49492081DC7B73700E0D525 /* Deprecated */,
 				C46E314C1DBFB40400FE5F49 /* FlowstateTests.swift */,
+				810129221DC920CC00A7807F /* FlowTestTests.swift */,
+				8101291E1DC91AB200A7807F /* FlowOpTests.swift */,
 				C4C4DA0D1DC36EEB00CB8A30 /* FlowRunnerTests.swift */,
-				C49492211DC7BFB800E0D525 /* TestFlowTests.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -450,6 +480,7 @@
 		81F1C05F1DBAAD04009D82CE /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
+				8101292B1DC953CA00A7807F /* BlockFlowApi.swift */,
 				C4C4DA071DC3609000CB8A30 /* BlockOp.swift */,
 				C4153D311DC7C8A700EBC3AD /* Flow.swift */,
 				C4153D2C1DC7C23100EBC3AD /* FlowCoreApi.swift */,
@@ -643,19 +674,10 @@
 			path = Waterfall;
 			sourceTree = "<group>";
 		};
-		C49492081DC7B73700E0D525 /* Deprecated */ = {
-			isa = PBXGroup;
-			children = (
-				81752CBF1DBB6FBF00C64D2A /* StepTests.swift */,
-				81752CC41DBB6FD600C64D2A /* SerialFlowTests.swift */,
-				C46E315A1DBFD2B600FE5F49 /* RepeatFlowTests.swift */,
-			);
-			name = Deprecated;
-			sourceTree = "<group>";
-		};
 		C49492091DC7BAC400E0D525 /* Flows */ = {
 			isa = PBXGroup;
 			children = (
+				810129261DC927E200A7807F /* BlockFlow.swift */,
 				C494920A1DC7BB4800E0D525 /* TestFlow.swift */,
 			);
 			path = Flows;
@@ -1020,6 +1042,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C4C4D9E91DC2620400CB8A30 /* FlowHandlerBlocks.swift in Sources */,
+				810129271DC927E200A7807F /* BlockFlow.swift in Sources */,
 				C494920B1DC7BB4800E0D525 /* TestFlow.swift in Sources */,
 				C4C4D9EE1DC2631A00CB8A30 /* SafeState.swift in Sources */,
 				C4565B041DC7ADBC007C0943 /* FlowError.swift in Sources */,
@@ -1037,6 +1060,7 @@
 				C494921D1DC7BEC800E0D525 /* TestFlowApi.swift in Sources */,
 				C4C4DA081DC3609000CB8A30 /* BlockOp.swift in Sources */,
 				C4ACD5241DC39D670047B643 /* FlowRun.swift in Sources */,
+				8101292C1DC953CA00A7807F /* BlockFlowApi.swift in Sources */,
 				81F1C06D1DBAAE26009D82CE /* FlowState.swift in Sources */,
 				C49F11AF1DC75C54001E7430 /* FlowTestResult.swift in Sources */,
 				81C1401A1DBD65B400E4CF80 /* FlowCore.swift in Sources */,
@@ -1054,6 +1078,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C4C4D9EC1DC2620400CB8A30 /* FlowHandlerBlocks.swift in Sources */,
+				8101292A1DC927E200A7807F /* BlockFlow.swift in Sources */,
 				C494920E1DC7BB4800E0D525 /* TestFlow.swift in Sources */,
 				C4C4D9F11DC2631A00CB8A30 /* SafeState.swift in Sources */,
 				C4565B071DC7ADBC007C0943 /* FlowError.swift in Sources */,
@@ -1071,6 +1096,7 @@
 				C49492201DC7BEC800E0D525 /* TestFlowApi.swift in Sources */,
 				C4C4DA0B1DC3609000CB8A30 /* BlockOp.swift in Sources */,
 				C4ACD5271DC39D670047B643 /* FlowRun.swift in Sources */,
+				8101292F1DC953CA00A7807F /* BlockFlowApi.swift in Sources */,
 				81F1C0701DBAAE26009D82CE /* FlowState.swift in Sources */,
 				C49F11B21DC75C54001E7430 /* FlowTestResult.swift in Sources */,
 				81C1401D1DBD65B400E4CF80 /* FlowCore.swift in Sources */,
@@ -1088,6 +1114,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C4C4D9EA1DC2620400CB8A30 /* FlowHandlerBlocks.swift in Sources */,
+				810129281DC927E200A7807F /* BlockFlow.swift in Sources */,
 				C494920C1DC7BB4800E0D525 /* TestFlow.swift in Sources */,
 				C4C4D9EF1DC2631A00CB8A30 /* SafeState.swift in Sources */,
 				C4565B051DC7ADBC007C0943 /* FlowError.swift in Sources */,
@@ -1105,6 +1132,7 @@
 				C494921E1DC7BEC800E0D525 /* TestFlowApi.swift in Sources */,
 				C4C4DA091DC3609000CB8A30 /* BlockOp.swift in Sources */,
 				C4ACD5251DC39D670047B643 /* FlowRun.swift in Sources */,
+				8101292D1DC953CA00A7807F /* BlockFlowApi.swift in Sources */,
 				81F1C06E1DBAAE26009D82CE /* FlowState.swift in Sources */,
 				C49F11B01DC75C54001E7430 /* FlowTestResult.swift in Sources */,
 				81C1401B1DBD65B400E4CF80 /* FlowCore.swift in Sources */,
@@ -1122,6 +1150,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C4C4D9EB1DC2620400CB8A30 /* FlowHandlerBlocks.swift in Sources */,
+				810129291DC927E200A7807F /* BlockFlow.swift in Sources */,
 				C494920D1DC7BB4800E0D525 /* TestFlow.swift in Sources */,
 				C4C4D9F01DC2631A00CB8A30 /* SafeState.swift in Sources */,
 				C4565B061DC7ADBC007C0943 /* FlowError.swift in Sources */,
@@ -1139,6 +1168,7 @@
 				C494921F1DC7BEC800E0D525 /* TestFlowApi.swift in Sources */,
 				C4C4DA0A1DC3609000CB8A30 /* BlockOp.swift in Sources */,
 				C4ACD5261DC39D670047B643 /* FlowRun.swift in Sources */,
+				8101292E1DC953CA00A7807F /* BlockFlowApi.swift in Sources */,
 				81F1C06F1DBAAE26009D82CE /* FlowState.swift in Sources */,
 				C49F11B11DC75C54001E7430 /* FlowTestResult.swift in Sources */,
 				81C1401C1DBD65B400E4CF80 /* FlowCore.swift in Sources */,
@@ -1158,7 +1188,10 @@
 				C4C4DA0E1DC36EEB00CB8A30 /* FlowRunnerTests.swift in Sources */,
 				C49492221DC7BFB800E0D525 /* TestFlowTests.swift in Sources */,
 				C49492051DC7B6F800E0D525 /* FlowstateTests.swift in Sources */,
+				8101291F1DC91AB200A7807F /* FlowOpTests.swift in Sources */,
+				810129311DC954DB00A7807F /* BlockFlowTests.swift in Sources */,
 				81212FAB1DBB7862005F550B /* Mocks.swift in Sources */,
+				810129231DC920CC00A7807F /* FlowTestTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1169,7 +1202,10 @@
 				C4C4DA101DC36EEB00CB8A30 /* FlowRunnerTests.swift in Sources */,
 				C49492241DC7BFB800E0D525 /* TestFlowTests.swift in Sources */,
 				C49492071DC7B6FA00E0D525 /* FlowstateTests.swift in Sources */,
+				810129211DC91AB200A7807F /* FlowOpTests.swift in Sources */,
+				810129331DC954DB00A7807F /* BlockFlowTests.swift in Sources */,
 				81212FAD1DBB7862005F550B /* Mocks.swift in Sources */,
+				810129251DC920CC00A7807F /* FlowTestTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1180,7 +1216,10 @@
 				C4C4DA0F1DC36EEB00CB8A30 /* FlowRunnerTests.swift in Sources */,
 				C49492231DC7BFB800E0D525 /* TestFlowTests.swift in Sources */,
 				C49492061DC7B6F900E0D525 /* FlowstateTests.swift in Sources */,
+				810129201DC91AB200A7807F /* FlowOpTests.swift in Sources */,
+				810129321DC954DB00A7807F /* BlockFlowTests.swift in Sources */,
 				81212FAC1DBB7862005F550B /* Mocks.swift in Sources */,
+				810129241DC920CC00A7807F /* FlowTestTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

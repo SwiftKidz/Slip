@@ -22,34 +22,47 @@
  SOFTWARE.
  */
 
-import Foundation
+import XCTest
+import Slip
 
-@testable import Slip
+class BlockFlowTests: XCTestCase {
 
-struct MockFlow: FlowControl {
+    func testFunctionality() {
+        let expectation = self.expectation(description: name ?? "Test")
 
-    func finish(_ error: Error) {
+        let count: Int = 1000
 
+        let blocks: [BlockFlowApi.RunBlock] = [Int](0..<count).map { n in
+            return { (f: BlockOp, i: Int, r: Any?) in
+                f.finish(i)
+            }
+        }
+
+        let flow = BlockFlow<Int>(runBlocks: blocks)
+        .onFinish { state, result in
+            XCTAssert(state == .finished)
+            XCTAssertNotNil(result.value)
+            XCTAssert(result.value?.count == count)
+            expectation.fulfill()
+        }
+        flow.onCancel {
+
+        }.onError { _ in
+
+        }.start()
+
+        waitForExpectations(timeout: 5, handler: nil)
     }
-    func finish<T>(_ result: T) {
 
+    func testNoBlocksFunctionality() {
+        let expectation = self.expectation(description: name ?? "Test")
+
+        let blocks = BlockFlow<Int>(runBlocks: [])
+        .onFinish { state, result in
+            expectation.fulfill()
+        }
+        blocks.start()
+
+        waitForExpectations(timeout: 5, handler: nil)
     }
-}
-
-enum MockErrors: Error {
-    case errorOnFlow, errorOnTest
-}
-
-class MockFlowHandler: FlowTestHandler, FlowOpHandler {
-    var isCanceled: Bool
-    var currentResults: Any?
-
-    init(canceled: Bool, results: Any?) {
-        isCanceled = canceled
-        currentResults = results
-    }
-
-    func finished(with: FlowOpResult) {}
-
-    func finished(with: FlowTestResult) {}
 }
