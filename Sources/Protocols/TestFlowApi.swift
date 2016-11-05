@@ -26,7 +26,7 @@ import Foundation
 
 public protocol TestFlowApi {
 
-    typealias RunBlock = (BlockOp, Int, Any?) -> ()
+    typealias RunBlock = (BlockOp, Int, Any) -> ()
     typealias TestBlock = (Test) -> ()
 
     var testBeforeRun: Bool { get set }

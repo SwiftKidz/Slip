@@ -28,39 +28,34 @@ import XCTest
 
 class DoWhilstTests: XCTestCase {
 
-    func testWhilstFunctionality() {
+    func testFunctionality() {
         let expectationRun = self.expectation(description: name ?? "Test")
 
         var count: Int = 0
 
-        DoWhilst<Int>(run: { controler in
+        DoWhilst<Int>(run: { (opHandler) in
             count += 1
-            controler.finish(count)
-        }) { previous in
-            guard count > 5 else { return true }
-            return false
-        }.onFinish { state in
-            expectationRun.fulfill()
-            XCTAssertNotNil(state.value)
-            print(state)
-            XCTAssert(state.value == 6)
-        }.start()
+            opHandler.finish(count)
+        }, test: { return count < 5 })
+            .onFinish { (state, result) in
+                XCTAssertNotNil(result.value)
+                XCTAssert(result.value! == [1, 2, 3, 4, 5])
+                expectationRun.fulfill()
+            }.start()
 
         waitForExpectations(timeout: 0.5, handler: nil)
 
         let expectationRunOnce = self.expectation(description: name ?? "Test")
 
-        DoWhilst<Int>(run: { controler in
+        DoWhilst<Int>(run: { (opHandler) in
             count += 1
-            controler.finish(count)
-        }) { previous in
-            guard count > 5 else { return true }
-            return false
-        }.onFinish { state in
-            expectationRunOnce.fulfill()
-            XCTAssertNotNil(state.value)
-            XCTAssert(count == 7)
-        }.start()
+            opHandler.finish(count)
+        }, test: { return count < 5 })
+            .onFinish { (state, result) in
+                XCTAssertNotNil(result.value)
+                XCTAssert(result.value! == [6])
+                expectationRunOnce.fulfill()
+            }.start()
 
         waitForExpectations(timeout: 0.5, handler: nil)
     }

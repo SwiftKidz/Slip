@@ -30,7 +30,7 @@
 $ gem install cocoapods
 ```
 
-> CocoaPods 1.1.0+ is required to build Slip 0.0.1+.
+> CocoaPods 1.1.0+ is required to build Slip 0.0.4+.
 
 To integrate Slip into your Xcode project using CocoaPods, specify it in your `Podfile`:
 
@@ -39,7 +39,7 @@ source 'https://github.com/CocoaPods/Specs.git'
 platform :ios, '8.0'
 use_frameworks!
 
-pod 'Slip', '~> 0.0.1'
+pod 'Slip', '~> 0.0.4'
 ```
 
 Then, run the following command:
@@ -62,7 +62,7 @@ $ brew install carthage
 To integrate Slip into your Xcode project using Carthage, specify it in your `Cartfile`:
 
 ```ogdl
-github "Slip/Slip" ~> 0.0.1
+github "Slip/Slip" ~> 0.0.4
 ```
 ### Swift Package Manager
 
@@ -74,7 +74,7 @@ import PackageDescription
 let package = Package(
     name: "Slip",
     dependencies: [
-        .Package(url: "https://github.com/SwiftKidz/Slip.git", "0.0.1")
+        .Package(url: "https://github.com/SwiftKidz/Slip.git", "0.0.4")
     ]
 )
 ```

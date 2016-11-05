@@ -42,11 +42,11 @@ enum MockErrors: Error {
 
 class MockFlowHandler: FlowTestHandler, FlowOpHandler {
     var isCanceled: Bool
-    var currentResults: Any?
+    var results: Any?
 
     init(canceled: Bool, results: Any?) {
         isCanceled = canceled
-        currentResults = results
+        self.results = results
     }
 
     func finished(with: FlowOpResult) {}

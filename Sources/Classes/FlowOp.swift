@@ -44,14 +44,13 @@ extension FlowOp {
     var operation: Operation {
         let f: BlockOp = self
         let o: Int = order
-        let r: Any? = flow.currentResults
         return BlockOperation { [weak self] in
             guard
                 let strongSelf = self,
                 !strongSelf.flow.isCanceled
             else { return }
 
-            strongSelf.runBlock(f, o, r)
+            strongSelf.runBlock(f, o, strongSelf.flow.results)
         }
     }
 }

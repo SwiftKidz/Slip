@@ -28,45 +28,33 @@ import Slip
 
 class DuringTests: XCTestCase {
 
-    func testDuringFunctionality() {
+    func testFunctionality() {
         let expectationRun = self.expectation(description: name ?? "Test")
-
+        
         var count: Int = 0
-
-        During<Int>(test: { testHandler in
-            DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
-                guard count > 5 else { testHandler.testComplete(success: true, error: nil); return }
-                testHandler.testComplete(success: false, error: nil)
-            }
-        }) { controler in
+        
+        During<Int>(test: { $0.complete(success: count < 5, error: nil) }, run: { (opHandler) in
             count += 1
-            controler.finish(count)
-            }.onFinish { state in
-                expectationRun.fulfill()
-                XCTAssertNotNil(state.value)
-                print(state)
-                XCTAssert(state.value == 6)
-
+            opHandler.finish(count)
+        }).onFinish { (state, result) in
+            XCTAssertNotNil(result.value)
+            XCTAssert(result.value! == [1, 2, 3, 4, 5])
+            expectationRun.fulfill()
             }.start()
-
+        
         waitForExpectations(timeout: 0.5, handler: nil)
-
+        
         let expectationNotRun = self.expectation(description: name ?? "Test")
-
-        During<Int>(test: { testHandler in
-            DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
-                guard count > 5 else { testHandler.testComplete(success: true, error: nil); return }
-                testHandler.testComplete(success: false, error: nil)
-            }
-        }) { controler in
+        
+        During<Int>(test: { $0.complete(success: count < 5, error: nil) }, run: { (opHandler) in
             count += 1
-            controler.finish(count)
-            }.onFinish { state in
-                expectationNotRun.fulfill()
-                XCTAssertNil(state.value)
-                XCTAssert(count == 6)
+            opHandler.finish(count)
+        }).onFinish { (state, result) in
+            XCTAssertNotNil(result.value)
+            XCTAssertTrue(result.value!.isEmpty)
+            expectationNotRun.fulfill()
             }.start()
-
+        
         waitForExpectations(timeout: 0.5, handler: nil)
     }
 }

@@ -24,12 +24,13 @@
 
 import Foundation
 
-protocol FlowTypeBlocks {
-    typealias RunBlock = (BlockOp, Int, Any?) -> ()
+protocol FlowTypeBlocks: class {
+    typealias RunBlock = (BlockOp, Int, Any) -> ()
 
     var blocks: [RunBlock] { get }
     var runBlock: RunBlock { get }
 
+    var limitOfSimultaneousOps: Int { get }
 }
 
 extension FlowTypeBlocks where Self: FlowRun & FlowOpHandler & FlowResults & Safe & SafeState & FlowOutcome & FlowStateChanged & FlowTestHandler {
@@ -42,6 +43,13 @@ extension FlowTypeBlocks where Self: FlowRun & FlowOpHandler & FlowResults & Saf
     func runFlowOfBlocks() {
         guard !blocks.isEmpty else { safeState = .finished; return }
         let ops = [Int](0..<blocks.count).map { FlowOp(orderNumber: $0, flowHandler: self, run: blocks[$0]) }.map { $0.operation }
+
+//        if limitOfSimultaneousOps == 1 {
+//            for i in 1..<ops.count {
+//                ops[i-1].addDependency(ops[i])
+//            }
+//        }
+
         opQueue.addOperations(ops, waitUntilFinished: false)
     }
 }

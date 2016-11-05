@@ -24,9 +24,9 @@
 
 import Foundation
 
-protocol FlowOpHandler {
+protocol FlowOpHandler: class {
     var isCanceled: Bool { get }
-    var currentResults: Any? { get }
+    var results: Any? { get }
     func finished(with: FlowOpResult)
 }
 
@@ -36,8 +36,8 @@ extension FlowOpHandler where Self: SafeState & FlowTypeBlocks & FlowStateChange
         return !(safeState == FlowState.running || safeState == FlowState.testing)
     }
 
-    var currentResults: Any? {
-        return safeResults.map { $0.result }
+    var results: Any? {
+        return currentResults
     }
 
     func finished(with res: FlowOpResult) {

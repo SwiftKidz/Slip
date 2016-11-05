@@ -26,7 +26,6 @@ import Foundation
 
 protocol FlowTestHandler {
     var isCanceled: Bool { get }
-    var currentResults: Any? { get }
     func finished(with: FlowTestResult)
 }
 

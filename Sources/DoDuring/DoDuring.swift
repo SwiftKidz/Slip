@@ -24,15 +24,28 @@
 
 import Foundation
 
-public final class DoDuring<T>: TestFlow<T> {
-
-    public typealias RunBlock = (FlowControl) -> ()
-    public typealias TestingBlock = (TestHandler) -> ()
-
-    public init(onBackgroundThread: Bool = true, run: @escaping RunBlock, test: @escaping TestingBlock) {
-        super.init(onBackgroundThread: onBackgroundThread, whenToRunTest: { state in
-            guard case .finished(_) = state else { return false }
-            return true
-            }, test: test, run: run)
+public final class DoDuring<T>: FlowRunner<T> {
+    
+    public typealias AsyncTest = (Test) -> ()
+    public typealias Run = (BlockOp) -> ()
+    
+    public convenience init(run: @escaping Run,
+                            test: @escaping AsyncTest,
+                            runQoS: QualityOfService = .background,
+                            sync: Bool = false) {
+        let convertedRun: FlowTypeBlocks.RunBlock = { (blockOp, _, _) in
+            run(blockOp)
+        }
+        self.init(run: convertedRun, test: test, limit: 1, runQoS: runQoS, sync: sync)
+    }
+    
+    private override init(run: @escaping FlowTypeBlocks.RunBlock,
+                          test: @escaping FlowTypeTests.TestBlock,
+                          limit: Int,
+                          runQoS: QualityOfService,
+                          sync: Bool) {
+        super.init(run: run, test: test, limit: limit, runQoS: runQoS, sync: sync)
+        testAtBeginning = false
+        testPassResult = true
     }
 }

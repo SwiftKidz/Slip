@@ -24,21 +24,31 @@
 
 import Foundation
 
-public final class DoUntil<T>: TestFlow<T> {
+public final class DoUntil<T>: FlowRunner<T> {
 
-    public typealias RunBlock = (FlowControl) -> ()
-    public typealias TestingBlock = (T?) -> (Bool)
+    public typealias Test = () -> (Bool)
+    public typealias Run = (BlockOp) -> ()
 
-    public init(onBackgroundThread: Bool = true, run: @escaping RunBlock, test: @escaping TestingBlock) {
-        super.init(onBackgroundThread: onBackgroundThread,
-                   whenToRunTest: { state in
-                guard case .finished(_) = state else { return false }
-                return true
-            }, test: { testHandler in
-                testHandler.testComplete(success: test(testHandler.lastRunResult as? T), error: nil)
-            }, run: run)
+    public convenience init(run: @escaping Run,
+                            test: @escaping Test,
+                            runQoS: QualityOfService = .background,
+                            sync: Bool = false) {
+        let convertedTest: FlowTypeTests.TestBlock = { testHandler in
+            testHandler.complete(success: test(), error: nil)
+        }
+        let convertedRun: FlowTypeBlocks.RunBlock = { (blockOp, _, _) in
+            run(blockOp)
+        }
+        self.init(run: convertedRun, test: convertedTest, limit: 1, runQoS: runQoS, sync: sync)
+    }
 
-        filterTestResult = { !$0 }
-        testResult = true
+    private override init(run: @escaping FlowTypeBlocks.RunBlock,
+                          test: @escaping FlowTypeTests.TestBlock,
+                          limit: Int,
+                          runQoS: QualityOfService,
+                          sync: Bool) {
+        super.init(run: run, test: test, limit: limit, runQoS: runQoS, sync: sync)
+        testAtBeginning = false
+        testPassResult = false
     }
 }

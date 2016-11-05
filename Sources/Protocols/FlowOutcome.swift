@@ -28,6 +28,10 @@ protocol FlowOutcome: class, FlowCoreApi {}
 
 extension FlowOutcome where Self: Safe & FlowError & FlowResults {
 
+    var currentResults: [T] {
+        return safeResults.flatMap { $0.result as? T }
+    }
+
     var endResult: Result<[T]> {
         let error = safeError
         guard error == nil else { return Result.failure(error!) }

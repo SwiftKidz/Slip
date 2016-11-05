@@ -24,44 +24,36 @@
 
 import XCTest
 
-@testable import Slip
+import Slip
 
 class WhilstTests: XCTestCase {
 
-    func testWhilstFunctionality() {
+    func testFunctionality() {
         let expectationRun = self.expectation(description: name ?? "Test")
 
         var count: Int = 0
 
-        Whilst<Int>(test: { previous in
-            guard count > 5 else { return true }
-            return false
-        }) { controler in
+        Whilst<Int>(test: { return count < 5 }, run: { (opHandler) in
             count += 1
-            controler.finish(count)
-        }.onFinish { state in
+            opHandler.finish(count)
+        }).onFinish { (state, result) in
+            XCTAssertNotNil(result.value)
+            XCTAssert(result.value! == [1, 2, 3, 4, 5])
             expectationRun.fulfill()
-            XCTAssertNotNil(state.value)
-            print(state)
-            XCTAssert(state.value == 6)
-
-        }.start()
+            }.start()
 
         waitForExpectations(timeout: 0.5, handler: nil)
 
         let expectationNotRun = self.expectation(description: name ?? "Test")
 
-        Whilst<Int>(test: { previous in
-            guard count > 5 else { return true }
-            return false
-        }) { controler in
+        Whilst<Int>(test: { return count < 5 }, run: { (opHandler) in
             count += 1
-            controler.finish(count)
-        }.onFinish { state in
+            opHandler.finish(count)
+        }).onFinish { (state, result) in
+            XCTAssertNotNil(result.value)
+            XCTAssertTrue(result.value!.isEmpty)
             expectationNotRun.fulfill()
-            XCTAssertNil(state.value)
-            XCTAssert(count == 6)
-        }.start()
+            }.start()
 
         waitForExpectations(timeout: 0.5, handler: nil)
     }

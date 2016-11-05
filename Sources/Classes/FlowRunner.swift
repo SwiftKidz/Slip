@@ -53,7 +53,8 @@ internal class FlowRunner<T>: FlowCoreApi {
     lazy var opQueue: OperationQueue = {
         let queue = OperationQueue()
         queue.maxConcurrentOperationCount = self.limitOfSimultaneousOps
-        queue.qualityOfService = .background
+        queue.qualityOfService = self.qos
+
         return queue
     }()
 
@@ -90,24 +91,6 @@ internal class FlowRunner<T>: FlowCoreApi {
         stateChanged()
         testFlow = true
     }
-
-//    init(runBlocks: [FlowTypeBlocks.RunBlock],
-//                 run: @escaping FlowTypeBlocks.RunBlock,
-//                 test: @escaping FlowTypeTests.TestBlock,
-//                 limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
-//                 runQoS: QualityOfService = .background,
-//                 sync: Bool = false) {
-//        rawState = .ready
-//        finishBlock = { _ in }
-//        blocks = runBlocks
-//        runBlock = run
-//        testBlock = test
-//        limitOfSimultaneousOps = limit
-//        qos = runQoS
-//        synchronous = sync
-//        rawResults = []
-//        stateChanged()
-//    }
 }
 
 extension FlowRunner: FlowCore {
