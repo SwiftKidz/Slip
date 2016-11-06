@@ -23,37 +23,51 @@
  */
 
 import XCTest
-
 import Slip
 
-class DuringTests: XCTestCase {
+class ParallelTests: XCTestCase {
 
     func testFunctionality() {
-        let expectationRun = self.expectation(description: name ?? "Test")
 
         var count: Int = 0
 
-        During<Int>(test: { $0.complete(success: count < 5, error: nil) }, run: { (opHandler) in
+        let expectation = self.expectation(description: name ?? "Test")
+
+        let b: Parallel.Block = { control in
             count += 1
-            opHandler.finish(count)
-        }).onFinish { (state, result) in
+            control.finish(count)
+        }
+
+        let blocks: [Parallel.Block] = [Int](0..<10).map { n in return b }
+
+        Parallel<Int>(runBlocks: blocks).onFinish { state, result in
             XCTAssertNotNil(result.value)
-            XCTAssert(result.value! == [1, 2, 3, 4, 5])
-            expectationRun.fulfill()
-            }.start()
+            XCTAssert(result.value?.count == 10)
+            expectation.fulfill()
+        }.start()
 
         waitForExpectations(timeout: 10, handler: nil)
+    }
 
-        let expectationNotRun = self.expectation(description: name ?? "Test")
+    func testLimitFunctionality() {
 
-        During<Int>(test: { $0.complete(success: count < 5, error: nil) }, run: { (opHandler) in
+        var count: Int = 0
+
+        let expectation = self.expectation(description: name ?? "Test")
+
+        let b: Parallel.Block = { control in
             count += 1
-            opHandler.finish(count)
-        }).onFinish { (state, result) in
+            control.finish(count)
+        }
+
+        let blocks: [Parallel.Block] = [Int](0..<10).map { n in return b }
+
+        Parallel<Int>.limit(runBlocks: blocks, limit: 1).onFinish { state, result in
             XCTAssertNotNil(result.value)
-            XCTAssertTrue(result.value!.isEmpty)
-            expectationNotRun.fulfill()
-            }.start()
+            XCTAssert(result.value?.count == 10)
+            XCTAssert(result.value! == [Int](1..<11))
+            expectation.fulfill()
+        }.start()
 
         waitForExpectations(timeout: 10, handler: nil)
     }

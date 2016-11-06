@@ -24,12 +24,29 @@
 
 import Foundation
 
-public final class Forever<T>: TestFlow<T> {
+public final class Forever<T>: FlowRunner<T> {
 
-    public typealias RunBlock = (FlowControl) -> ()
-    public typealias TestingBlock = (TestHandler) -> ()
+    public typealias Run = (BlockOp) -> ()
 
-    public override init(onBackgroundThread: Bool = true, run: @escaping RunBlock) {
-        super.init(onBackgroundThread: onBackgroundThread, run: run)
+    public convenience init(run: @escaping Run,
+                            runQoS: QualityOfService = .background,
+                            sync: Bool = false) {
+        let convertedTest: FlowTypeTests.TestBlock = { testHandler in
+            testHandler.complete(success: true, error: nil)
+        }
+        let convertedRun: FlowTypeBlocks.RunBlock = { (blockOp, _, _) in
+            run(blockOp)
+        }
+        self.init(run: convertedRun, test: convertedTest, limit: 1, runQoS: runQoS, sync: sync)
+    }
+
+    private override init(run: @escaping FlowTypeBlocks.RunBlock,
+                          test: @escaping FlowTypeTests.TestBlock,
+                          limit: Int,
+                          runQoS: QualityOfService,
+                          sync: Bool) {
+        super.init(run: run, test: test, limit: limit, runQoS: runQoS, sync: sync)
+        testAtBeginning = true
+        testPassResult = true
     }
 }

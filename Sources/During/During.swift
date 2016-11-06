@@ -25,10 +25,10 @@
 import Foundation
 
 public final class During<T>: FlowRunner<T> {
-    
+
     public typealias AsyncTest = (Test) -> ()
     public typealias Run = (BlockOp) -> ()
-    
+
     public convenience init(test: @escaping AsyncTest,
                             run: @escaping Run,
                             runQoS: QualityOfService = .background,
@@ -38,7 +38,7 @@ public final class During<T>: FlowRunner<T> {
         }
         self.init(run: convertedRun, test: test, limit: 1, runQoS: runQoS, sync: sync)
     }
-    
+
     private override init(run: @escaping FlowTypeBlocks.RunBlock,
                           test: @escaping FlowTypeTests.TestBlock,
                           limit: Int,

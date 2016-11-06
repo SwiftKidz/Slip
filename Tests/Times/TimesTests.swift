@@ -23,38 +23,52 @@
  */
 
 import XCTest
-
 import Slip
 
-class DuringTests: XCTestCase {
+class TimesTests: XCTestCase {
 
     func testFunctionality() {
-        let expectationRun = self.expectation(description: name ?? "Test")
+        let expectation = self.expectation(description: name ?? "Test")
 
-        var count: Int = 0
-
-        During<Int>(test: { $0.complete(success: count < 5, error: nil) }, run: { (opHandler) in
-            count += 1
-            opHandler.finish(count)
-        }).onFinish { (state, result) in
+        Times<Int>(number: 10, run: { control, iteration in
+            control.finish(iteration)
+        }).onFinish { state, result in
             XCTAssertNotNil(result.value)
-            XCTAssert(result.value! == [1, 2, 3, 4, 5])
-            expectationRun.fulfill()
-            }.start()
+            XCTAssert(result.value?.count == 10)
+            expectation.fulfill()
+        }.start()
 
         waitForExpectations(timeout: 10, handler: nil)
+    }
 
-        let expectationNotRun = self.expectation(description: name ?? "Test")
+    func testLimitFunctionality() {
+        let expectation = self.expectation(description: name ?? "Test")
 
-        During<Int>(test: { $0.complete(success: count < 5, error: nil) }, run: { (opHandler) in
-            count += 1
-            opHandler.finish(count)
-        }).onFinish { (state, result) in
+        Times<Int>.limit(number: 10, limit: 1, run: { control, iteration in
+            control.finish(iteration)
+        }).onFinish { state, result in
             XCTAssertNotNil(result.value)
-            XCTAssertTrue(result.value!.isEmpty)
-            expectationNotRun.fulfill()
+            XCTAssert(result.value?.count == 10)
+            XCTAssert(result.value! == [Int](0..<10))
+            expectation.fulfill()
             }.start()
 
         waitForExpectations(timeout: 10, handler: nil)
     }
+
+    func testSeriesFunctionality() {
+        let expectation = self.expectation(description: name ?? "Test")
+
+        Times<Int>.series(number: 10, run: { control, iteration in
+            control.finish(iteration)
+        }).onFinish { state, result in
+            XCTAssertNotNil(result.value)
+            XCTAssert(result.value?.count == 10)
+            XCTAssert(result.value! == [Int](0..<10))
+            expectation.fulfill()
+            }.start()
+
+        waitForExpectations(timeout: 10, handler: nil)
+    }
+
 }

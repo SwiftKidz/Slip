@@ -49,7 +49,7 @@ class TestFlowTests: XCTestCase {
             test.complete(success: count < 5, error: nil)
         }.start()
 
-        waitForExpectations(timeout: 5, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
     }
 
     func testNoBlocksFunctionality() {
@@ -70,6 +70,6 @@ class TestFlowTests: XCTestCase {
 
         test.start()
 
-        waitForExpectations(timeout: 5, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
     }
 }

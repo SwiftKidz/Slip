@@ -43,7 +43,7 @@ class DoWhilstTests: XCTestCase {
                 expectationRun.fulfill()
             }.start()
 
-        waitForExpectations(timeout: 0.5, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
 
         let expectationRunOnce = self.expectation(description: name ?? "Test")
 
@@ -57,6 +57,6 @@ class DoWhilstTests: XCTestCase {
                 expectationRunOnce.fulfill()
             }.start()
 
-        waitForExpectations(timeout: 0.5, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
     }
 }

@@ -29,9 +29,9 @@ class DoDuringTests: XCTestCase {
 
     func testFunctionality() {
         let expectationRun = self.expectation(description: name ?? "Test")
-        
+
         var count: Int = 0
-        
+
         DoDuring<Int>(run: { (opHandler) in
             count += 1
             opHandler.finish(count)
@@ -41,11 +41,11 @@ class DoDuringTests: XCTestCase {
                 XCTAssert(result.value! == [1, 2, 3, 4, 5])
                 expectationRun.fulfill()
             }.start()
-        
-        waitForExpectations(timeout: 0.5, handler: nil)
-        
+
+        waitForExpectations(timeout: 10, handler: nil)
+
         let expectationRunOnce = self.expectation(description: name ?? "Test")
-        
+
         DoDuring<Int>(run: { (opHandler) in
             count += 1
             opHandler.finish(count)
@@ -55,7 +55,7 @@ class DoDuringTests: XCTestCase {
                 XCTAssert(result.value! == [6])
                 expectationRunOnce.fulfill()
             }.start()
-        
-        waitForExpectations(timeout: 0.5, handler: nil)
+
+        waitForExpectations(timeout: 10, handler: nil)
     }
 }

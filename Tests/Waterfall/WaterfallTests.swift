@@ -62,7 +62,7 @@ class WaterfallTests: XCTestCase {
                 expectationOne.fulfill()
             }.start()
 
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
     }
 
     func testWaterfallFunctionalityWithWrongTypeOnBlock() {
@@ -97,6 +97,6 @@ class WaterfallTests: XCTestCase {
                 expectationOne.fulfill()
         }.start()
 
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
     }
 }

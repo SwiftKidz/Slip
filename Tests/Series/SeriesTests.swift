@@ -56,7 +56,7 @@ class SeriesTests: XCTestCase {
                 expectationOne.fulfill()
             }.start()
 
-        waitForExpectations(timeout: 1, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
     }
 
 }

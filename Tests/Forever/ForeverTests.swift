@@ -23,7 +23,6 @@
  */
 
 import XCTest
-
 import Slip
 
 class ForeverTests: XCTestCase {
@@ -33,14 +32,14 @@ class ForeverTests: XCTestCase {
 
         var count: Int = 0
 
-        Forever<Int> { (control) in
+        Forever<Int>(run: { (control) in
             count += 1
-            guard count > 6 else { control.finish(count); return }
+            guard count > 100 else { control.finish(count); return }
             control.finish(MockErrors.errorOnFlow)
-        }.onError { _ in
+        }).onError { _ in
             expectation.fulfill()
         }.start()
 
-        waitForExpectations(timeout: 0.5, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
     }
 }
