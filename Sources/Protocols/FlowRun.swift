@@ -24,9 +24,6 @@
 
 import Foundation
 
-public protocol FlowControl {
-    func finish<R>(_ result: R)
-    func finish(_ error: Error)
+protocol FlowRun {
+    var opQueue: OperationQueue { get }
 }
-
-public protocol FlowHandler: StepFlow, FlowControl {}

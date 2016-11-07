@@ -23,28 +23,47 @@
  */
 
 import XCTest
-@testable import Slip
+import Slip
 
-class StepTests: XCTestCase {
+class BlockFlowTests: XCTestCase {
 
-    func testStepOnCallingThread() {
+    func testFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
-        let step = Step { (stepFlow, result) -> (Void) in
-            XCTAssertNil(result)
+
+        let count: Int = 1000
+
+        let blocks: [BlockFlowApi.RunBlock] = [Int](0..<count).map { n in
+            return { (f: BlockOp, i: Int, r: Any?) in
+                print("\(i)")
+                f.finish(i)
+            }
+        }
+
+        let flow = BlockFlow<Int>(runBlocks: blocks)
+        .onFinish { state, result in
+            XCTAssert(state == .finished)
+            XCTAssertNotNil(result.value)
+            XCTAssert(result.value?.count == count)
             expectation.fulfill()
         }
-        step.runStep(flowController: MockFlow(), previousResult: nil)
-        waitForExpectations(timeout: 0.5, handler: nil)
+        flow.onCancel {
+            print("Cancel")
+        }.onError { _ in
+            print("Error")
+        }.start()
+
+        waitForExpectations(timeout: 1, handler: nil)
     }
 
-    func testStepOnBackgroundThread() {
+    func testNoBlocksFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
-        let step = Step(onBackgroundThread: true) { (stepFlow, result) -> (Void) in
-            XCTAssertNil(result)
+
+        let blocks = BlockFlow<Int>(runBlocks: [])
+        .onFinish { state, result in
             expectation.fulfill()
         }
-        step.runStep(flowController: MockFlow(), previousResult: nil)
-        waitForExpectations(timeout: 0.5, handler: nil)
-    }
+        blocks.start()
 
+        waitForExpectations(timeout: 10, handler: nil)
+    }
 }

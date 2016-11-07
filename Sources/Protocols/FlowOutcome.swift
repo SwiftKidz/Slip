@@ -24,22 +24,18 @@
 
 import Foundation
 
-public final class Step {
-    public typealias CodeBlock = (FlowControl, Any?) -> ()
-    public typealias CodeBlockNoPreviousResult = (FlowControl) -> ()
-    internal let codeClosure: CodeBlock
-    internal let runOnBackgroundThread: Bool
+protocol FlowOutcome: class, FlowCoreApi {}
 
-    internal init(onBackgroundThread: Bool = false, closure: @escaping CodeBlock) {
-        runOnBackgroundThread = onBackgroundThread
-        codeClosure = closure
+extension FlowOutcome where Self: Safe & FlowError & FlowResults {
+
+    var currentResults: [T] {
+        return safeResults.flatMap { $0.result as? T }
     }
 
-    internal func runStep(flowController: FlowControl, previousResult: Any?) {
-        guard runOnBackgroundThread else { codeClosure(flowController, previousResult); return }
+    var endResult: Result<[T]> {
+        let error = safeError
+        guard error == nil else { return Result.failure(error!) }
 
-        DispatchQueue.global(qos: DispatchQoS.QoSClass.utility).async {
-            self.codeClosure(flowController, previousResult)
-        }
+        return Result.success(safeResults.flatMap { $0.result as? T })
     }
 }

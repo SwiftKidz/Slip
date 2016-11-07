@@ -23,45 +23,37 @@
  */
 
 import XCTest
-
 import Slip
 
 class UntilTests: XCTestCase {
 
-    func testUntilFunctionality() {
+    func testFunctionality() {
         let expectationRun = self.expectation(description: name ?? "Test")
 
         var count: Int = 0
 
-        Until<Int>(test: { previous in
-            guard count > 5 else { return false }
-            return true
-        }) { controler in
+        Until<Int>(test: { return count > 5 }, run: { (opHandler) in
             count += 1
-            controler.finish(count)
-        }.onFinish { state in
-                expectationRun.fulfill()
-                XCTAssertNotNil(state.value)
-                print(state)
-                XCTAssert(state.value == 6)
+            opHandler.finish(count)
+        }).onFinish { (state, result) in
+            XCTAssertNotNil(result.value)
+            XCTAssert(result.value! == [1, 2, 3, 4, 5, 6])
+            expectationRun.fulfill()
         }.start()
 
-        waitForExpectations(timeout: 0.5, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
 
         let expectationNotRun = self.expectation(description: name ?? "Test")
 
-        Until<Int>(test: { previous in
-            guard count > 5 else { return false }
-            return true
-        }) { controler in
+        Until<Int>(test: { return count > 5 }, run: { (opHandler) in
             count += 1
-            controler.finish(count)
-            }.onFinish { state in
+            opHandler.finish(count)
+        }).onFinish { (state, result) in
+                XCTAssertNotNil(result.value)
+                XCTAssertTrue(result.value!.isEmpty)
                 expectationNotRun.fulfill()
-                XCTAssertNil(state.value)
-                XCTAssert(count == 6)
             }.start()
 
-        waitForExpectations(timeout: 0.5, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
     }
 }

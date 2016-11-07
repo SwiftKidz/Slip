@@ -27,55 +27,36 @@ import Slip
 
 class SeriesTests: XCTestCase {
 
-    func testInitWithSteps() {
+    func testFunctionality() {
+
+        var count: Int = 0
+
         let expectationOne = self.expectation(description: name ?? "Test")
 
-        let stepOne = Step.series { flowController in
-            flowController.finish("empty step")
+        let b1: Series.Block = { control in
+            count += 1
+            control.finish(count)
         }
 
-        let stepTwo = Step.series { flowController in
-            flowController.finish("empty step")
+        let b2: Series.Block = { control in
+            count += 1
+            control.finish(count)
         }
 
-        Series<Any>(steps: [stepOne, stepTwo]).onFinish { (state) in
-            guard case .finished(_) = state else { XCTFail(); return }
-            expectationOne.fulfill()
-        }.start()
-
-        waitForExpectations(timeout: 0.5, handler: nil)
-
-        let expectationTwo = self.expectation(description: name ?? "Test")
-
-        Series<Any>(steps: stepOne, stepTwo).onFinish { (state) in
-            guard case .finished(_) = state else { XCTFail();  return }
-            expectationTwo.fulfill()
-        }.start()
-
-        waitForExpectations(timeout: 0.5, handler: nil)
-    }
-
-    func testResultsAreSerial() {
-        let expectation = self.expectation(description: name ?? "Test")
-
-        let stepOne = Step.series { flowController in
-            flowController.finish(0)
+        let b3: Series.Block = { control in
+            count += 1
+            control.finish(count)
         }
 
-        let stepTwo = Step.series { flowController in
-            flowController.finish(1)
-        }
+        Series<Int>(runBlocks: [b1, b2, b3])
+            .onFinish { state, result in
+                XCTAssertNil(result.error)
+                XCTAssertNotNil(result.value)
+                XCTAssertTrue([1, 2, 3] == result.value!)
+                expectationOne.fulfill()
+            }.start()
 
-        Series<Any>(steps: stepOne, stepTwo).onFinish { (state) in
-            guard
-                case .finished(_) = state,
-                let result = state.value as? [Int]
-            else { XCTFail(); return }
-            if result != [0, 1] { XCTFail() }
-            expectation.fulfill()
-        }.start()
-
-        waitForExpectations(timeout: 0.5, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
     }
 
 }

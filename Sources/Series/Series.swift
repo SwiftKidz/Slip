@@ -25,17 +25,28 @@
 
 import Foundation
 
-public final class Series<T>: SerialFlow<T> {
+public final class Series<T>: FlowRunner<T> {
 
-    public init(steps: [Step]) {
-        let processBlock: CurrentStateResultBlock = { previousResult, newResult in
-            guard let previous = previousResult as? [Any] else { return [newResult] }
-            return previous + [newResult]
+    public typealias Block = (BlockOp) -> ()
+
+    public convenience init(runBlocks: [Block],
+                            runQoS: QualityOfService = .background,
+                            sync: Bool = false) {
+
+        func toRunBlock(run: @escaping Block) -> BlockFlowApi.RunBlock {
+            return { (operation, _, _) in
+                run(operation)
+            }
         }
-        super.init(steps: steps, process: processBlock, passToNext: { _ in nil })
+        let convertedBlocks: [BlockFlowApi.RunBlock] = runBlocks.map(toRunBlock)
+
+        self.init(runBlocks: convertedBlocks, limit: 1, runQoS: runQoS, sync: sync)
     }
 
-    public convenience init(steps: Step...) {
-        self.init(steps: steps)
+    private override init(runBlocks: [BlockFlowApi.RunBlock],
+                          limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
+                          runQoS: QualityOfService = .background,
+                          sync: Bool = false) {
+        super.init(runBlocks: runBlocks, limit: limit, runQoS: runQoS, sync: sync)
     }
 }

@@ -23,7 +23,8 @@
  */
 
 import Foundation
-import Slip
+
+@testable import Slip
 
 struct MockFlow: FlowControl {
 
@@ -37,4 +38,18 @@ struct MockFlow: FlowControl {
 
 enum MockErrors: Error {
     case errorOnFlow, errorOnTest
+}
+
+class MockFlowHandler: FlowTestHandler, FlowOpHandler, FlowStopped {
+    var hasStopped: Bool
+    var results: Any?
+
+    init(canceled: Bool, results: Any?) {
+        hasStopped = canceled
+        self.results = results
+    }
+
+    func finished(with: FlowOpResult) {}
+
+    func finished(with: FlowTestResult) {}
 }

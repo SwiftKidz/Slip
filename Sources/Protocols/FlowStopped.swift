@@ -24,11 +24,26 @@
 
 import Foundation
 
-extension Step {
+protocol FlowStopped {
+    var hasStopped: Bool { get }
+}
 
-    static public func series(onBackgroundThread: Bool = false, closure: @escaping CodeBlockNoPreviousResult) -> Step {
-        return Step(onBackgroundThread: onBackgroundThread) { (flowController, _) in
-            closure(flowController)
-        }
+extension FlowStopped where Self: SafeState & FlowOpHandler & FlowTestHandler & FlowOutcome & FlowStateChanged {
+
+    var isCanceled: Bool {
+        return safeState == FlowState.canceled
     }
+
+    var isFinished: Bool {
+        return safeState == FlowState.finished
+    }
+
+    var hasFailed: Bool {
+        return safeState == FlowState.failed
+    }
+
+    var hasStopped: Bool {
+        return isFinished || isCanceled || hasFailed
+    }
+
 }

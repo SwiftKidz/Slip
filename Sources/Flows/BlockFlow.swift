@@ -24,12 +24,12 @@
 
 import Foundation
 
-public protocol TestHandler {
+public final class BlockFlow<T>: FlowRunner<T>, BlockFlowApi {
 
-    typealias RunBlock = (FlowControl) -> ()
-    typealias TestBlock = (TestHandler) -> ()
-
-    func testComplete(success: Bool, error: Error?)
-    var lastRunResult: Any { get }
-
+    public override init(runBlocks: [BlockFlowApi.RunBlock],
+         limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
+         runQoS: QualityOfService = .background,
+         sync: Bool = false) {
+        super.init(runBlocks: runBlocks, limit: limit, runQoS: runQoS, sync: sync)
+    }
 }

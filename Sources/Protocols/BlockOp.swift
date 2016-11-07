@@ -24,9 +24,4 @@
 
 import Foundation
 
-public protocol StepFlow: Flow {
-
-    typealias CodeBlock = (FlowControl, Any?) -> ()
-    func step(onBackgroundThread: Bool, closure: @escaping CodeBlock) -> Self
-
-}
+public protocol BlockOp: FlowControl {}

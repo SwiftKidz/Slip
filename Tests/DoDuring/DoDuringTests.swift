@@ -23,49 +23,39 @@
  */
 
 import XCTest
-
 import Slip
 
 class DoDuringTests: XCTestCase {
 
-    func testDoDuringFunctionality() {
+    func testFunctionality() {
         let expectationRun = self.expectation(description: name ?? "Test")
 
         var count: Int = 0
 
-        DoDuring<Int>(run: { controler in
+        DoDuring<Int>(run: { (opHandler) in
             count += 1
-            controler.finish(count)
-        }) { testHandler in
-            DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
-                guard count > 5 else { testHandler.testComplete(success: true, error: nil); return }
-                testHandler.testComplete(success: false, error: nil)
-            }
-        }.onFinish { state in
+            opHandler.finish(count)
+        }, test: { $0.complete(success: count < 5, error: nil) })
+            .onFinish { (state, result) in
+                XCTAssertNotNil(result.value)
+                XCTAssert(result.value! == [1, 2, 3, 4, 5])
                 expectationRun.fulfill()
-                XCTAssertNotNil(state.value)
-                print(state)
-                XCTAssert(state.value == 6)
-        }.start()
+            }.start()
 
-        waitForExpectations(timeout: 0.5, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
 
         let expectationRunOnce = self.expectation(description: name ?? "Test")
 
-        DoDuring<Int>(run: { controler in
+        DoDuring<Int>(run: { (opHandler) in
             count += 1
-            controler.finish(count)
-        }) { testHandler in
-            DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async {
-                guard count > 5 else { testHandler.testComplete(success: true, error: nil); return }
-                testHandler.testComplete(success: false, error: nil)
-            }
-        }.onFinish { state in
-            expectationRunOnce.fulfill()
-            XCTAssertNotNil(state.value)
-            XCTAssert(count == 7)
-        }.start()
+            opHandler.finish(count)
+        }, test: { $0.complete(success: count < 5, error: nil) })
+            .onFinish { (state, result) in
+                XCTAssertNotNil(result.value)
+                XCTAssert(result.value! == [6])
+                expectationRunOnce.fulfill()
+            }.start()
 
-        waitForExpectations(timeout: 0.5, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
     }
 }

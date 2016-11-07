@@ -24,9 +24,20 @@
 
 import Foundation
 
-extension Step {
+public enum Result<T> {
+    case success(T)
+    case failure(Error)
+}
 
-    static public func waterfall(onBackgroundThread: Bool = false, closure: @escaping CodeBlock) -> Step {
-        return Step(onBackgroundThread: onBackgroundThread, closure: closure)
+extension Result {
+
+    public var value: T? {
+        guard case .success(let r) = self else { return nil }
+        return r
+    }
+
+    public var error: Error? {
+        guard case .failure(let e) = self else { return nil }
+        return e
     }
 }

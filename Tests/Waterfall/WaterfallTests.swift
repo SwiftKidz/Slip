@@ -23,64 +23,80 @@
  */
 
 import XCTest
-@testable import Slip
+
+import Slip
 
 class WaterfallTests: XCTestCase {
 
-    func testInitWithArrayOfSteps() {
+    func testFunctionality() {
+
+        var count: Int = 0
+
         let expectationOne = self.expectation(description: name ?? "Test")
 
-        let stepOne = Step.waterfall { flowController, previousResult in
-            XCTAssertNil(previousResult)
-            flowController.finish("empty step")
+        let b1: Waterfall.Block = { (control, previousResult: [Int]) in
+            XCTAssertTrue(previousResult.isEmpty)
+            count += 1
+            control.finish(count)
         }
 
-        let stepTwo = Step.waterfall { flowController, previousResult in
-            let previous = previousResult as? [String]
-            XCTAssert(["empty step"] == previous ?? [])
-            flowController.finish("empty step")
+        let b2: Waterfall.Block = { (control, previousResult: [Int]) in
+            XCTAssertFalse(previousResult.isEmpty)
+            XCTAssertTrue([1] == previousResult)
+            count += 1
+            control.finish(count)
         }
 
-        Waterfall<Any>(steps: [stepOne, stepTwo]).onFinish { (state) in
-            guard case .finished(_) = state else { XCTFail(); return }
-            expectationOne.fulfill()
-        }.start()
+        let b3: Waterfall.Block = { (control, previousResult: [Int]) in
+            XCTAssertFalse(previousResult.isEmpty)
+            XCTAssertTrue([1, 2] == previousResult)
+            count += 1
+            control.finish(count)
+        }
 
-        waitForExpectations(timeout: 0.5, handler: nil)
+        Waterfall<Int>(runBlocks: [b1, b2, b3])
+            .onFinish { state, result in
+                XCTAssertNil(result.error)
+                XCTAssertNotNil(result.value)
+                XCTAssertTrue([1, 2, 3] == result.value!)
+                expectationOne.fulfill()
+            }.start()
 
-        let expectationTwo = self.expectation(description: name ?? "Test")
-
-        Waterfall<Any>(steps: stepOne, stepTwo).onFinish { (state) in
-            guard case .finished(_) = state else { XCTFail(); return }
-            expectationTwo.fulfill()
-        }.start()
-
-        waitForExpectations(timeout: 0.5, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
     }
 
-    func testResultsAreWaterfall() {
-        let expectation = self.expectation(description: name ?? "Test")
+    func testWaterfallFunctionalityWithWrongTypeOnBlock() {
 
-        let stepOne = Step.waterfall { flowController, previousResult in
-            print("previous result is \(previousResult)")
-            XCTAssertNil(previousResult)
-            flowController.finish(1)
+        var count: Int = 0
+
+        let expectationOne = self.expectation(description: name ?? "Test")
+
+        let b1: Waterfall.Block = { (control, previousResult: [String]) in
+            XCTAssertTrue(previousResult.isEmpty)
+            count += 1
+            control.finish(count)
         }
 
-        let stepTwo = Step.waterfall { flowController, previousResult in
-            let previous = previousResult as? [Int]
-            XCTAssertEqual(previous ?? [], [1])
-            flowController.finish(2)
+        let b2: Waterfall.Block = { (control, previousResult: [String]) in
+            XCTAssertTrue(previousResult.isEmpty)
+            count += 1
+            control.finish(count)
         }
 
-        Waterfall<[Int]>(steps: stepOne, stepTwo).onFinish { (state) in
-            guard case .finished(_) = state else { XCTFail(); return }
-            let previous = state.value
-            XCTAssert([1, 2] == previous ?? [])
-            expectation.fulfill()
+        let b3: Waterfall.Block = { (control, previousResult: [String]) in
+            XCTAssertTrue(previousResult.isEmpty)
+            count += 1
+            control.finish("count")
+        }
+
+        Waterfall<String>(runBlocks: [b1, b2, b3])
+            .onFinish { state, result in
+                XCTAssertNil(result.error)
+                XCTAssertNotNil(result.value)
+                XCTAssertTrue(["count"] == result.value!)
+                expectationOne.fulfill()
         }.start()
 
-        waitForExpectations(timeout: 0.5, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
     }
-
 }
