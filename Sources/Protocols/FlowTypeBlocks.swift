@@ -45,12 +45,12 @@ extension FlowTypeBlocks where Self: FlowRun & FlowOpHandler & FlowResults & Saf
 
         //let ops = [Int](0..<blocks.count).map { FlowOp(orderNumber: $0, flowHandler: self, run: blocks[$0]) }.map { $0.operation }
         //var ops: [Operation] = []
-        
+
         for i in 0..<blocks.count {
             //ops.append(FlowOp(orderNumber: i, flowHandler: self, run: blocks[i]).operation)
             opQueue.addOperation(FlowOp(orderNumber: i, flowHandler: self, run: blocks[i]).operation)
         }
-        
+
         //opQueue.addOperations(ops, waitUntilFinished: false)
     }
 }
