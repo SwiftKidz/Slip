@@ -62,35 +62,65 @@ extension FlowStateChanged where Self: FlowOpHandler & FlowTestHandler & FlowTyp
     }
 
     func failed() {
-        if !testFlow { opQueue.cancelAllOperations() }
+        print("fb error \(safeState)")
+        opQueue.cancelAllOperations()
         guard
-            let failBlock = errorBlock,
+            let _ = errorBlock,
             let error = safeError
-            else {
-                DispatchQueue.main.async {
-                    self.finishBlock(self.safeState, self.endResult)
-                }
-                return
-        }
-        DispatchQueue.main.async {
-            failBlock(error)
-        }
-    }
-
-    func canceled() {
-        if !testFlow { opQueue.cancelAllOperations() }
-        guard let cancelBlock = cancelBlock else {
+        else {
             DispatchQueue.main.async {
-                 self.finishBlock(self.safeState, self.endResult)
+                self.runFinishBlock()
             }
             return
         }
         DispatchQueue.main.async {
-            cancelBlock()
+            self.runErrorBlock(error: error)
+        }
+    }
+
+    func canceled() {
+        print("fb canceled \(safeState)")
+        opQueue.cancelAllOperations()
+        guard let _ = cancelBlock else {
+            DispatchQueue.main.async {
+                 self.runFinishBlock()
+            }
+            return
+        }
+        DispatchQueue.main.async {
+            self.runCancelBlock()
         }
     }
 
     func finished() {
-        self.finishBlock(self.safeState, self.endResult)
+        print("fb finished \(safeState)")
+        runFinishBlock()
+    }
+
+    fileprivate func runFinishBlock() {
+        var finishBlock: FinishBlock!
+        write {
+            finishBlock = self.finishBlock
+            self.finishBlock = { _ in }
+        }
+        finishBlock(self.safeState, self.endResult)
+    }
+
+    fileprivate func runCancelBlock() {
+        var cancelBlock: CancelBlock!
+        write {
+            cancelBlock = self.cancelBlock
+            self.cancelBlock = { }
+        }
+        cancelBlock()
+    }
+
+    fileprivate func runErrorBlock(error: Error) {
+        var errorBlock: ErrorBlock!
+        write {
+            errorBlock = self.errorBlock
+            self.errorBlock = { _ in }
+        }
+        errorBlock(error)
     }
 }

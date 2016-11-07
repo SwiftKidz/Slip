@@ -42,13 +42,8 @@ extension FlowTypeBlocks where Self: FlowRun & FlowOpHandler & FlowResults & Saf
 
     func runFlowOfBlocks() {
         guard !blocks.isEmpty else { safeState = .finished; return }
-        let ops = [Int](0..<blocks.count).map { FlowOp(orderNumber: $0, flowHandler: self, run: blocks[$0]) }.map { $0.operation }
 
-//        if limitOfSimultaneousOps == 1 {
-//            for i in 1..<ops.count {
-//                ops[i-1].addDependency(ops[i])
-//            }
-//        }
+        let ops = [Int](0..<blocks.count).map { FlowOp(orderNumber: $0, flowHandler: self, run: blocks[$0]) }.map { $0.operation }
 
         opQueue.addOperations(ops, waitUntilFinished: false)
     }

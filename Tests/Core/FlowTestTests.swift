@@ -57,7 +57,7 @@ class FlowTestsTests: XCTestCase {
         let handler = MockFlowHandler(canceled: false, results: nil)
 
         let op = FlowTest(flowHandler: handler) { test in
-            handler.isCanceled = true
+            handler.hasStopped = true
             test.complete(success: true, error: nil)
         }.operation
 
@@ -79,7 +79,7 @@ class FlowTestsTests: XCTestCase {
         let handler = MockFlowHandler(canceled: false, results: nil)
 
         let op = FlowTest(flowHandler: handler) { test in
-            handler.isCanceled = true
+            handler.hasStopped = true
             test.complete(success: true, error: MockErrors.errorOnTest)
         }.operation
 

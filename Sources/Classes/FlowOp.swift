@@ -47,7 +47,7 @@ extension FlowOp {
         return BlockOperation { [weak self] in
             guard
                 let strongSelf = self,
-                !strongSelf.flow.isCanceled
+                !strongSelf.flow.hasStopped
             else { return }
 
             strongSelf.runBlock(f, o, strongSelf.flow.results)
@@ -58,18 +58,18 @@ extension FlowOp {
 extension FlowOp: BlockOp {
 
     func finish<R>(_ result: R) {
-        guard !flow.isCanceled else {
-            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
-            return
-        }
+//        guard !flow.hasStopped else {
+//            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
+//            return
+//        }
         flow.finished(with: FlowOpResult(order: order, result: result, error: nil))
     }
 
     func finish(_ error: Error) {
-        guard !flow.isCanceled else {
-            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
-            return
-        }
+//        guard !flow.hasStopped else {
+//            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
+//            return
+//        }
         flow.finished(with: FlowOpResult(order: order, result: nil, error: error))
     }
 }

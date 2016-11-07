@@ -24,32 +24,26 @@
 
 import Foundation
 
-@testable import Slip
-
-struct MockFlow: FlowControl {
-
-    func finish(_ error: Error) {
-
-    }
-    func finish<T>(_ result: T) {
-
-    }
+protocol FlowStopped {
+    var hasStopped: Bool { get }
 }
 
-enum MockErrors: Error {
-    case errorOnFlow, errorOnTest
-}
+extension FlowStopped where Self: SafeState & FlowOpHandler & FlowTestHandler & FlowOutcome & FlowStateChanged {
 
-class MockFlowHandler: FlowTestHandler, FlowOpHandler, FlowStopped {
-    var hasStopped: Bool
-    var results: Any?
-
-    init(canceled: Bool, results: Any?) {
-        hasStopped = canceled
-        self.results = results
+    var isCanceled: Bool {
+        return safeState == FlowState.canceled
     }
 
-    func finished(with: FlowOpResult) {}
+    var isFinished: Bool {
+        return safeState == FlowState.finished
+    }
 
-    func finished(with: FlowTestResult) {}
+    var hasFailed: Bool {
+        return safeState == FlowState.failed
+    }
+
+    var hasStopped: Bool {
+        return isFinished || isCanceled || hasFailed
+    }
+
 }

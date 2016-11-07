@@ -24,23 +24,23 @@
 
 import Foundation
 
-protocol FlowOpHandler: class {
-    var isCanceled: Bool { get }
+protocol FlowOpHandler: class, FlowStopped {
     var results: Any? { get }
     func finished(with: FlowOpResult)
 }
 
-extension FlowOpHandler where Self: SafeState & FlowTypeBlocks & FlowStateChanged & FlowTestHandler & FlowOutcome {
-
-    var isCanceled: Bool {
-        return !(safeState == FlowState.running || safeState == FlowState.testing)
-    }
+extension FlowOpHandler where Self: SafeState & FlowTypeBlocks & FlowStateChanged & FlowTestHandler & FlowOutcome & FlowStopped {
 
     var results: Any? {
         return currentResults
     }
 
     func finished(with res: FlowOpResult) {
+        guard !hasStopped else {
+            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
+            return
+        }
+
         guard res.error == nil else {
             safeError = res.error!
             safeState = .failed

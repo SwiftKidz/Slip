@@ -131,6 +131,8 @@ extension FlowRunner: FlowHandlerBlocks {
     }
 }
 
+extension FlowRunner: FlowStopped {}
+
 extension FlowRunner: FlowOutcome {}
 
 extension FlowRunner: SafeState {}
