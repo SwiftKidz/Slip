@@ -36,7 +36,7 @@ extension FlowOpHandler where Self: SafeState & FlowTypeBlocks & FlowStateChange
     }
 
     func finished(with res: FlowOpResult) {
-        print("Finished \(res.order)")
+        //print("\(safeResults.count)")
         guard !hasStopped else {
             print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
             return

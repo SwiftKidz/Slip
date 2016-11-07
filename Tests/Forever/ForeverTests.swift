@@ -40,6 +40,6 @@ class ForeverTests: XCTestCase {
             expectation.fulfill()
         }.start()
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 }

@@ -26,6 +26,18 @@ import Foundation
 
 @testable import Slip
 
+enum TestConfig {
+
+    static var operationNumber: Int {
+        guard #available(OSX 10.10, *) else { return 100 }
+        return 10
+    }
+
+    static var timeout: TimeInterval {
+        return 10
+    }
+}
+
 struct MockFlow: FlowControl {
 
     func finish(_ error: Error) {

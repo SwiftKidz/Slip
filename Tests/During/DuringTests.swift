@@ -42,7 +42,7 @@ class DuringTests: XCTestCase {
             expectationRun.fulfill()
             }.start()
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
 
         let expectationNotRun = self.expectation(description: name ?? "Test")
 
@@ -55,6 +55,6 @@ class DuringTests: XCTestCase {
             expectationNotRun.fulfill()
             }.start()
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 }

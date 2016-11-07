@@ -30,11 +30,9 @@ class BlockFlowTests: XCTestCase {
     func testFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let count: Int = 1000
-
-        let blocks: [BlockFlowApi.RunBlock] = [Int](0..<count).map { n in
+        let blocks: [BlockFlowApi.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
             return { (f: BlockOp, i: Int, r: Any?) in
-                print("\(i)")
+                print(i)
                 f.finish(i)
             }
         }
@@ -43,7 +41,7 @@ class BlockFlowTests: XCTestCase {
         .onFinish { state, result in
             XCTAssert(state == .finished)
             XCTAssertNotNil(result.value)
-            XCTAssert(result.value?.count == count)
+            XCTAssert(result.value?.count == TestConfig.operationNumber)
             expectation.fulfill()
         }
         flow.onCancel {
@@ -52,7 +50,7 @@ class BlockFlowTests: XCTestCase {
             print("Error")
         }.start()
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
     func testNoBlocksFunctionality() {
@@ -64,6 +62,6 @@ class BlockFlowTests: XCTestCase {
         }
         blocks.start()
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 }

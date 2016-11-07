@@ -46,7 +46,7 @@ class FlowOpTests: XCTestCase {
         bop.addDependency(op)
         queue.addOperations([op, bop], waitUntilFinished: false)
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
     func testCanceledAfterRunOp() {
@@ -68,7 +68,7 @@ class FlowOpTests: XCTestCase {
         bop.addDependency(op)
         queue.addOperations([op, bop], waitUntilFinished: false)
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
     func testCanceledAfterRunWithErrorOp() {
@@ -90,7 +90,38 @@ class FlowOpTests: XCTestCase {
         bop.addDependency(op)
         queue.addOperations([op, bop], waitUntilFinished: false)
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
+    func testMultipleOps() {
+        let expectation = self.expectation(description: name ?? "Test")
+
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = OperationQueue.defaultMaxConcurrentOperationCount
+
+        let handler = MockFlowHandler(canceled: false, results: nil)
+
+        let opNumber: Int = 100000
+        var countOps: Int = 0
+
+        var ops = [Int](0..<opNumber).map { n in
+            return FlowOp(orderNumber: n, flowHandler: handler) { (operation, iteration, result) in
+                countOps += 1
+                operation.finish(iteration)
+            }.operation
+        }
+
+        let bop = BlockOperation {
+            XCTAssert(countOps == opNumber)
+            expectation.fulfill()
+        }
+
+        ops.forEach { operation in
+            bop.addDependency(operation)
+        }
+        ops.append(bop)
+        queue.addOperations(ops, waitUntilFinished: false)
+
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
+    }
 }
