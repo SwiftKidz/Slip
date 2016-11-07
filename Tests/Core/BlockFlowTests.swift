@@ -32,7 +32,6 @@ class BlockFlowTests: XCTestCase {
 
         let blocks: [BlockFlowApi.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
             return { (f: BlockOp, i: Int, r: Any?) in
-                print(i)
                 f.finish(i)
             }
         }

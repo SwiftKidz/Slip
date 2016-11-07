@@ -30,7 +30,7 @@ enum TestConfig {
 
     static var operationNumber: Int {
         guard #available(OSX 10.10, *) else { return 100 }
-        return 10
+        return 60
     }
 
     static var timeout: TimeInterval {
