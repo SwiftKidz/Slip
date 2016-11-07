@@ -62,7 +62,6 @@ extension FlowStateChanged where Self: FlowOpHandler & FlowTestHandler & FlowTyp
     }
 
     func failed() {
-        print("fb error \(safeState)")
         opQueue.cancelAllOperations()
         guard
             let _ = errorBlock,
@@ -79,7 +78,6 @@ extension FlowStateChanged where Self: FlowOpHandler & FlowTestHandler & FlowTyp
     }
 
     func canceled() {
-        print("fb canceled \(safeState)")
         opQueue.cancelAllOperations()
         guard let _ = cancelBlock else {
             DispatchQueue.main.async {
@@ -93,7 +91,6 @@ extension FlowStateChanged where Self: FlowOpHandler & FlowTestHandler & FlowTyp
     }
 
     func finished() {
-        print("fb finished \(safeState)")
         runFinishBlock()
     }
 

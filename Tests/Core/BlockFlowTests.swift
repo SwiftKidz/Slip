@@ -52,7 +52,7 @@ class BlockFlowTests: XCTestCase {
             print("Error")
         }.start()
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: 1, handler: nil)
     }
 
     func testNoBlocksFunctionality() {
