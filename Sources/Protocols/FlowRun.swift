@@ -24,6 +24,43 @@
 
 import Foundation
 
-protocol FlowRun {
+protocol FlowRun: class, FlowTypeTests, FlowResults {
     var opQueue: OperationQueue { get }
+}
+
+extension FlowRun where Self: FlowTestHandler {
+
+    func runTest() {
+        let test = FlowTest(flowHandler: self, test: testBlock).operation
+        opQueue.addOperation(test)
+    }
+}
+
+extension FlowRun where Self: FlowOpHandler {
+
+    func runClosure() {
+        //let run = FlowOp(orderNumber: safeResults.count, flowHandler: self, run: runBlock).operation
+        //opQueue.addOperation(run)
+    }
+
+    func runFlowOfBlocks(onFinish: @escaping (FlowOpResult) -> Void) {
+        guard !blocks.isEmpty else { safeState = .finished; return }
+
+        var ops: [Operation] = []
+
+        for i in 0..<blocks.count {
+            ops.append(operationFrom(block: blocks[i], order: i, finishOpCallback: onFinish))
+        }
+
+        opQueue.addOperations(ops, waitUntilFinished: false)
+        blocks.removeAll()
+    }
+
+    private func operationFrom(block: @escaping FlowTypeBlocks.RunBlock, order: Int, finishOpCallback: @escaping (FlowOpResult) -> Void) -> Operation {
+        let f: BlockOp = FlowOp(orderNumber: order, callBack: finishOpCallback)
+        let o: Int = order
+        return BlockOperation { [weak self] in
+            block(f, o, self?.results ?? [])
+        }
+    }
 }

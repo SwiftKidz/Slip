@@ -24,26 +24,25 @@
 
 import Foundation
 
-protocol FlowStopped {
+protocol FlowStopped: class, FlowState {
     var hasStopped: Bool { get }
 }
 
-extension FlowStopped where Self: SafeState & FlowOpHandler & FlowTestHandler & FlowOutcome & FlowStateChanged {
+extension FlowStopped {
 
     var isCanceled: Bool {
-        return safeState == FlowState.canceled
+        return safeState == State.canceled
     }
 
     var isFinished: Bool {
-        return safeState == FlowState.finished
+        return safeState == State.finished
     }
 
     var hasFailed: Bool {
-        return safeState == FlowState.failed
+        return safeState == State.failed
     }
 
     var hasStopped: Bool {
         return isFinished || isCanceled || hasFailed
     }
-
 }

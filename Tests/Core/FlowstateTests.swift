@@ -26,23 +26,23 @@ import XCTest
 
 import Slip
 
-class FlowstateTests: XCTestCase {
+class StateTests: XCTestCase {
 
     func testEquatableFlowState() {
-        var state: FlowState = .ready
-        XCTAssertTrue(state == FlowState.ready)
+        var state: State = .ready
+        XCTAssertTrue(state == State.ready)
         state = .queued
-        XCTAssertTrue(state == FlowState.queued)
+        XCTAssertTrue(state == State.queued)
         state = .testing
-        XCTAssertTrue(state == FlowState.testing)
+        XCTAssertTrue(state == State.testing)
         state = .running
-        XCTAssertTrue(state == FlowState.running)
+        XCTAssertTrue(state == State.running)
         state = .failed
-        XCTAssertTrue(state == FlowState.failed)
+        XCTAssertTrue(state == State.failed)
         state = .canceled
-        XCTAssertTrue(state == FlowState.canceled)
+        XCTAssertTrue(state == State.canceled)
         state = .finished
-        XCTAssertTrue(state == FlowState.finished)
-        XCTAssertTrue(state != FlowState.failed)
+        XCTAssertTrue(state == State.finished)
+        XCTAssertTrue(state != State.failed)
     }
 }

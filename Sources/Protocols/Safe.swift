@@ -24,18 +24,20 @@
 
 import Foundation
 
+//Using the "Reader-Writer Access" Asynchrounous Design Pattern
+
 protocol Safe {
     var safeQueue: DispatchQueue { get }
 }
 
 extension Safe {
 
-    func read(_ block: ()->()) {
+    func readSafe(_ block: () -> Void) {
         safeQueue.sync { block() }
     }
 
-    func write(_ block: @escaping ()->()) {
-        safeQueue.sync(flags: .barrier, execute: block)
+    func writeSafe(_ block: @escaping () -> Void) {
+        safeQueue.async(flags: .barrier, execute: block)
     }
 
 }

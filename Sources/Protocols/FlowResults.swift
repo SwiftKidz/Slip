@@ -24,34 +24,25 @@
 
 import Foundation
 
-protocol FlowResults: class {
+protocol FlowResults: class, Safe {
     var numberOfRunningBlocks: Int { get }
     var rawResults: [FlowOpResult] { get set }
 }
 
-extension FlowResults where Self: Safe {
+extension FlowResults {
 
     var safeResults: [FlowOpResult] {
         var val: [FlowOpResult]!
-        read {
+        readSafe {
             val = self.rawResults
         }
         return val
     }
 
-    func addNewResult(_ result: FlowOpResult) -> Bool {
-        var finished: Bool!
-        write {
+    func addNew(result: FlowOpResult, onCompletion: @escaping (Bool) -> ()) {
+        writeSafe {
             self.rawResults.append(result)
-            finished = self.rawResults.count == self.numberOfRunningBlocks
+            onCompletion(self.rawResults.count == self.numberOfRunningBlocks)
         }
-        return finished
-    }
-}
-
-extension FlowResults where Self: FlowTypeBlocks {
-
-    var numberOfRunningBlocks: Int {
-        return blocks.count
     }
 }

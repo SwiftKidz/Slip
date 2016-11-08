@@ -26,50 +26,22 @@ import Foundation
 
 final class FlowOp {
 
-    typealias RunBlock = (BlockOp, Int, Any?) -> ()
-
     fileprivate let order: Int
-    fileprivate let flow: FlowOpHandler
-    fileprivate let runBlock: RunBlock
+    fileprivate let flowCallback: (FlowOpResult)->()
 
-    init(orderNumber: Int, flowHandler: FlowOpHandler, run: @escaping RunBlock) {
+    init(orderNumber: Int, callBack: @escaping (FlowOpResult)->()) {
         order = orderNumber
-        flow = flowHandler
-        runBlock = run
-    }
-}
-
-extension FlowOp {
-
-    var operation: Operation {
-        let f: BlockOp = self
-        let o: Int = order
-        return BlockOperation { [weak self] in
-            guard
-                let strongSelf = self,
-                !strongSelf.flow.hasStopped
-            else { return }
-
-            strongSelf.runBlock(f, o, strongSelf.flow.results)
-        }
+        flowCallback = callBack
     }
 }
 
 extension FlowOp: BlockOp {
 
     func finish<R>(_ result: R) {
-//        guard !flow.hasStopped else {
-//            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
-//            return
-//        }
-        flow.finished(with: FlowOpResult(order: order, result: result, error: nil))
+        flowCallback(FlowOpResult(order: order, result: result, error: nil))
     }
 
     func finish(_ error: Error) {
-//        guard !flow.hasStopped else {
-//            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
-//            return
-//        }
-        flow.finished(with: FlowOpResult(order: order, result: nil, error: error))
+        flowCallback(FlowOpResult(order: order, result: nil, error: error))
     }
 }

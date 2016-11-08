@@ -31,7 +31,7 @@ class FlowRunnerTests: XCTestCase {
     func testFlowRunnerNoErrorFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let blocks: [FlowRunner.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
+        let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
             return { (f: BlockOp, i: Int, r: Any?) in
                 f.finish()
             }
@@ -53,7 +53,7 @@ class FlowRunnerTests: XCTestCase {
     func testFlowRunnerErrorFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let blocks: [FlowRunner.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
+        let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
             return { (f: BlockOp, i: Int, r: Any?) in
                 f.finish(MockErrors.errorOnFlow)
             }
@@ -74,7 +74,7 @@ class FlowRunnerTests: XCTestCase {
     func testFlowRunnerErrorBlockFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let blocks: [FlowRunner.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
+        let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
             return { (f: BlockOp, i: Int, r: Any?) in
                 f.finish(MockErrors.errorOnFlow)
             }
@@ -95,7 +95,7 @@ class FlowRunnerTests: XCTestCase {
     func testFlowRunnerCancelFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let blocks: [FlowRunner.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
+        let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
             return { (f: BlockOp, i: Int, r: Any?) in
                 sleep(1)
                 f.finish()
@@ -120,7 +120,7 @@ class FlowRunnerTests: XCTestCase {
     func testFlowRunnerCancelBlockFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let blocks: [FlowRunner.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
+        let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
             return { (f: BlockOp, i: Int, r: Any?) in
                 sleep(1)
                 f.finish()
@@ -145,12 +145,12 @@ class FlowRunnerTests: XCTestCase {
 
         var count: Int = 0
 
-        let block: FlowRunner.RunBlock = { (flow: BlockOp, iteration: Int, result: Any?) in
+        let block: FlowTypeBlocks.RunBlock = { (flow: BlockOp, iteration: Int, result: Any?) in
             count += 1
             flow.finish(count-1)
         }
 
-        let testt: FlowRunner.TestBlock = { (test: Test) in
+        let testt: FlowTypeTests.TestBlock = { (test: Test) in
             test.complete(success: count < 5, error: nil)
         }
 
@@ -173,12 +173,12 @@ class FlowRunnerTests: XCTestCase {
 
         var count: Int = 0
 
-        let block: FlowRunner.RunBlock = { (flow: BlockOp, iteration: Int, result: Any?) in
+        let block: FlowTypeBlocks.RunBlock = { (flow: BlockOp, iteration: Int, result: Any?) in
             count += 1
             flow.finish(count-1)
         }
 
-        let testt: FlowRunner.TestBlock = { (test: Test) in
+        let testt: FlowTypeTests.TestBlock = { (test: Test) in
             test.complete(success: count < 5, error: MockErrors.errorOnTest)
         }
 
@@ -200,7 +200,7 @@ class FlowRunnerTests: XCTestCase {
     func testFlowRunnerChangesNotPermittedFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let blocks: [FlowRunner.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
+        let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
             return { (f: BlockOp, i: Int, r: Any?) in
                 sleep(1)
                 f.finish()
@@ -237,12 +237,12 @@ class FlowRunnerTests: XCTestCase {
 
         var count: Int = 0
 
-        let block: FlowRunner.RunBlock = { (flow: BlockOp, iteration: Int, result: Any?) in
+        let block: FlowTypeBlocks.RunBlock = { (flow: BlockOp, iteration: Int, result: Any?) in
             count += 1
             flow.finish(count-1)
         }
 
-        let testt: FlowRunner.TestBlock = { (test: Test) in
+        let testt: FlowTypeTests.TestBlock = { (test: Test) in
             test.complete(success: count < 5, error: MockErrors.errorOnTest)
         }
 
@@ -287,7 +287,7 @@ class FlowRunnerTests: XCTestCase {
     }
 
     func testFlowRunnerNoBlocksFunctionality() {
-        let blocks: [FlowRunner.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
+        let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
             return { (f: BlockOp, i: Int, r: Any?) in
                 f.finish()
             }
@@ -304,12 +304,12 @@ class FlowRunnerTests: XCTestCase {
     func testFlowTesterNoBlocksFunctionality() {
         var count: Int = 0
 
-        let block: FlowRunner.RunBlock = { (flow: BlockOp, iteration: Int, result: Any?) in
+        let block: FlowTypeBlocks.RunBlock = { (flow: BlockOp, iteration: Int, result: Any?) in
             count += 1
             flow.finish(count-1)
         }
 
-        let testt: FlowRunner.TestBlock = { (test: Test) in
+        let testt: FlowTypeTests.TestBlock = { (test: Test) in
             test.complete(success: count < 5, error: MockErrors.errorOnTest)
         }
 

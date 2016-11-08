@@ -24,28 +24,9 @@
 
 import Foundation
 
-protocol FlowHandlerBlocks: class, FlowCoreApi, FlowTypeBlocks, FlowTypeTests {
+protocol FlowHandlerBlocks: class, FlowCoreApi {
 
     var finishBlock: FinishBlock { get set }
     var errorBlock: ErrorBlock? { get set }
     var cancelBlock: CancelBlock? { get set }
-
-    var runBlock: RunBlock { get set }
-    var testBlock: TestBlock { get set }
-
-}
-
-extension FlowHandlerBlocks {
-
-    public func onRun(_ block: @escaping RunBlock) -> Self {
-        guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
-        runBlock = block
-        return self
-    }
-
-    public func onTest(_ block: @escaping TestBlock) -> Self {
-        guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
-        testBlock = block
-        return self
-    }
 }

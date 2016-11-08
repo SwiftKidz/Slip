@@ -12,7 +12,7 @@ public protocol FlowCoreApi {
 
     associatedtype T
 
-    typealias FinishBlock = (FlowState, Result<[T]>) -> ()//(Flow) -> ()
+    typealias FinishBlock = (State, Result<[T]>) -> ()//(Flow) -> ()
     typealias ErrorBlock = (Error) -> ()
     typealias CancelBlock = () -> ()
 
@@ -20,7 +20,7 @@ public protocol FlowCoreApi {
     func onError(_ block: @escaping ErrorBlock) -> Self
     func onCancel(_ block: @escaping CancelBlock) -> Self
 
-    var state: FlowState { get }
+    var state: State { get }
 
     func start()
     func cancel()

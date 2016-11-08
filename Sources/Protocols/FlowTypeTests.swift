@@ -24,7 +24,7 @@
 
 import Foundation
 
-protocol FlowTypeTests {
+protocol FlowTypeTests: class, FlowState, FlowTypeBlocks {
 
     typealias TestBlock = (Test) -> ()
 
@@ -32,13 +32,21 @@ protocol FlowTypeTests {
     var testAtBeginning: Bool { get }
     var testPassResult: Bool { get }
 
-    var testBlock: TestBlock { get }
+    var testBlock: TestBlock { get set }
+    var runBlock: FlowTypeBlocks.RunBlock { get set }
 }
 
-extension FlowTypeTests where Self: FlowRun & FlowTestHandler {
+extension FlowTypeTests {
 
-    func runTest() {
-        let test = FlowTest(flowHandler: self, test: testBlock).operation
-        opQueue.addOperation(test)
+    public func onRun(_ block: @escaping TestFlowApi.RunBlock) -> Self {
+        guard case .ready = safeState else { print("Cannot modify flow after starting") ; return self }
+        runBlock = block
+        return self
+    }
+
+    public func onTest(_ block: @escaping TestFlowApi.TestBlock) -> Self {
+        guard case .ready = safeState else { print("Cannot modify flow after starting") ; return self }
+        testBlock = block
+        return self
     }
 }

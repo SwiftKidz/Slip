@@ -24,9 +24,9 @@
 
 import Foundation
 
-protocol FlowOutcome: class, FlowCoreApi {}
+protocol FlowOutcome: class, Safe, FlowCoreApi, FlowError, FlowResults {}
 
-extension FlowOutcome where Self: Safe & FlowError & FlowResults {
+extension FlowOutcome {
 
     var currentResults: [T] {
         return safeResults.flatMap { $0.result as? T }

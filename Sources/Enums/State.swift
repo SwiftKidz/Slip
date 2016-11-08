@@ -24,25 +24,27 @@
 
 import Foundation
 
-protocol SafeState: class, Safe {
-    var rawState: FlowState { get set }
+public enum State {
+    case ready
+    case queued
+    case testing
+    case running
+    case canceled
+    case failed
+    case finished
 }
 
-extension SafeState where Self: FlowStateChanged & FlowOpHandler & FlowTestHandler & FlowOutcome {
-
-    var safeState: FlowState {
-        get {
-            var val: FlowState!
-            read {
-                val = self.rawState
-            }
-            return val
-        }
-        set {
-            write {
-                self.rawState = newValue
-            }
-            stateChanged()
+extension State: Equatable {
+    public static func==(lhs: State, rhs: State) -> Bool {
+        switch (lhs, rhs) {
+        case (.ready, .ready): return true
+        case (.queued, .queued): return true
+        case (.testing, .testing): return true
+        case (.canceled, .canceled): return true
+        case (.failed, .failed): return true
+        case (.running, .running): return true
+        case (.finished, .finished): return true
+        default: return false
         }
     }
 }

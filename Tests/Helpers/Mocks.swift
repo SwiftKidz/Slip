@@ -29,11 +29,11 @@ import Foundation
 enum TestConfig {
 
     static var operationNumber: Int {
-        return 60
+        return 10000
     }
 
     static var timeout: TimeInterval {
-        return 10
+        return 120
     }
 }
 
@@ -51,14 +51,18 @@ enum MockErrors: Error {
     case errorOnFlow, errorOnTest
 }
 
-class MockFlowHandler: FlowTestHandler, FlowOpHandler, FlowStopped {
+class MockFlowHandler: Safe, FlowState, FlowTestHandler, FlowOpHandler {
     var hasStopped: Bool
     var results: Any?
+    var rawState: State = .ready
+    let safeQueue: DispatchQueue = DispatchQueue(label: "com.slip.flow.safeQueue", attributes: DispatchQueue.Attributes.concurrent)
 
     init(canceled: Bool, results: Any?) {
         hasStopped = canceled
         self.results = results
     }
+
+    func stateChanged() {}
 
     func finished(with: FlowOpResult) {}
 

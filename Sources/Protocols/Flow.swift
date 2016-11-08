@@ -28,7 +28,7 @@ public protocol Flow {
 
     associatedtype T
 
-    var state: FlowState { get }
+    var state: State { get }
     var result: Result<[T]> { get }
 
 }

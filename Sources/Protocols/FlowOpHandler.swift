@@ -25,37 +25,36 @@
 import Foundation
 
 protocol FlowOpHandler: class, FlowStopped {
-    var results: Any? { get }
     func finished(with: FlowOpResult)
 }
 
-extension FlowOpHandler where Self: SafeState & FlowTypeBlocks & FlowStateChanged & FlowTestHandler & FlowOutcome & FlowStopped {
-
-    var results: Any? {
-        return currentResults
-    }
-
-    func finished(with res: FlowOpResult) {
-        //print("\(safeResults.count)")
-        guard !hasStopped else {
-            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
-            return
-        }
-
-        guard res.error == nil else {
-            safeError = res.error!
-            safeState = .failed
-            return
-        }
-
-        let shouldFinish = addNewResult(res)
-
-        guard !testFlow else {
-            safeState = .testing
-            return
-        }
-
-        guard shouldFinish else { return }
-        safeState = .finished
-    }
-}
+//extension FlowOpHandler where Self: SafeState & FlowTypeBlocks & FlowStateChanged & FlowTestHandler & FlowOutcome & FlowStopped {
+//
+//    var results: Any? {
+//        return currentResults
+//    }
+//
+//    func finished(with res: FlowOpResult) {
+////        //print("\(safeResults.count)")
+////        guard !hasStopped else {
+////            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
+////            return
+////        }
+////
+//        guard res.error == nil else {
+//            safeError = res.error!
+//            safeState = .failed
+//            return
+//        }
+//
+//        let shouldFinish = addNewResult(res)
+//
+//        guard !testFlow else {
+//            safeState = .testing
+//            return
+//        }
+//
+//        guard shouldFinish else { return }
+//        safeState = .finished
+//    }
+//}
