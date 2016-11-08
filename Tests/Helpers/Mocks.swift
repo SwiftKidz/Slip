@@ -29,7 +29,6 @@ import Foundation
 enum TestConfig {
 
     static var operationNumber: Int {
-        guard #available(OSX 10.10, *) else { return 100 }
         return 60
     }
 
