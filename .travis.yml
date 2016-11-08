@@ -49,7 +49,6 @@ script:
       swiftlint lint
     elif [ "$TEST_TYPE" = Distribution ]; then
       pod lib lint "$PODSPEC"
-      carthage build --no-skip-current
     fi
 after_success:
 - |

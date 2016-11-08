@@ -46,7 +46,7 @@ class FlowTestsTests: XCTestCase {
         bop.addDependency(op)
         queue.addOperations([op, bop], waitUntilFinished: false)
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
     func testCanceledAfterRunTest() {
@@ -68,7 +68,7 @@ class FlowTestsTests: XCTestCase {
         bop.addDependency(op)
         queue.addOperations([op, bop], waitUntilFinished: false)
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
     func testCanceledAfterRunWithErrorOp() {
@@ -90,7 +90,7 @@ class FlowTestsTests: XCTestCase {
         bop.addDependency(op)
         queue.addOperations([op, bop], waitUntilFinished: false)
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
 }

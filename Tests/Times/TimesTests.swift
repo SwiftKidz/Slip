@@ -30,45 +30,45 @@ class TimesTests: XCTestCase {
     func testFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        Times<Int>(number: 10, run: { control, iteration in
+        Times<Int>(number: TestConfig.operationNumber, run: { control, iteration in
             control.finish(iteration)
         }).onFinish { state, result in
             XCTAssertNotNil(result.value)
-            XCTAssert(result.value?.count == 10)
+            XCTAssert(result.value?.count == TestConfig.operationNumber)
             expectation.fulfill()
         }.start()
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
     func testLimitFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        Times<Int>.limit(number: 10, limit: 1, run: { control, iteration in
+        Times<Int>.limit(number: TestConfig.operationNumber, limit: 1, run: { control, iteration in
             control.finish(iteration)
         }).onFinish { state, result in
             XCTAssertNotNil(result.value)
-            XCTAssert(result.value?.count == 10)
-            XCTAssert(result.value! == [Int](0..<10))
+            XCTAssert(result.value?.count == TestConfig.operationNumber)
+            XCTAssert(result.value! == [Int](0..<TestConfig.operationNumber))
             expectation.fulfill()
             }.start()
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
     func testSeriesFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        Times<Int>.series(number: 10, run: { control, iteration in
+        Times<Int>.series(number: TestConfig.operationNumber, run: { control, iteration in
             control.finish(iteration)
         }).onFinish { state, result in
             XCTAssertNotNil(result.value)
-            XCTAssert(result.value?.count == 10)
-            XCTAssert(result.value! == [Int](0..<10))
+            XCTAssert(result.value?.count == TestConfig.operationNumber)
+            XCTAssert(result.value! == [Int](0..<TestConfig.operationNumber))
             expectation.fulfill()
             }.start()
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
 }

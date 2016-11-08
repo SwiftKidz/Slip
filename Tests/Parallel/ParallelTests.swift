@@ -38,15 +38,15 @@ class ParallelTests: XCTestCase {
             control.finish(count)
         }
 
-        let blocks: [Parallel.Block] = [Int](0..<10).map { n in return b }
+        let blocks: [Parallel.Block] = [Int](0..<TestConfig.operationNumber).map { n in return b }
 
         Parallel<Int>(runBlocks: blocks).onFinish { state, result in
             XCTAssertNotNil(result.value)
-            XCTAssert(result.value?.count == 10)
+            XCTAssert(result.value?.count == TestConfig.operationNumber)
             expectation.fulfill()
         }.start()
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
     func testLimitFunctionality() {
@@ -60,15 +60,15 @@ class ParallelTests: XCTestCase {
             control.finish(count)
         }
 
-        let blocks: [Parallel.Block] = [Int](0..<10).map { n in return b }
+        let blocks: [Parallel.Block] = [Int](0..<TestConfig.operationNumber).map { n in return b }
 
         Parallel<Int>.limit(runBlocks: blocks, limit: 1).onFinish { state, result in
             XCTAssertNotNil(result.value)
-            XCTAssert(result.value?.count == 10)
-            XCTAssert(result.value! == [Int](1..<11))
+            XCTAssert(result.value?.count == TestConfig.operationNumber)
+            XCTAssert(result.value! == [Int](1..<TestConfig.operationNumber+1))
             expectation.fulfill()
         }.start()
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 }

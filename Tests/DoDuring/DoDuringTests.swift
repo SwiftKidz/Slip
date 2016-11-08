@@ -42,7 +42,7 @@ class DoDuringTests: XCTestCase {
                 expectationRun.fulfill()
             }.start()
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
 
         let expectationRunOnce = self.expectation(description: name ?? "Test")
 
@@ -56,6 +56,6 @@ class DoDuringTests: XCTestCase {
                 expectationRunOnce.fulfill()
             }.start()
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 }

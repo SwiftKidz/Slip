@@ -40,9 +40,9 @@ class WhilstTests: XCTestCase {
             XCTAssertNotNil(result.value)
             XCTAssert(result.value! == [1, 2, 3, 4, 5])
             expectationRun.fulfill()
-            }.start()
+        }.start()
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
 
         let expectationNotRun = self.expectation(description: name ?? "Test")
 
@@ -55,6 +55,6 @@ class WhilstTests: XCTestCase {
             expectationNotRun.fulfill()
             }.start()
 
-        waitForExpectations(timeout: 10, handler: nil)
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 }
