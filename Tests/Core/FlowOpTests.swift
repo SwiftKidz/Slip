@@ -102,7 +102,7 @@ class FlowOpTests: XCTestCase {
         let handler = MockFlowHandler(canceled: false, results: nil)
 
         let opNumber: Int = 100000
-        var countOps: Int = 0
+//        var countOps: Int = 0
 
         var ops = [Int](0..<opNumber).map { n in
             return FlowOp(orderNumber: n, flowHandler: handler) { (operation, iteration, result) in
