@@ -40,4 +40,7 @@ extension Safe {
         safeQueue.async(flags: .barrier, execute: block)
     }
 
+    func writeSafeSync(_ block: () -> Void) {
+        safeQueue.sync { block() }
+    }
 }

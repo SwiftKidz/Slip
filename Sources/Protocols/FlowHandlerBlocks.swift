@@ -25,7 +25,6 @@
 import Foundation
 
 protocol FlowHandlerBlocks: class, FlowCoreApi {
-
     var finishBlock: FinishBlock { get set }
     var errorBlock: ErrorBlock? { get set }
     var cancelBlock: CancelBlock? { get set }

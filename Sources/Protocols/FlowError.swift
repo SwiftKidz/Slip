@@ -33,15 +33,17 @@ extension FlowError where Self: Safe {
     var safeError: Error? {
         get {
             var val: Error?
-            readSafe {
-                val = self.rawError
-            }
+            val = self.rawError
+//            readSafe {
+//                val = self.rawError
+//            }
             return val
         }
         set {
-            writeSafe {
-                self.rawError = newValue
-            }
+            self.rawError = newValue
+//            writeSafe {
+//
+//            }
         }
     }
 }

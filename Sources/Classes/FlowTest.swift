@@ -25,38 +25,16 @@
 import Foundation
 
 final class FlowTest {
+    fileprivate let flowCallback: (FlowTestResult)->()
 
-    fileprivate let flow: FlowTestHandler
-    fileprivate let testBlock: FlowTypeTests.TestBlock
-
-    init(flowHandler: FlowTestHandler, test: @escaping FlowTypeTests.TestBlock) {
-        flow = flowHandler
-        testBlock = test
-    }
-}
-
-extension FlowTest {
-
-    var operation: Operation {
-        let t: Test = self
-        return BlockOperation { [weak self] in
-            guard
-                let strongSelf = self,
-                !strongSelf.flow.hasStopped
-                else { return }
-
-            strongSelf.testBlock(t)
-        }
+    init(callBack: @escaping (FlowTestResult)->()) {
+        flowCallback = callBack
     }
 }
 
 extension FlowTest: Test {
 
     func complete(success: Bool, error: Error?) {
-//        guard !flow.hasStopped else {
-//            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
-//            return
-//        }
-        flow.finished(with: FlowTestResult(success: success, error: error))
+        flowCallback(FlowTestResult(success: success, error: error))
     }
 }

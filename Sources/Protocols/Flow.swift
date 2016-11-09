@@ -25,10 +25,8 @@
 import Foundation
 
 public protocol Flow {
-
     associatedtype T
 
     var state: State { get }
     var result: Result<[T]> { get }
-
 }

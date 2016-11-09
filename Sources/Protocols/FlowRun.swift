@@ -24,23 +24,30 @@
 
 import Foundation
 
-protocol FlowRun: class, FlowTypeTests, FlowResults {
+protocol FlowRun: class, FlowTypeTests, FlowOutcome {
     var opQueue: OperationQueue { get }
 }
 
 extension FlowRun where Self: FlowTestHandler {
 
-    func runTest() {
-        let test = FlowTest(flowHandler: self, test: testBlock).operation
+    func runTest(onFinish: @escaping (FlowTestResult) -> Void) {
+        let tHandler = FlowTest(callBack: onFinish)
+        let test = BlockOperation { //[weak self] in
+            self.testBlock(tHandler)
+        }
         opQueue.addOperation(test)
     }
 }
 
 extension FlowRun where Self: FlowOpHandler {
 
-    func runClosure() {
-        //let run = FlowOp(orderNumber: safeResults.count, flowHandler: self, run: runBlock).operation
-        //opQueue.addOperation(run)
+    func runClosure(onFinish: @escaping (FlowOpResult) -> Void) {
+        let o: Int = self.rawResults.count
+        let f: BlockOp = FlowOp(orderNumber: o, callBack: onFinish)
+        let run = BlockOperation {
+            self.runBlock(f, o, self.currentResults)
+        }
+        opQueue.addOperation(run)
     }
 
     func runFlowOfBlocks(onFinish: @escaping (FlowOpResult) -> Void) {
@@ -56,11 +63,13 @@ extension FlowRun where Self: FlowOpHandler {
         blocks.removeAll()
     }
 
-    private func operationFrom(block: @escaping FlowTypeBlocks.RunBlock, order: Int, finishOpCallback: @escaping (FlowOpResult) -> Void) -> Operation {
+    private func operationFrom(block: @escaping FlowTypeBlocks.RunBlock,
+                               order: Int,
+                               finishOpCallback: @escaping (FlowOpResult) -> Void) -> Operation {
         let f: BlockOp = FlowOp(orderNumber: order, callBack: finishOpCallback)
         let o: Int = order
         return BlockOperation { [weak self] in
-            block(f, o, self?.results ?? [])
+            block(f, o, self?.currentResults ?? [])
         }
     }
 }

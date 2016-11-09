@@ -26,7 +26,7 @@ import Foundation
 
 protocol FlowState: class, Safe {
     var rawState: State { get set }
-    func stateChanged()
+    func changedTo(_ state: State)
 }
 
 extension FlowState {
@@ -40,10 +40,20 @@ extension FlowState {
             return val
         }
         set {
-            writeSafe {
+            writeSafe { //[unowned self] in
                 self.rawState = newValue
-                self.stateChanged()
+                self.changedTo(self.rawState)
             }
+        }
+    }
+
+    var unsafeState: State {
+        get {
+            return self.rawState
+        }
+        set {
+            self.rawState = newValue
+            changedTo(self.rawState)
         }
     }
 }
