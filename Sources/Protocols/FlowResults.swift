@@ -42,7 +42,7 @@ extension FlowResults {
     func addNew(result: FlowOpResult, onCompletion: @escaping (Bool) -> ()) {
         writeSafe { //[unowned self] in
             self.rawResults.append(result)
-            //print("\(self.rawResults.count) - \(self.numberOfRunningBlocks) : \(self.rawResults.count == self.numberOfRunningBlocks)")
+            print("\(self.rawResults.count) - \(self.numberOfRunningBlocks) : \(self.rawResults.count == self.numberOfRunningBlocks)")
             onCompletion(self.rawResults.count == self.numberOfRunningBlocks)
         }
     }

@@ -42,24 +42,36 @@ extension FlowRun where Self: FlowTestHandler {
 extension FlowRun where Self: FlowOpHandler {
 
     func runClosure(onFinish: @escaping (FlowOpResult) -> Void) {
-        let o: Int = self.rawResults.count
-        let f: BlockOp = FlowOp(orderNumber: o, callBack: onFinish)
-        let run = BlockOperation {
-            self.runBlock(f, o, self.currentResults)
-        }
+//        let o: Int = self.rawResults.count
+//        let f: BlockOp = FlowOp(orderNumber: o, callBack: onFinish)
+//        let run = BlockOperation {
+//            self.runBlock(f, o, self.currentResults)
+//        }
+        let run: FlowOp = FlowOp(qos: .background,
+                                  orderNumber: rawResults.count,
+                                  results: { self.currentResults },
+                                  callBack: onFinish,
+                                  run: runBlock)
+
         opQueue.addOperation(run)
     }
 
     func runFlowOfBlocks(onFinish: @escaping (FlowOpResult) -> Void) {
         guard !blocks.isEmpty else { safeState = .finished; return }
 
-        var ops: [Operation] = []
+       // var ops: [Operation] = []
 
         for i in 0..<blocks.count {
-            ops.append(operationFrom(block: blocks[i], order: i, finishOpCallback: onFinish))
+            //ops.append(operationFrom(block: blocks[i], order: i, finishOpCallback: onFinish))
+            let op = FlowOp(qos: .background,
+                            orderNumber: i,
+                            results: getCurrentResults,
+                            callBack: onFinish,
+                            run: blocks[i])
+            opQueue.addOperation(op)
         }
 
-        opQueue.addOperations(ops, waitUntilFinished: false)
+        //opQueue.addOperations(ops, waitUntilFinished: false)
         blocks.removeAll()
     }
 

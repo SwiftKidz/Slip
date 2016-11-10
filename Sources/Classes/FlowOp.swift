@@ -24,24 +24,106 @@
 
 import Foundation
 
-final class FlowOp {
+final class FlowOp: Operation {
 
+    fileprivate enum ChangeKey: String { case isFinished, isExecuting }
+
+    fileprivate let runQueue: DispatchQueue
+    fileprivate let runBlock: FlowTypeBlocks.RunBlock
     fileprivate let order: Int
-    fileprivate let flowCallback: (FlowOpResult)->()
+    fileprivate let flowCallback: (FlowOpResult) -> Void
+    fileprivate let resultHandler: FlowOutcome?
+
+    var finishedOp: Bool = false {
+        didSet {
+            didChangeValue(forKey: ChangeKey.isFinished.rawValue)
+        }
+        willSet {
+            willChangeValue(forKey: ChangeKey.isFinished.rawValue)
+        }
+    }
+
+    var executingOp: Bool = false {
+        didSet {
+            didChangeValue(forKey: ChangeKey.isExecuting.rawValue)
+        }
+        willSet {
+            willChangeValue(forKey: ChangeKey.isExecuting.rawValue)
+        }
+    }
+
+    init(qos: DispatchQoS = .background,
+         orderNumber: Int,
+         resultsHandler: FlowOutcome,
+         callBack: @escaping (FlowOpResult) -> Void,
+         run: @escaping FlowTypeBlocks.RunBlock) {
+        order = orderNumber
+        flowCallback = callBack
+        runQueue = DispatchQueue(
+            label: "com.slip.flowOp.runQueue",
+            qos: qos
+        )
+        runBlock = run
+        resultHandler = resultsHandler
+    }
 
     init(orderNumber: Int, callBack: @escaping (FlowOpResult)->()) {
         order = orderNumber
         flowCallback = callBack
+        runQueue = DispatchQueue(
+            label: "com.slip.flowOp.runQueue",
+            qos: .background
+        )
+        runBlock = { _ in }
+    }
+}
+
+extension FlowOp {
+
+    override func start() {
+        guard !isCancelled else { return }
+        executingOp = true
+
+        runQueue.async { [weak self] in
+            guard let strongSelf = self else { return }
+            strongSelf.runBlock(strongSelf, strongSelf.order, strongSelf.getResult())
+        }
+    }
+
+    func markAsFinished() {
+        executingOp = false
+        finishedOp = true
+    }
+}
+
+extension FlowOp {
+
+    override var isAsynchronous: Bool {
+        return true
+    }
+
+    override var isFinished: Bool {
+        get { return finishedOp }
+        set { finishedOp = newValue }
+    }
+
+    override var isExecuting: Bool {
+        get { return executingOp }
+        set { executingOp = newValue }
     }
 }
 
 extension FlowOp: BlockOp {
 
     func finish<R>(_ result: R) {
+        guard !isCancelled else { return }
         flowCallback(FlowOpResult(order: order, result: result, error: nil))
+        markAsFinished()
     }
 
     func finish(_ error: Error) {
+        guard !isCancelled else { return }
         flowCallback(FlowOpResult(order: order, result: nil, error: error))
+        markAsFinished()
     }
 }

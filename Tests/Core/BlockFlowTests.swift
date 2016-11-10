@@ -34,7 +34,7 @@ class BlockFlowTests: XCTestCase {
             return { (f: BlockOp, i: Int, r: Any?) in
                 f.finish(i)
                 //guard (i+1)%1000 == 0 else { return }
-                //print(i)
+                print("\(i) - \(r)")
             }
         }
 
