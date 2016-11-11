@@ -34,14 +34,12 @@ class TestFlowTests: XCTestCase {
 
         let flow = TestFlow<Int>()
         .onFinish { state, result in
-            print(state)
-            print(result)
             expectation.fulfill()
         }
         flow.onCancel {
-
+            XCTFail()
         }.onError { _ in
-
+            XCTFail()
         }.onRun { flow, iteration, results in
             count += 1
             flow.finish(iteration)
@@ -57,8 +55,6 @@ class TestFlowTests: XCTestCase {
 
         let test = TestFlow<Int>()
         .onFinish { state, result in
-            print(state)
-            print(result)
             expectation.fulfill()
         }
 

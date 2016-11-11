@@ -31,7 +31,7 @@ extension FlowOutcome {
     func getCurrentResults() -> [T] {
         return safeResults.flatMap { $0.result as? T }
     }
-    
+
     var currentResults: [T] {
         return safeResults.flatMap { $0.result as? T }
     }

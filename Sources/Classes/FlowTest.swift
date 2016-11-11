@@ -24,11 +24,77 @@
 
 import Foundation
 
-final class FlowTest {
-    fileprivate let flowCallback: (FlowTestResult)->()
+final class FlowTest: Operation {
 
-    init(callBack: @escaping (FlowTestResult)->()) {
+    fileprivate enum ChangeKey: String { case isFinished, isExecuting }
+
+    fileprivate let runQueue: DispatchQueue
+    fileprivate let testBlock: FlowTypeTests.TestBlock
+    fileprivate let flowCallback: (FlowTestResult) -> Void
+
+    var finishedOp: Bool = false {
+        didSet {
+            didChangeValue(forKey: ChangeKey.isFinished.rawValue)
+        }
+        willSet {
+            willChangeValue(forKey: ChangeKey.isFinished.rawValue)
+        }
+    }
+
+    var executingOp: Bool = false {
+        didSet {
+            didChangeValue(forKey: ChangeKey.isExecuting.rawValue)
+        }
+        willSet {
+            willChangeValue(forKey: ChangeKey.isExecuting.rawValue)
+        }
+    }
+
+    init(qos: DispatchQoS = .background,
+         callBack: @escaping (FlowTestResult) -> Void,
+         test: @escaping FlowTypeTests.TestBlock) {
         flowCallback = callBack
+        runQueue = DispatchQueue(
+            label: "com.slip.flowTest.runQueue",
+            qos: qos
+        )
+        testBlock = test
+    }
+
+}
+
+extension FlowTest {
+
+    override func start() {
+        guard !isCancelled else { return }
+        executingOp = true
+
+        runQueue.async { [weak self] in
+            guard let strongSelf = self else { return }
+            strongSelf.testBlock(strongSelf)
+        }
+    }
+
+    func markAsFinished() {
+        executingOp = false
+        finishedOp = true
+    }
+}
+
+extension FlowTest {
+
+    override var isAsynchronous: Bool {
+        return true
+    }
+
+    override var isFinished: Bool {
+        get { return finishedOp }
+        set { finishedOp = newValue }
+    }
+
+    override var isExecuting: Bool {
+        get { return executingOp }
+        set { executingOp = newValue }
     }
 }
 
@@ -36,5 +102,6 @@ extension FlowTest: Test {
 
     func complete(success: Bool, error: Error?) {
         flowCallback(FlowTestResult(success: success, error: error))
+        markAsFinished()
     }
 }

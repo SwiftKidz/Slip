@@ -26,7 +26,7 @@ import Foundation
 
 protocol FlowTypeTests: class, FlowState, FlowTypeBlocks {
 
-    typealias TestBlock = (Test) -> ()
+    typealias TestBlock = (Test) -> Void
 
     var testFlow: Bool { get }
     var testAtBeginning: Bool { get }

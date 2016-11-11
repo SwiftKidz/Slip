@@ -37,12 +37,12 @@ class StateTests: XCTestCase {
         XCTAssertTrue(state == State.testing)
         state = .running
         XCTAssertTrue(state == State.running)
-        state = .failed
-        XCTAssertTrue(state == State.failed)
+        state = .failed(MockErrors.errorOnFlow)
+        XCTAssertTrue(state == State.failed(MockErrors.errorOnFlow))
         state = .canceled
         XCTAssertTrue(state == State.canceled)
         state = .finished
         XCTAssertTrue(state == State.finished)
-        XCTAssertTrue(state != State.failed)
+        XCTAssertTrue(state != State.failed(MockErrors.errorOnFlow))
     }
 }

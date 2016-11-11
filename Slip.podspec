@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
  s.name = 'Slip'
- s.version = '0.0.4'
+ s.version = '0.0.5'
  s.license = { :type => "MIT", :file => "LICENSE" }
  s.summary = 'Control the execution flow of your code using steps'
  s.homepage = 'https://github.com/SwiftKidz'

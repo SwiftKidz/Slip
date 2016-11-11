@@ -40,7 +40,9 @@ extension Safe {
         safeQueue.async(flags: .barrier, execute: block)
     }
 
-    func writeSafeSync(_ block: () -> Void) {
-        safeQueue.sync { block() }
+    func safeBlock(_ block: () -> Void) {
+//        objc_sync_enter(self)
+//        defer { objc_sync_exit(self) }
+        block()
     }
 }

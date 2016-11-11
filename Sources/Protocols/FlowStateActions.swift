@@ -51,7 +51,7 @@ extension FlowStateActions {
         opQueue.cancelAllOperations()
         guard
             let _ = errorBlock,
-            let error = safeError
+            let error = unsafeState.error
         else {
             finished()
             return
@@ -59,6 +59,7 @@ extension FlowStateActions {
         DispatchQueue.main.async {
             self.errorBlock?(error)
             self.errorBlock = nil
+            self.finishBlock = { _ in }
         }
     }
 
@@ -71,6 +72,7 @@ extension FlowStateActions {
         DispatchQueue.main.async {
             self.cancelBlock?()
             self.cancelBlock = nil
+            self.finishBlock = { _ in }
         }
 
     }
@@ -81,16 +83,4 @@ extension FlowStateActions {
             self.finishBlock = { _ in }
         }
     }
-
-    fileprivate func runCancelBlock() {
-        var block: CancelBlock?
-        writeSafeSync {
-            block = self.cancelBlock
-            self.cancelBlock = nil
-        }
-        DispatchQueue.main.async {
-            block?()
-        }
-    }
-
 }

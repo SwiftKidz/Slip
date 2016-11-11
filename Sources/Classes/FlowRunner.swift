@@ -100,7 +100,7 @@ internal class FlowRunner<T>: FlowCoreApi {
 
 extension FlowRunner: Safe {}
 
-extension FlowRunner: FlowState {
+extension FlowRunner: FlowState, FlowStateActions {
 
     func changedTo(_ state: State) {
         switch state {
@@ -138,8 +138,6 @@ extension FlowRunner: FlowResults {}
 
 extension FlowRunner: FlowOutcome {}
 
-extension FlowRunner: FlowStateActions {}
-
 extension FlowRunner: FlowOpHandler {}
 
 extension FlowRunner: FlowTestHandler {}
@@ -147,19 +145,19 @@ extension FlowRunner: FlowTestHandler {}
 extension FlowRunner {
 
     public func onFinish(_ block: @escaping FinishBlock) -> Self {
-        guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
+        guard case .ready = rawState else { print("Cannot modify flow after starting") ; return self }
         finishBlock = block
         return self
     }
 
     public func onError(_ block: @escaping FlowCoreApi.ErrorBlock) -> Self {
-        guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
+        guard case .ready = rawState else { print("Cannot modify flow after starting") ; return self }
         errorBlock = block
         return self
     }
 
     public func onCancel(_ block: @escaping FlowCoreApi.CancelBlock) -> Self {
-        guard case .ready = state else { print("Cannot modify flow after starting") ; return self }
+        guard case .ready = rawState else { print("Cannot modify flow after starting") ; return self }
         cancelBlock = block
         return self
     }

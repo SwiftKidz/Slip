@@ -29,7 +29,7 @@ import Foundation
 enum TestConfig {
 
     static var operationNumber: Int {
-        return 100
+        return 1000
     }
 
     static var timeout: TimeInterval {
@@ -52,57 +52,17 @@ enum MockErrors: Error {
 }
 
 
-class MockFlowHandler<T>: Safe, FlowState, FlowTestHandler, FlowOpHandler, FlowStateActions {
+class MockFlowHandler<T>: FlowTestHandler, FlowOpHandler {
 
     var hasStopped: Bool
     var results: Any?
-    var rawState: State = .ready
-    let safeQueue: DispatchQueue = DispatchQueue(label: "com.slip.flow.safeQueue", attributes: DispatchQueue.Attributes.concurrent)
-    var opQueue: OperationQueue = OperationQueue()
-    var finishBlock: FinishBlock = { _ in }
-    var errorBlock: FlowCoreApi.ErrorBlock?
-    var cancelBlock: FlowCoreApi.CancelBlock?
-    var blocks: [FlowTypeBlocks.RunBlock] = []
-    let numberOfRunningBlocks: Int = 0
-    var rawResults: [FlowOpResult] = []
-    var rawError: Error?
-    let limitOfSimultaneousOps: Int = 0
-    var testFlow: Bool = false
-    var testAtBeginning: Bool = true
-    var testPassResult: Bool = true
-    var runBlock: FlowTypeBlocks.RunBlock = { _ in }
-    var testBlock: FlowTypeTests.TestBlock = { _ in }
 
     init(canceled: Bool, results: Any?) {
         hasStopped = canceled
         self.results = results
     }
 
-    func changedTo(_ state: State) {}
+    func finishedOp(with: FlowOpResult) {}
 
-    func finishedOp(with: FlowOpResult) {
-
-    }
-
-    func finished(with: FlowOpResult) {}
-
-    func finished(with: FlowTestResult) {}
-
-    func queued() {}
-    func testing() {}
-    func finished() {}
-    func running() {}
-    func failed() {}
-    func canceled() {}
-
-    typealias FinishBlock = (State, Result<[T]>) -> ()
-
-    func onFinish(_ block: @escaping FinishBlock) -> Self { return self }
-    func onError(_ block: @escaping FlowCoreApi.ErrorBlock) -> Self { return self }
-    func onCancel(_ block: @escaping FlowCoreApi.CancelBlock) -> Self { return self }
-
-    var state: State = .queued
-
-    func start() {}
-    func cancel() {}
+    func finishedTest(with: FlowTestResult) {}
 }

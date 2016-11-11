@@ -31,25 +31,16 @@ protocol FlowRun: class, FlowTypeTests, FlowOutcome {
 extension FlowRun where Self: FlowTestHandler {
 
     func runTest(onFinish: @escaping (FlowTestResult) -> Void) {
-        let tHandler = FlowTest(callBack: onFinish)
-        let test = BlockOperation { //[weak self] in
-            self.testBlock(tHandler)
-        }
-        opQueue.addOperation(test)
+        opQueue.addOperation(FlowTest(qos: .background, callBack: onFinish, test: testBlock))
     }
 }
 
 extension FlowRun where Self: FlowOpHandler {
 
     func runClosure(onFinish: @escaping (FlowOpResult) -> Void) {
-//        let o: Int = self.rawResults.count
-//        let f: BlockOp = FlowOp(orderNumber: o, callBack: onFinish)
-//        let run = BlockOperation {
-//            self.runBlock(f, o, self.currentResults)
-//        }
         let run: FlowOp = FlowOp(qos: .background,
                                   orderNumber: rawResults.count,
-                                  results: { self.currentResults },
+                                  resultsHandler: { [weak self] in return self?.getCurrentResults() ?? [] },
                                   callBack: onFinish,
                                   run: runBlock)
 
@@ -59,29 +50,14 @@ extension FlowRun where Self: FlowOpHandler {
     func runFlowOfBlocks(onFinish: @escaping (FlowOpResult) -> Void) {
         guard !blocks.isEmpty else { safeState = .finished; return }
 
-       // var ops: [Operation] = []
-
         for i in 0..<blocks.count {
-            //ops.append(operationFrom(block: blocks[i], order: i, finishOpCallback: onFinish))
-            let op = FlowOp(qos: .background,
-                            orderNumber: i,
-                            results: getCurrentResults,
-                            callBack: onFinish,
-                            run: blocks[i])
-            opQueue.addOperation(op)
+            opQueue.addOperation(FlowOp(qos: .background,
+                                        orderNumber: i,
+                                        resultsHandler: { [weak self] in return self?.getCurrentResults() ?? [] },
+                                        callBack: onFinish,
+                                        run: blocks[i]))
         }
 
-        //opQueue.addOperations(ops, waitUntilFinished: false)
         blocks.removeAll()
-    }
-
-    private func operationFrom(block: @escaping FlowTypeBlocks.RunBlock,
-                               order: Int,
-                               finishOpCallback: @escaping (FlowOpResult) -> Void) -> Operation {
-        let f: BlockOp = FlowOp(orderNumber: order, callBack: finishOpCallback)
-        let o: Int = order
-        return BlockOperation { [weak self] in
-            block(f, o, self?.currentResults ?? [])
-        }
     }
 }

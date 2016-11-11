@@ -51,7 +51,7 @@ class TimesTests: XCTestCase {
             XCTAssert(result.value?.count == TestConfig.operationNumber)
             XCTAssert(result.value! == [Int](0..<TestConfig.operationNumber))
             expectation.fulfill()
-            }.start()
+        }.start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }

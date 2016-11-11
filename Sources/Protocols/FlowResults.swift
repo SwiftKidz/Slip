@@ -32,17 +32,17 @@ protocol FlowResults: class, Safe {
 extension FlowResults {
 
     var safeResults: [FlowOpResult] {
-        //print("will read results")
         var val: [FlowOpResult]!
-        val = self.rawResults
-        //print("Did read results")
+        readSafe {
+            val = self.rawResults
+        }
         return val
     }
 
     func addNew(result: FlowOpResult, onCompletion: @escaping (Bool) -> ()) {
         writeSafe { //[unowned self] in
             self.rawResults.append(result)
-            print("\(self.rawResults.count) - \(self.numberOfRunningBlocks) : \(self.rawResults.count == self.numberOfRunningBlocks)")
+            //print("\(self.rawResults.count) - \(self.numberOfRunningBlocks) : \(self.rawResults.count == self.numberOfRunningBlocks)")
             onCompletion(self.rawResults.count == self.numberOfRunningBlocks)
         }
     }

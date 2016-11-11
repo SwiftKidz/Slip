@@ -30,8 +30,16 @@ public enum State {
     case testing
     case running
     case canceled
-    case failed
+    case failed(Error)
     case finished
+}
+
+extension State {
+
+    var error: Error? {
+        guard case .failed(let error) = self else { return nil }
+        return error
+    }
 }
 
 extension State: Equatable {
@@ -41,7 +49,7 @@ extension State: Equatable {
         case (.queued, .queued): return true
         case (.testing, .testing): return true
         case (.canceled, .canceled): return true
-        case (.failed, .failed): return true
+        case (.failed(_), .failed(_)): return true
         case (.running, .running): return true
         case (.finished, .finished): return true
         default: return false

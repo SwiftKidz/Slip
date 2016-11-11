@@ -57,7 +57,6 @@ class ParallelTests: XCTestCase {
 
         let b: Parallel.Block = { control in
             count += 1
-            print(count)
             control.finish(count)
         }
 

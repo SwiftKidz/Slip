@@ -62,7 +62,7 @@ class FlowRunnerTests: XCTestCase {
         let flowRunner = FlowRunner<Void>(runBlocks: blocks)
 
         flowRunner.onFinish { state, result in
-            XCTAssert(state == .failed)
+            XCTAssert(state == .failed(MockErrors.errorOnFlow))
             XCTAssertNotNil(result.error)
             XCTAssertNil(result.value)
             expectation.fulfill()
@@ -83,8 +83,8 @@ class FlowRunnerTests: XCTestCase {
         let flowRunner = FlowRunner<Void>(runBlocks: blocks)
 
         flowRunner.onError { error in
-            guard case MockErrors.errorOnFlow = error else { XCTFail(); return }
             expectation.fulfill()
+            guard case MockErrors.errorOnFlow = error else { XCTFail(); return }
         }.onFinish { state, result in
             XCTFail()
         }.start()
@@ -97,7 +97,7 @@ class FlowRunnerTests: XCTestCase {
 
         let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
             return { (f: BlockOp, i: Int, r: Any?) in
-                sleep(1)
+                sleep(2)
                 f.finish()
             }
         }
@@ -108,7 +108,7 @@ class FlowRunnerTests: XCTestCase {
             XCTAssert(state == .canceled)
             XCTAssertNil(result.error)
             XCTAssertNotNil(result.value)
-            print(result.value)
+            print("Cancel value \(result.value ?? [])")
             //XCTAssert(result.value?.isEmpty ?? false)
             expectation.fulfill()
         }.start()
@@ -187,7 +187,7 @@ class FlowRunnerTests: XCTestCase {
         flowTester.testAtBeginning = true
 
         flowTester.onFinish { state, result in
-            XCTAssert(state == .failed)
+            XCTAssert(state == .failed(MockErrors.errorOnFlow))
             XCTAssertNotNil(result.error)
             guard let error = result.error as? MockErrors else { XCTFail(); return }
             guard case MockErrors.errorOnTest = error else { XCTFail(); return }
@@ -203,7 +203,7 @@ class FlowRunnerTests: XCTestCase {
 
         let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
             return { (f: BlockOp, i: Int, r: Any?) in
-                sleep(1)
+                if i < 3 { sleep(1) }
                 f.finish()
             }
         }
@@ -251,7 +251,7 @@ class FlowRunnerTests: XCTestCase {
         flowTester.testAtBeginning = false
 
         flowTester.onFinish { state, result in
-            XCTAssert(state == .failed)
+            XCTAssert(state == .failed(MockErrors.errorOnFlow))
             XCTAssertNotNil(result.error)
             guard let error = result.error as? MockErrors else { XCTFail(); return }
             guard case MockErrors.errorOnTest = error else { XCTFail(); return }

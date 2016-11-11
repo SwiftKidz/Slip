@@ -31,15 +31,15 @@ protocol FlowStopped: class, FlowState {
 extension FlowStopped {
 
     var isCanceled: Bool {
-        return safeState == State.canceled
+        return unsafeState == State.canceled
     }
 
     var isFinished: Bool {
-        return safeState == State.finished
+        return unsafeState == State.finished
     }
 
     var hasFailed: Bool {
-        return safeState == State.failed
+        if case .failed(_) = unsafeState { return true } else { return false }
     }
 
     var hasStopped: Bool {

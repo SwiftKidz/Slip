@@ -32,7 +32,7 @@ final class FlowOp: Operation {
     fileprivate let runBlock: FlowTypeBlocks.RunBlock
     fileprivate let order: Int
     fileprivate let flowCallback: (FlowOpResult) -> Void
-    fileprivate let resultHandler: FlowOutcome?
+    fileprivate let resultHandler: () -> (Any)
 
     var finishedOp: Bool = false {
         didSet {
@@ -54,7 +54,7 @@ final class FlowOp: Operation {
 
     init(qos: DispatchQoS = .background,
          orderNumber: Int,
-         resultsHandler: FlowOutcome,
+         resultsHandler: @escaping () -> (Any),
          callBack: @escaping (FlowOpResult) -> Void,
          run: @escaping FlowTypeBlocks.RunBlock) {
         order = orderNumber
@@ -75,6 +75,7 @@ final class FlowOp: Operation {
             qos: .background
         )
         runBlock = { _ in }
+        resultHandler = { return [] }
     }
 }
 
@@ -84,9 +85,9 @@ extension FlowOp {
         guard !isCancelled else { return }
         executingOp = true
 
-        runQueue.async { [weak self] in
-            guard let strongSelf = self else { return }
-            strongSelf.runBlock(strongSelf, strongSelf.order, strongSelf.getResult())
+        runQueue.async { //[weak self] in
+            let strongSelf = self //guard  else { return }
+            strongSelf.runBlock(strongSelf, strongSelf.order, strongSelf.resultHandler())
         }
     }
 
