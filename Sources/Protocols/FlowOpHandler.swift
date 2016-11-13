@@ -31,24 +31,22 @@ protocol FlowOpHandler: class {
 extension FlowOpHandler where Self: FlowStopped & FlowResults & FlowTypeTests {
 
     func finishedOp(with res: FlowOpResult) {
-        safeBlock {
-            guard !hasStopped else {
-                print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
-                return
-            }
-
-            guard res.error == nil else {
-                safeState = .failed(res.error!)
-                return
-            }
-
-            addNew(result: res) { shouldFinish in
-                guard shouldFinish else { return }
-                self.safeState = .finished
-            }
-
-            guard testFlow else { return }
-            safeState = .testing
+        guard !hasStopped else {
+            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
+            return
         }
+
+        guard res.error == nil else {
+            safeState = .failed(res.error!)
+            return
+        }
+
+        addNew(result: res) { shouldFinish in
+            guard shouldFinish else { return }
+            self.unsafeState = .finished
+        }
+
+        guard testFlow else { return }
+        safeState = .testing
     }
 }

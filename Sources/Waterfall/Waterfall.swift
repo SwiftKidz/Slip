@@ -24,7 +24,7 @@
 
 import Foundation
 
-public final class Waterfall<T>: FlowRunner<T> {
+public final class Waterfall<T>: FlowHandler<T> {
 
     public typealias Block = (BlockOp, [T]) -> ()
 

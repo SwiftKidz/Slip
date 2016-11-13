@@ -24,26 +24,11 @@
 
 import Foundation
 
-protocol FlowError: class {
-    var rawError: Error? { get set }
-}
+protocol FlowError: class, FlowState {}
 
-extension FlowError where Self: Safe {
+extension FlowError {
 
-    var safeError: Error? {
-        get {
-            var val: Error?
-            val = self.rawError
-//            readSafe {
-//                val = self.rawError
-//            }
-            return val
-        }
-        set {
-            self.rawError = newValue
-//            writeSafe {
-//
-//            }
-        }
+    var unsafeError: Error? {
+        return unsafeState.error
     }
 }

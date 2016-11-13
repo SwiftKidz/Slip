@@ -25,6 +25,7 @@
 import Foundation
 
 protocol FlowState: class, Safe {
+    var stateQueue: DispatchQueue { get }
     var rawState: State { get set }
     func changedTo(_ state: State)
 }
@@ -34,13 +35,13 @@ extension FlowState {
     var safeState: State {
         get {
             var val: State!
-            readSafe {
+            readSafe(queue: stateQueue) {
                 val = self.rawState
             }
             return val
         }
         set {
-            writeSafe { //[unowned self] in
+            writeSafe(queue: stateQueue) {
                 self.rawState = newValue
                 self.changedTo(self.rawState)
             }

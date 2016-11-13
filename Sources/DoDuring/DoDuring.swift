@@ -24,7 +24,7 @@
 
 import Foundation
 
-public final class DoDuring<T>: FlowRunner<T> {
+public final class DoDuring<T>: FlowHandler<T> {
 
     public typealias AsyncTest = (Test) -> ()
     public typealias Run = (BlockOp) -> ()

@@ -24,7 +24,7 @@
 
 import Foundation
 
-public final class Sequential<T>: FlowRunner<T> {
+public final class Sequential<T>: FlowHandler<T> {
 
     public typealias Block = (BlockOp, T?) -> ()
 

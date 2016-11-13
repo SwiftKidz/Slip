@@ -24,7 +24,8 @@
 
 import Foundation
 
-protocol FlowRun: class, FlowTypeTests, FlowOutcome {
+protocol FlowRun: class, FlowCoreApi, FlowTypeTests, FlowOutcome {
+    var flowRunner: FlowRunner<T> { get }
     var opQueue: OperationQueue { get }
 }
 
@@ -40,7 +41,7 @@ extension FlowRun where Self: FlowOpHandler {
     func runClosure(onFinish: @escaping (FlowOpResult) -> Void) {
         let run: FlowOp = FlowOp(qos: .background,
                                   orderNumber: rawResults.count,
-                                  resultsHandler: { [weak self] in return self?.getCurrentResults() ?? [] },
+                                  resultsHandler: { [weak self] in self?.getCurrentResults() ?? [] },
                                   callBack: onFinish,
                                   run: runBlock)
 
@@ -53,7 +54,7 @@ extension FlowRun where Self: FlowOpHandler {
         for i in 0..<blocks.count {
             opQueue.addOperation(FlowOp(qos: .background,
                                         orderNumber: i,
-                                        resultsHandler: { [weak self] in return self?.getCurrentResults() ?? [] },
+                                        resultsHandler: { [weak self] in self?.getCurrentResults() ?? [] },
                                         callBack: onFinish,
                                         run: blocks[i]))
         }

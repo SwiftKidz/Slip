@@ -24,7 +24,7 @@
 
 import Foundation
 
-public final class DoUntil<T>: FlowRunner<T> {
+public final class DoUntil<T>: FlowHandler<T> {
 
     public typealias Test = () -> (Bool)
     public typealias Run = (BlockOp) -> ()

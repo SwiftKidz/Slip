@@ -24,7 +24,7 @@
 
 import Foundation
 
-public final class BlockFlow<T>: FlowRunner<T>, BlockFlowApi {
+public final class BlockFlow<T>: FlowHandler<T>, BlockFlowApi {
 
     public override init(runBlocks: [BlockFlowApi.RunBlock],
          limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,

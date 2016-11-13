@@ -24,7 +24,7 @@
 
 import Foundation
 
-public final class During<T>: FlowRunner<T> {
+public final class During<T>: FlowHandler<T> {
 
     public typealias AsyncTest = (Test) -> ()
     public typealias Run = (BlockOp) -> ()

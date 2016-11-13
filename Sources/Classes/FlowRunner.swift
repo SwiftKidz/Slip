@@ -24,155 +24,155 @@
 
 import Foundation
 
-internal class FlowRunner<T>: FlowCoreApi {
+internal final class FlowRunner<T> {
 
-    public typealias FinishBlock = (State, Result<[T]>) -> ()
+    fileprivate var stop: Bool = false
+    fileprivate var rawResults: [FlowOpResult] = []
+    fileprivate let runnerQueue: DispatchQueue
+    fileprivate let opQueue: OperationQueue
+    fileprivate var finishHandler: (Result<[FlowOpResult]>) -> Void
+    fileprivate var testFlow: Bool = false
+    fileprivate var testPassResult: Bool = true
+    fileprivate var onRunSucceed: () -> Void = {}
+    fileprivate var onTestSucceed: () -> Void = {}
+    fileprivate let numberOfRunningBlocks: Int
 
-    var finishBlock: FinishBlock
-    var errorBlock: FlowCoreApi.ErrorBlock?
-    var cancelBlock: FlowCoreApi.CancelBlock?
+    var safeQueue: DispatchQueue = DispatchQueue(label: "com.slip.flow.flowRunnerQueue", attributes: DispatchQueue.Attributes.concurrent)
 
-    var runBlock: FlowTypeBlocks.RunBlock
-    var testBlock: FlowTypeTests.TestBlock
-
-    var rawState: State
-    var rawResults: [FlowOpResult]
-    var rawError: Error?
-
-    var blocks: [FlowTypeBlocks.RunBlock]
-    let numberOfRunningBlocks: Int
-
-    let limitOfSimultaneousOps: Int
-    let qos: QualityOfService
-    let synchronous: Bool
-
-    var testFlow: Bool = false
-    var testAtBeginning: Bool = true
-    var testPassResult: Bool = true
-
-    let safeQueue: DispatchQueue = DispatchQueue(label: "com.slip.flow.safeQueue", attributes: DispatchQueue.Attributes.concurrent)
-
-    lazy var opQueue: OperationQueue = {
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = self.limitOfSimultaneousOps
-        queue.qualityOfService = self.qos
-
-        return queue
-    }()
-
-    init(runBlocks: [FlowTypeBlocks.RunBlock],
-         limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
-         runQoS: QualityOfService = .background,
-         sync: Bool = false) {
-        finishBlock = { _ in }
-        blocks = runBlocks
-        numberOfRunningBlocks = runBlocks.count
-        runBlock = { $0.0.finish() }
-        testBlock = { $0.complete(success: false, error: nil) }
-        limitOfSimultaneousOps = limit
-        qos = runQoS
-        synchronous = sync
-        rawResults = []
-        rawState = .ready
-        changedTo(rawState)
-    }
-
-    init(run: @escaping FlowTypeBlocks.RunBlock,
-                     test: @escaping FlowTypeTests.TestBlock,
-                     limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
-                     runQoS: QualityOfService = .background,
-                     sync: Bool = false) {
-
-        finishBlock = { _ in }
-        blocks = []
-        numberOfRunningBlocks = -1
-        runBlock = run
-        testBlock = test
-        limitOfSimultaneousOps = limit
-        qos = runQoS
-        synchronous = sync
-        rawResults = []
-        testFlow = true
-        rawState = .ready
-        changedTo(rawState)
+    init(maxSimultaneousOps: Int,
+         qos: QualityOfService,
+         opNumber: Int,
+         onFinish: @escaping (Result<[FlowOpResult]>) -> Void) {
+        runnerQueue = DispatchQueue(label: "com.slip.flow.flowRunnerQueue", attributes: DispatchQueue.Attributes.concurrent)
+        opQueue = OperationQueue()
+        opQueue.maxConcurrentOperationCount = maxSimultaneousOps
+        opQueue.qualityOfService = qos
+        finishHandler = onFinish
+        numberOfRunningBlocks = opNumber
     }
 }
 
-extension FlowRunner: Safe {}
+extension FlowRunner: Safe {
 
-extension FlowRunner: FlowState, FlowStateActions {
+    fileprivate var currentResults: [FlowOpResult] {
+        var res: [FlowOpResult]!
+        readSafe(queue: runnerQueue) { res = rawResults }
+        return res
+    }
 
-    func changedTo(_ state: State) {
-        switch state {
-        case .ready:
-            print("Flow is ready to begin")
-        case .queued:
-            queued()
-        case .testing:
-            testing()
-        case .running:
-            running()
-        case .canceled:
-            canceled()
-        case .failed:
-            failed()
-        case .finished:
-            finished()
+    fileprivate func getCurrentResults() -> [T] {
+        return currentResults.flatMap { $0.result as? T }
+    }
+
+    fileprivate var shouldStop: Bool {
+        var stopping: Bool!
+        readSafe(queue: runnerQueue) { stopping = stop }
+        return stopping
+    }
+
+    fileprivate func finishWith(result: Result<[FlowOpResult]>) {
+        let fHandler = finishHandler
+        DispatchQueue.global(qos: .default).async {
+            fHandler(result)
         }
     }
+
+    func cancelRunner() {
+        writeSafe(queue: runnerQueue) { self.stop = true }
+    }
 }
 
-extension FlowRunner: FlowError {}
+extension FlowRunner {
+    
+    func runClosure(runBlock: @escaping TestFlowApi.RunBlock, onFinish: @escaping () -> Void) {
+        let execute: (FlowOpResult) -> Void = { (res) in
+            self.finishedOp(with: res)
+        }
+        
+        let run: FlowOp = FlowOp(qos: .background,
+                                 orderNumber: rawResults.count,
+                                 resultsHandler: { [weak self] in self?.getCurrentResults() ?? [] },
+                                 callBack: execute,
+                                 run: runBlock)
+        
+        onRunSucceed = onFinish
 
-extension FlowRunner: FlowStopped {}
+        opQueue.addOperation(run)
+    }
+    
+    func runFlowOfBlocks(blocks: [FlowTypeBlocks.RunBlock], onFinish: @escaping () -> Void) {
+        guard !blocks.isEmpty else { safeState = .finished; return }
+        
+        for i in 0..<blocks.count {
+            opQueue.addOperation(FlowOp(qos: .background,
+                                        orderNumber: i,
+                                        resultsHandler: { [weak self] in self?.getCurrentResults() ?? [] },
+                                        callBack: onFinish,
+                                        run: blocks[i]))
+        }
+        
+        blocks.removeAll()
+    }
+    
+}
 
-extension FlowRunner: FlowHandlerBlocks {}
+extension FlowRunner: FlowOpHandler {
 
-extension FlowRunner: FlowTypeBlocks {}
+    func finishedOp(with res: FlowOpResult) {
+        safeBlock(queue: runnerQueue) {
+            self.handle(op: res)
+        }
+    }
 
-extension FlowRunner: FlowTypeTests {}
+    func handle(op res: FlowOpResult) {
+        guard !stop else {
+            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
+            return
+        }
 
-extension FlowRunner: FlowRun {}
+        guard res.error == nil else {
+            finishWith(result: Result.failure(res.error!))
+            return
+        }
 
-extension FlowRunner: FlowResults {}
+        rawResults.append(res)
+        guard !(rawResults.count == numberOfRunningBlocks) else {
+            finishWith(result: Result.success(rawResults))
+            return
+        }
 
-extension FlowRunner: FlowOutcome {}
+        guard testFlow else { return }
+        onRunSucceed()
+    }
+}
 
-extension FlowRunner: FlowOpHandler {}
+extension FlowRunner: FlowTestHandler {
 
-extension FlowRunner: FlowTestHandler {}
+    func finishedTest(with res: FlowTestResult) {
+        safeBlock(queue: runnerQueue) {
+            self.handle(test: res)
+        }
+    }
+
+    func handle(test res: FlowTestResult) {
+        guard !stop else {
+            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
+            return
+        }
+
+        guard res.error == nil else {
+            finishWith(result: Result.failure(res.error!))
+            return
+        }
+
+        guard testPassResult == res.success else {
+            finishWith(result: Result.success(rawResults))
+            return
+        }
+        onTestSucceed()
+    }
+}
 
 extension FlowRunner {
 
-    public func onFinish(_ block: @escaping FinishBlock) -> Self {
-        guard case .ready = rawState else { print("Cannot modify flow after starting") ; return self }
-        finishBlock = block
-        return self
-    }
-
-    public func onError(_ block: @escaping FlowCoreApi.ErrorBlock) -> Self {
-        guard case .ready = rawState else { print("Cannot modify flow after starting") ; return self }
-        errorBlock = block
-        return self
-    }
-
-    public func onCancel(_ block: @escaping FlowCoreApi.CancelBlock) -> Self {
-        guard case .ready = rawState else { print("Cannot modify flow after starting") ; return self }
-        cancelBlock = block
-        return self
-    }
-
-    public var state: State {
-        return safeState
-    }
-
-    public func start() {
-        guard case .ready = safeState else { print("Cannot start flow twice") ; return }
-        unsafeState = .queued // To start immediatly. here its safe to use unsafeState...
-    }
-
-    public func cancel() {
-        guard case .running = safeState else { print("Cannot cancel a flow that is not running") ; return }
-        safeState = .canceled
-    }
 }

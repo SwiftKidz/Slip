@@ -25,7 +25,7 @@
 
 import Foundation
 
-public final class Series<T>: FlowRunner<T> {
+public final class Series<T>: FlowHandler<T> {
 
     public typealias Block = (BlockOp) -> ()
 

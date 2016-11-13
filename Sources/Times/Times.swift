@@ -24,7 +24,7 @@
 
 import Foundation
 
-public final class Times<T>: FlowRunner<T> {
+public final class Times<T>: FlowHandler<T> {
 
     public typealias Block = (BlockOp, Int) -> ()
 

@@ -29,9 +29,9 @@ protocol FlowStateActions: class, FlowState, FlowTypeBlocks, FlowRun, FlowOpHand
 extension FlowStateActions {
 
     func queued() {
-        guard testFlow else { safeState = .running; return }
-        guard testAtBeginning else { safeState = .running; return }
-        safeState = .testing
+        guard testFlow else { unsafeState = .running; return }
+        guard testAtBeginning else { unsafeState = .running; return }
+        unsafeState = .testing
     }
 
     func testing() {
@@ -79,7 +79,7 @@ extension FlowStateActions {
 
     func finished() {
         DispatchQueue.main.async {
-            self.finishBlock(self.state, self.endResult)
+            self.finishBlock(self.unsafeState, self.endResult)
             self.finishBlock = { _ in }
         }
     }

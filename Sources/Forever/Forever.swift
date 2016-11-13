@@ -24,7 +24,7 @@
 
 import Foundation
 
-public final class Forever<T>: FlowRunner<T> {
+public final class Forever<T>: FlowHandler<T> {
 
     public typealias Run = (BlockOp) -> ()
 

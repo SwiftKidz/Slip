@@ -24,7 +24,7 @@
 
 import Foundation
 
-public final class TestFlow<T>: FlowRunner<T>, TestFlowApi {
+public final class TestFlow<T>: FlowHandler<T>, TestFlowApi {
 
     public var testBeforeRun: Bool {
         get {

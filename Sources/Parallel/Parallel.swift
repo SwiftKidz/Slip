@@ -25,7 +25,7 @@
 
 import Foundation
 
-public final class Parallel<T>: FlowRunner<T> {
+public final class Parallel<T>: FlowHandler<T> {
 
     public typealias Block = (BlockOp) -> ()
 

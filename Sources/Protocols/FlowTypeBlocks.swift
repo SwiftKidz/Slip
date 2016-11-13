@@ -31,25 +31,3 @@ protocol FlowTypeBlocks: class {
 
     var limitOfSimultaneousOps: Int { get }
 }
-
-//extension FlowTypeBlocks where Self: FlowRun & FlowOpHandler & FlowResults & Safe & SafeState & FlowOutcome & FlowStateChanged & FlowTestHandler {
-//
-//    func runClosure() {
-//        //let run = FlowOp(orderNumber: safeResults.count, flowHandler: self, run: runBlock).operation
-//        //opQueue.addOperation(run)
-//    }
-//
-//    func runFlowOfBlocks() {
-//        guard !blocks.isEmpty else { safeState = .finished; return }
-//
-//        //let ops = [Int](0..<blocks.count).map { FlowOp(orderNumber: $0, flowHandler: self, run: blocks[$0]) }.map { $0.operation }
-//        var ops: [Operation] = []
-//
-//        for i in 0..<blocks.count {
-//            //ops.append(FlowOp(orderNumber: i, flowHandler: self, run: blocks[i]).operation)
-//            //opQueue.addOperation(FlowOp(orderNumber: i, flowHandler: self, run: blocks[i]).operation)
-//        }
-//
-//        opQueue.addOperations(ops, waitUntilFinished: false)
-//    }
-//}

@@ -32,17 +32,47 @@ protocol Safe {
 
 extension Safe {
 
-    func readSafe(_ block: () -> Void) {
-        safeQueue.sync { block() }
+    func readSafe(queue: DispatchQueue, _ block: () -> Void) {
+//        print("1 - Entered Read Safe \(queue.label)")
+        queue.sync { block(); }//print("1 - Executed Write Safe \(queue.label)") }
+//        print("1 - Exited Read Safe \(queue.label)")
     }
 
-    func writeSafe(_ block: @escaping () -> Void) {
-        safeQueue.async(flags: .barrier, execute: block)
+    func writeSafe(queue: DispatchQueue, _ block: @escaping () -> Void) {
+//        print("2 - Entered Write Safe \(queue.label)")
+        queue.async(flags: .barrier) {
+            block()
+//            print("2 - Executed Write Safe \(queue.label)")
+        }
+//        print("2 - Exited write Safe \(queue.label)")
     }
 
-    func safeBlock(_ block: () -> Void) {
-//        objc_sync_enter(self)
-//        defer { objc_sync_exit(self) }
-        block()
+    func safeBlock(queue: DispatchQueue, _ block: @escaping () -> Void) {
+        queue.async(flags: .barrier) { block() }
     }
+
+//    func readSafe(_ block: () -> Void) {
+////        objc_sync_enter(self)
+////        defer { objc_sync_exit(self) }
+////        block()
+//        print("1 - Entered Read Safe")
+//        safeQueue.sync { block(); print("1 - Executed Write Safe") }
+//        print("1 - Exited Read Safe")
+//
+//    }
+//
+//    func writeSafe(_ block: @escaping () -> Void) {
+////        objc_sync_enter(self)
+////        defer { objc_sync_exit(self) }
+////        block()
+//        //safeQueue.sync { block() }
+//        print("2 - Entered Write Safe")
+//        safeQueue.async(flags: .barrier) {
+//            block()
+//            print("2 - Executed Write Safe")
+//        }
+////        safeQueue.async(flags: .barrier, execute: block)
+//        print("2 - Exited write Safe")
+//    }
+
 }

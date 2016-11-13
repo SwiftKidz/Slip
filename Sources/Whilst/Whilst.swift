@@ -24,7 +24,7 @@
 
 import Foundation
 
-public final class Whilst<T>: FlowRunner<T> {
+public final class Whilst<T>: FlowHandler<T> {
 
     public typealias Test = () -> (Bool)
     public typealias Run = (BlockOp) -> ()
