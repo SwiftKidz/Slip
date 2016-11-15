@@ -61,6 +61,12 @@ internal class FlowHandler<T>: FlowCoreApi {
         return queue
     }()
 
+    lazy var flowRunner: FlowRunner<T> = {
+        return FlowRunner<T>(maxSimultaneousOps: self.limitOfSimultaneousOps,
+                             qos: self.qos,
+                             onFinish: self.process)
+    }()
+
     init(runBlocks: [FlowTypeBlocks.RunBlock],
          limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
          runQoS: QualityOfService = .background,
@@ -96,6 +102,19 @@ internal class FlowHandler<T>: FlowCoreApi {
         testFlow = true
         rawState = .ready
         changedTo(rawState)
+    }
+}
+
+extension FlowHandler {
+
+    func process(result: Result<[FlowOpResult]>) {
+        switch result {
+        case .success(let results):
+            rawResults = results
+            safeState = .finished
+        case .failure(let error):
+            safeState = .failed(error)
+        }
     }
 }
 

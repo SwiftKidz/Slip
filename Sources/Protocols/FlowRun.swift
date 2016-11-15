@@ -32,13 +32,21 @@ protocol FlowRun: class, FlowCoreApi, FlowTypeTests, FlowOutcome {
 extension FlowRun where Self: FlowTestHandler {
 
     func runTest(onFinish: @escaping (FlowTestResult) -> Void) {
-        opQueue.addOperation(FlowTest(qos: .background, callBack: onFinish, test: testBlock))
+        flowRunner.runTest(testBlock: testBlock) {
+            self.safeState = .running
+        }
+        //opQueue.addOperation(FlowTest(qos: .background, callBack: onFinish, test: testBlock))
     }
 }
 
 extension FlowRun where Self: FlowOpHandler {
 
     func runClosure(onFinish: @escaping (FlowOpResult) -> Void) {
+        flowRunner.runClosure(runBlock: runBlock) {
+            guard self.testFlow else { return }
+            self.safeState = .testing
+        }
+        /*
         let run: FlowOp = FlowOp(qos: .background,
                                   orderNumber: rawResults.count,
                                   resultsHandler: { [weak self] in self?.getCurrentResults() ?? [] },
@@ -46,9 +54,12 @@ extension FlowRun where Self: FlowOpHandler {
                                   run: runBlock)
 
         opQueue.addOperation(run)
+         */
     }
 
     func runFlowOfBlocks(onFinish: @escaping (FlowOpResult) -> Void) {
+        flowRunner.runFlowOfBlocks(blocks: blocks)
+        /*
         guard !blocks.isEmpty else { safeState = .finished; return }
 
         for i in 0..<blocks.count {
@@ -58,7 +69,7 @@ extension FlowRun where Self: FlowOpHandler {
                                         callBack: onFinish,
                                         run: blocks[i]))
         }
-
+        */
         blocks.removeAll()
     }
 }

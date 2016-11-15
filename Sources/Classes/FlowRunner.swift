@@ -35,20 +35,19 @@ internal final class FlowRunner<T> {
     fileprivate var testPassResult: Bool = true
     fileprivate var onRunSucceed: () -> Void = {}
     fileprivate var onTestSucceed: () -> Void = {}
-    fileprivate let numberOfRunningBlocks: Int
+    fileprivate var numberOfRunningBlocks: Int
 
     var safeQueue: DispatchQueue = DispatchQueue(label: "com.slip.flow.flowRunnerQueue", attributes: DispatchQueue.Attributes.concurrent)
 
     init(maxSimultaneousOps: Int,
          qos: QualityOfService,
-         opNumber: Int,
          onFinish: @escaping (Result<[FlowOpResult]>) -> Void) {
         runnerQueue = DispatchQueue(label: "com.slip.flow.flowRunnerQueue", attributes: DispatchQueue.Attributes.concurrent)
         opQueue = OperationQueue()
         opQueue.maxConcurrentOperationCount = maxSimultaneousOps
         opQueue.qualityOfService = qos
         finishHandler = onFinish
-        numberOfRunningBlocks = opNumber
+        numberOfRunningBlocks = -1
     }
 }
 
@@ -83,37 +82,52 @@ extension FlowRunner: Safe {
 }
 
 extension FlowRunner {
-    
+
     func runClosure(runBlock: @escaping TestFlowApi.RunBlock, onFinish: @escaping () -> Void) {
         let execute: (FlowOpResult) -> Void = { (res) in
             self.finishedOp(with: res)
         }
-        
+
         let run: FlowOp = FlowOp(qos: .background,
                                  orderNumber: rawResults.count,
                                  resultsHandler: { [weak self] in self?.getCurrentResults() ?? [] },
                                  callBack: execute,
                                  run: runBlock)
-        
+
         onRunSucceed = onFinish
 
         opQueue.addOperation(run)
     }
-    
-    func runFlowOfBlocks(blocks: [FlowTypeBlocks.RunBlock], onFinish: @escaping () -> Void) {
-        guard !blocks.isEmpty else { safeState = .finished; return }
-        
+
+    func runFlowOfBlocks(blocks: [FlowTypeBlocks.RunBlock]) {
+        guard !blocks.isEmpty else { finishWith(result: Result.success(rawResults)); return }
+
+        numberOfRunningBlocks = blocks.count
+
+        let execute: (FlowOpResult) -> Void = { (res) in
+            self.finishedOp(with: res)
+        }
+
         for i in 0..<blocks.count {
             opQueue.addOperation(FlowOp(qos: .background,
                                         orderNumber: i,
                                         resultsHandler: { [weak self] in self?.getCurrentResults() ?? [] },
-                                        callBack: onFinish,
+                                        callBack: execute,
                                         run: blocks[i]))
         }
-        
-        blocks.removeAll()
     }
-    
+}
+
+extension FlowRunner {
+
+    func runTest(testBlock: @escaping FlowTypeTests.TestBlock, onFinish: @escaping () -> Void) {
+        let execute: (FlowTestResult) -> Void = { (res) in
+            self.finishedTest(with: res)
+        }
+        opQueue.addOperation(FlowTest(qos: .background, callBack: execute, test: testBlock))
+
+        onTestSucceed = onFinish
+    }
 }
 
 extension FlowRunner: FlowOpHandler {
