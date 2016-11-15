@@ -48,7 +48,7 @@ extension Safe {
     }
 
     func safeBlock(queue: DispatchQueue, _ block: @escaping () -> Void) {
-        queue.async(flags: .barrier) { block() }
+        queue.sync { block() } //(flags: .barrier)
     }
 
 //    func readSafe(_ block: () -> Void) {

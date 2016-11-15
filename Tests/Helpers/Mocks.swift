@@ -29,11 +29,11 @@ import Foundation
 enum TestConfig {
 
     static var operationNumber: Int {
-        return 1000
+        return 5000
     }
 
     static var timeout: TimeInterval {
-        return 5
+        return 10
     }
 }
 

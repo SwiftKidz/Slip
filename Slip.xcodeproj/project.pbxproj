@@ -129,6 +129,9 @@
 		81F1C0791DBAB3AD009D82CE /* FlowControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46ED5191DBA218100D26944 /* FlowControl.swift */; };
 		81F1C07A1DBAB3AE009D82CE /* FlowControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46ED5191DBA218100D26944 /* FlowControl.swift */; };
 		81F1C07B1DBAB3AF009D82CE /* FlowControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46ED5191DBA218100D26944 /* FlowControl.swift */; };
+		C4053C4D1DDB2E1C003A63B2 /* FlowRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4053C4C1DDB2E1C003A63B2 /* FlowRunnerTests.swift */; };
+		C4053C4E1DDB2E1C003A63B2 /* FlowRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4053C4C1DDB2E1C003A63B2 /* FlowRunnerTests.swift */; };
+		C4053C4F1DDB2E1C003A63B2 /* FlowRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4053C4C1DDB2E1C003A63B2 /* FlowRunnerTests.swift */; };
 		C4153D2D1DC7C23100EBC3AD /* FlowCoreApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4153D2C1DC7C23100EBC3AD /* FlowCoreApi.swift */; };
 		C4153D2E1DC7C23100EBC3AD /* FlowCoreApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4153D2C1DC7C23100EBC3AD /* FlowCoreApi.swift */; };
 		C4153D2F1DC7C23100EBC3AD /* FlowCoreApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4153D2C1DC7C23100EBC3AD /* FlowCoreApi.swift */; };
@@ -235,9 +238,9 @@
 		C4C4DA091DC3609000CB8A30 /* BlockOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4DA071DC3609000CB8A30 /* BlockOp.swift */; };
 		C4C4DA0A1DC3609000CB8A30 /* BlockOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4DA071DC3609000CB8A30 /* BlockOp.swift */; };
 		C4C4DA0B1DC3609000CB8A30 /* BlockOp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4DA071DC3609000CB8A30 /* BlockOp.swift */; };
-		C4C4DA0E1DC36EEB00CB8A30 /* FlowRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4DA0D1DC36EEB00CB8A30 /* FlowRunnerTests.swift */; };
-		C4C4DA0F1DC36EEB00CB8A30 /* FlowRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4DA0D1DC36EEB00CB8A30 /* FlowRunnerTests.swift */; };
-		C4C4DA101DC36EEB00CB8A30 /* FlowRunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4DA0D1DC36EEB00CB8A30 /* FlowRunnerTests.swift */; };
+		C4C4DA0E1DC36EEB00CB8A30 /* FlowHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4DA0D1DC36EEB00CB8A30 /* FlowHandlerTests.swift */; };
+		C4C4DA0F1DC36EEB00CB8A30 /* FlowHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4DA0D1DC36EEB00CB8A30 /* FlowHandlerTests.swift */; };
+		C4C4DA101DC36EEB00CB8A30 /* FlowHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4C4DA0D1DC36EEB00CB8A30 /* FlowHandlerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -299,6 +302,7 @@
 		81C1402B1DBEA30F00E4CF80 /* During.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = During.swift; sourceTree = "<group>"; };
 		81E40EDB1DD8C26200391C89 /* FlowRunner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowRunner.swift; sourceTree = "<group>"; };
 		81F1C06C1DBAAE26009D82CE /* State.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = State.swift; sourceTree = "<group>"; };
+		C4053C4C1DDB2E1C003A63B2 /* FlowRunnerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowRunnerTests.swift; sourceTree = "<group>"; };
 		C4153D2C1DC7C23100EBC3AD /* FlowCoreApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowCoreApi.swift; sourceTree = "<group>"; };
 		C4153D311DC7C8A700EBC3AD /* Flow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Flow.swift; sourceTree = "<group>"; };
 		C42D691F1DBA68480074CE5A /* Series.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Series.swift; sourceTree = "<group>"; };
@@ -342,7 +346,7 @@
 		C4C4D9FD1DC267E400CB8A30 /* FlowResults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowResults.swift; sourceTree = "<group>"; };
 		C4C4DA021DC26BC700CB8A30 /* FlowStateActions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowStateActions.swift; sourceTree = "<group>"; };
 		C4C4DA071DC3609000CB8A30 /* BlockOp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockOp.swift; sourceTree = "<group>"; };
-		C4C4DA0D1DC36EEB00CB8A30 /* FlowRunnerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowRunnerTests.swift; sourceTree = "<group>"; };
+		C4C4DA0D1DC36EEB00CB8A30 /* FlowHandlerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowHandlerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -501,10 +505,11 @@
 		81752CBE1DBB6F7A00C64D2A /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				C4053C4C1DDB2E1C003A63B2 /* FlowRunnerTests.swift */,
 				C46E314C1DBFB40400FE5F49 /* FlowstateTests.swift */,
 				810129221DC920CC00A7807F /* FlowTestTests.swift */,
 				8101291E1DC91AB200A7807F /* FlowOpTests.swift */,
-				C4C4DA0D1DC36EEB00CB8A30 /* FlowRunnerTests.swift */,
+				C4C4DA0D1DC36EEB00CB8A30 /* FlowHandlerTests.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -1361,7 +1366,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C4C4DA0E1DC36EEB00CB8A30 /* FlowRunnerTests.swift in Sources */,
+				C4C4DA0E1DC36EEB00CB8A30 /* FlowHandlerTests.swift in Sources */,
+				C4053C4D1DDB2E1C003A63B2 /* FlowRunnerTests.swift in Sources */,
 				C49492221DC7BFB800E0D525 /* TestFlowTests.swift in Sources */,
 				81AA79EF1DCECD8300AAF4D8 /* TimesTests.swift in Sources */,
 				81AA79B01DCE6F4700AAF4D8 /* SequentialTests.swift in Sources */,
@@ -1387,7 +1393,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C4C4DA101DC36EEB00CB8A30 /* FlowRunnerTests.swift in Sources */,
+				C4C4DA101DC36EEB00CB8A30 /* FlowHandlerTests.swift in Sources */,
+				C4053C4F1DDB2E1C003A63B2 /* FlowRunnerTests.swift in Sources */,
 				C49492241DC7BFB800E0D525 /* TestFlowTests.swift in Sources */,
 				81AA79F11DCECD8300AAF4D8 /* TimesTests.swift in Sources */,
 				81AA79B41DCE6F4800AAF4D8 /* SequentialTests.swift in Sources */,
@@ -1413,7 +1420,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C4C4DA0F1DC36EEB00CB8A30 /* FlowRunnerTests.swift in Sources */,
+				C4C4DA0F1DC36EEB00CB8A30 /* FlowHandlerTests.swift in Sources */,
+				C4053C4E1DDB2E1C003A63B2 /* FlowRunnerTests.swift in Sources */,
 				C49492231DC7BFB800E0D525 /* TestFlowTests.swift in Sources */,
 				81AA79F01DCECD8300AAF4D8 /* TimesTests.swift in Sources */,
 				81AA79B21DCE6F4800AAF4D8 /* SequentialTests.swift in Sources */,
