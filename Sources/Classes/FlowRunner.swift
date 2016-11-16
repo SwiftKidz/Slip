@@ -30,10 +30,13 @@ internal final class FlowRunner<T> {
     fileprivate var rawResults: [FlowOpResult] = []
     fileprivate let runnerQueue: DispatchQueue
     fileprivate let resultsQueue: DispatchQueue
+    fileprivate let finishQueue: DispatchQueue
     fileprivate let opQueue: OperationQueue
     fileprivate var finishHandler: (Result<[FlowOpResult]>) -> Void
     fileprivate var numberOfRunningBlocks: Int
 
+    fileprivate let resultsHandler: FlowOperationResults
+    
     var onRunSucceed: () -> Void = {}
     var onTestSucceed: () -> Void = {}
     var testFlow: Bool = false
@@ -46,12 +49,17 @@ internal final class FlowRunner<T> {
          qos: QualityOfService,
          onFinish: @escaping (Result<[FlowOpResult]>) -> Void) {
         runnerQueue = DispatchQueue(label: "com.slip.flow.flowRunnerQueue", attributes: DispatchQueue.Attributes.concurrent)
-        resultsQueue = DispatchQueue(label: "com.slip.flow.flowRunner.resultsQueue", attributes: DispatchQueue.Attributes.concurrent)
+        resultsQueue = DispatchQueue(label: "com.slip.flow.flowRunner.resultsQueue")//, attributes: DispatchQueue.Attributes.concurrent)
+        finishQueue = DispatchQueue(label: "com.slip.flow.flowRunner.finishQueue")//, attributes: DispatchQueue.Attributes.concurrent)
         opQueue = OperationQueue()
         opQueue.maxConcurrentOperationCount = maxSimultaneousOps
         opQueue.qualityOfService = qos
         finishHandler = onFinish
         numberOfRunningBlocks = -1
+        
+        resultsHandler = FlowOperationResults(){
+            print("Should End")
+        }
     }
 
     func cancelRunner() {
@@ -75,10 +83,11 @@ extension FlowRunner: Safe {
     }
 
     fileprivate var currentResults: [FlowOpResult] {
-        var res: [FlowOpResult]!
-        resultsQueue.sync { res = rawResults }
-        res = rawResults
-        return res
+//        var res: [FlowOpResult]!
+//        resultsQueue.sync { res = rawResults }
+//        res = rawResults
+//        return res
+        return resultsHandler.currentResults
     }
 
     fileprivate func getCurrentResults() -> [T] {
@@ -86,17 +95,23 @@ extension FlowRunner: Safe {
     }
 
     fileprivate func addNewResult(result: FlowOpResult) {
-        resultsQueue.async(flags: .barrier) {
-            self.rawResults.append(result)
-            guard self.rawResults.count == self.numberOfRunningBlocks else { return }
-            self.handleStop(error: nil, results: self.rawResults)
-        }
+        resultsHandler.addNewResult(result)
+//        resultsQueue.sync {
+//            self.rawResults.append(result)
+//            guard self.rawResults.count == self.numberOfRunningBlocks else { return }
+//            self.handleStop(error: nil, results: self.rawResults)
+//        }
+//        resultsQueue.async(flags: .barrier) {
+//            self.rawResults.append(result)
+//            guard self.rawResults.count == self.numberOfRunningBlocks else { return }
+//            self.handleStop(error: nil, results: self.rawResults)
+//        }
     }
 
     fileprivate func finishWith(result: Result<[FlowOpResult]>) {
-        let fHandler = finishHandler
-        DispatchQueue.global(qos: .background).async {
-            fHandler(result)
+        finishQueue.async {
+            self.finishHandler(result)
+            self.finishHandler = { _ in }
         }
     }
 }

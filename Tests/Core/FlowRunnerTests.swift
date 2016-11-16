@@ -58,12 +58,12 @@ class FlowRunnerTests: XCTestCase {
             }
         }
 
-        let flowRunner = FlowRunner<Void>(maxSimultaneousOps: 1,//OperationQueue.defaultMaxConcurrentOperationCount,
+        let flowRunner = FlowRunner<Void>(maxSimultaneousOps: OperationQueue.defaultMaxConcurrentOperationCount,
                                           qos: .background) { res in
                                             switch res {
                                             case .failure(_): XCTFail()
                                             case .success(let results):
-                                                print("Finish: \(results.count)")
+                                                //print("Finish: \(results.count)")
                                                 XCTAssert(results.count == TestConfig.operationNumber)
                                             }
                                             expectation.fulfill()
