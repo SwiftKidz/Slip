@@ -36,7 +36,7 @@ internal final class FlowRunner<T> {
     fileprivate var numberOfRunningBlocks: Int
 
     fileprivate let resultsHandler: FlowOperationResults
-    
+
     var onRunSucceed: () -> Void = {}
     var onTestSucceed: () -> Void = {}
     var testFlow: Bool = false
@@ -56,8 +56,8 @@ internal final class FlowRunner<T> {
         opQueue.qualityOfService = qos
         finishHandler = onFinish
         numberOfRunningBlocks = -1
-        
-        resultsHandler = FlowOperationResults(){
+
+        resultsHandler = FlowOperationResults() {
             print("Should End")
         }
     }
@@ -106,6 +106,7 @@ extension FlowRunner: Safe {
 //            guard self.rawResults.count == self.numberOfRunningBlocks else { return }
 //            self.handleStop(error: nil, results: self.rawResults)
 //        }
+
     }
 
     fileprivate func finishWith(result: Result<[FlowOpResult]>) {
@@ -136,6 +137,7 @@ extension FlowRunner {
         guard !blocks.isEmpty else { finishWith(result: Result.success(rawResults)); return }
 
         numberOfRunningBlocks = blocks.count
+        resultsHandler.numberOfResultsToFinish = blocks.count
 
         let execute: (FlowOpResult) -> Void = { (res) in
             self.finishedOp(with: res)
