@@ -28,24 +28,26 @@ final class FlowOperationResults {
 
     fileprivate var rawResults: [FlowOpResult] = []
     fileprivate let resultsQueue: DispatchQueue
-    fileprivate var finishHandler: () -> Void
+    fileprivate let finishHandler: ([FlowOpResult], Error?) -> Void
+    fileprivate let numberOfResultsToFinish: Int
+    fileprivate var stop: Bool = false
 
-    var numberOfResultsToFinish: Int = -1
-
-    init(onFinish: @escaping () -> Void) {
-        resultsQueue = DispatchQueue(label: "com.slip.flow.FlowOperationResults.resultsQueue", attributes: DispatchQueue.Attributes.concurrent)
+    init(maxOps: Int = -1, onFinish: @escaping ([FlowOpResult], Error?) -> Void) {
+        resultsQueue = DispatchQueue(label: "com.slip.flow.FlowOperationResults.resultsQueue")//, attributes: DispatchQueue.Attributes.concurrent)
         finishHandler = onFinish
+        numberOfResultsToFinish = maxOps
     }
 }
 
 extension FlowOperationResults {
 
+    func getCurrentResults() -> [FlowOpResult] {
+        return currentResults
+    }
     var currentResults: [FlowOpResult] {
         var res: [FlowOpResult]!
-        objc_sync_enter(self)
-        //resultsQueue.sync { res = rawResults }
+        resultsQueue.sync { res = rawResults }
         res = rawResults
-        objc_sync_exit(self)
         return res
     }
 }
@@ -53,25 +55,30 @@ extension FlowOperationResults {
 extension FlowOperationResults {
 
     func addNewResult(_ result: FlowOpResult) {
-        objc_sync_enter(self)
-        self.rawResults.append(result)
-        guard self.rawResults.count == self.numberOfResultsToFinish else { return }
-        let handler = self.finishHandler
-        self.finishHandler = {}
-        DispatchQueue.global(qos: .userInitiated).async {
-            handler()
-        }
-        objc_sync_exit(self)
-        /*
-        resultsQueue.async(flags: .barrier) {
-            self.rawResults.append(result)
-            guard self.rawResults.count == self.numberOfResultsToFinish else { return }
-            let handler = self.finishHandler
-            self.finishHandler = {}
-            DispatchQueue.global(qos: .userInitiated).async {
-                handler()
+        resultsQueue.sync {//(flags: .barrier) { [unowned self] in
+            guard !self.stop else { return }
+            guard result.error == nil else {
+                self.finish(result.error)
+                return
             }
+            self.rawResults.append(result)
+            //print("\(self.rawResults.count) - \(self.numberOfResultsToFinish)")
+            guard self.rawResults.count == self.numberOfResultsToFinish else { return }
+            self.finish()
         }
-        */
     }
+}
+
+extension FlowOperationResults {
+
+    func finish(_ error: Error? = nil) {
+        stop = true
+        let handler = finishHandler
+        let results = rawResults
+        let error = error
+        DispatchQueue.global().async {
+            handler(results, error)
+        }
+    }
+
 }

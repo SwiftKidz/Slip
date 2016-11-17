@@ -46,14 +46,71 @@ class FlowRunnerTests: XCTestCase {
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
+//    func testSafeArray() {
+//        let expectation = self.expectation(description: name ?? "Test")
+//
+//        let flowResults: FlowOperationResults = FlowOperationResults(maxOps: TestConfig.operationNumber, onFinish: { results in
+//            expectation.fulfill()
+//        })
+//
+//        let blocks: [BlockOperation] = [Int](0..<TestConfig.operationNumber).map { n in
+//            return BlockOperation {
+//                //print(flowResults.currentResults.count)
+//                flowResults.addNewResult(FlowOpResult(order: n, result: n, error: nil))
+//            }
+//        }
+//        let opQueue: OperationQueue = OperationQueue()
+//        opQueue.maxConcurrentOperationCount = OperationQueue.defaultMaxConcurrentOperationCount
+//        opQueue.qualityOfService = .background
+//
+//        opQueue.addOperations(blocks, waitUntilFinished: false)
+//
+//        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
+//    }
+//
+//    func testSafeArrayWithFlowOps() {
+//        let expectation = self.expectation(description: name ?? "Test")
+//
+//        let flowResults: FlowOperationResults = FlowOperationResults(maxOps: TestConfig.operationNumber, onFinish: { results in
+//            print("Finished with \(results.count) results")
+//            expectation.fulfill()
+//        })
+//
+//        var blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
+//            return { (f: BlockOp, i: Int, r: Any?) in
+//                //print("\(i+1) - \((r as? [Void])?.count ?? 0 )")
+//                if (i+1)%1000 == 0 {
+//                    print("\(i+1) - \((r as? [Void])?.count ?? 0 )")
+//                }
+//                //print("safe with flow ops \((r as? [Void])?.count ?? 0 )")
+//                f.finish()
+//            }
+//        }
+//
+//        let opQueue: OperationQueue = OperationQueue()
+//        opQueue.maxConcurrentOperationCount = OperationQueue.defaultMaxConcurrentOperationCount
+//        opQueue.qualityOfService = .background
+//
+//        for i in 0..<blocks.count {
+//            let op = FlowOp(qos: .background,
+//                            orderNumber: i,
+//                            resultsHandler: flowResults,
+//                            run: blocks[i])
+//            opQueue.addOperation(op)
+//        }
+//
+//        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
+//    }
+
     func testFlowRunnerNoErrorFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
         var blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
             return { (f: BlockOp, i: Int, r: Any?) in
-                if (i+1)%100 == 0 {
-                    print("\(i) - \((r as? [Void])?.count ?? 0 )")
-                }
+//                if (i+1)%10000 == 0 {
+//                    print("\(i+1) - \((r as? [Void])?.count ?? 0 )")
+//                }
+//                print("\((r as? [Void])?.count ?? 0 )")
                 f.finish()
             }
         }
@@ -136,20 +193,23 @@ class FlowRunnerTests: XCTestCase {
         var count: Int = 0
 
         let block: FlowTypeBlocks.RunBlock = { (flow: BlockOp, iteration: Int, result: Any?) in
+            print(result)
             count += 1
             flow.finish(count-1)
         }
 
         let testt: FlowTypeTests.TestBlock = { (test: Test) in
+            print(count)
             test.complete(success: count < 5, error: nil)
         }
 
-        let flowRunner = FlowRunner<Void>(maxSimultaneousOps: OperationQueue.defaultMaxConcurrentOperationCount,
+        let flowRunner = FlowRunner<Int>(maxSimultaneousOps: OperationQueue.defaultMaxConcurrentOperationCount,
                                           qos: .background) { res in
                                             switch res {
                                             case .failure(_): XCTFail()
                                             case .success(let results):
-                                                XCTAssert(!results.isEmpty)
+                                                print("\(results)")
+                                                XCTAssert(results.isEmpty)
                                             }
                                             expectation.fulfill()
         }

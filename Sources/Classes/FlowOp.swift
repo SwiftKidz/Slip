@@ -31,8 +31,7 @@ final class FlowOp: Operation {
     fileprivate let runQueue: DispatchQueue
     fileprivate let runBlock: FlowTypeBlocks.RunBlock
     fileprivate let order: Int
-    fileprivate let flowCallback: (FlowOpResult) -> Void
-    fileprivate let resultHandler: () -> (Any)
+    fileprivate let resultHandler: FlowOperationResults
 
     var finishedOp: Bool = false {
         didSet {
@@ -54,28 +53,15 @@ final class FlowOp: Operation {
 
     init(qos: DispatchQoS = .background,
          orderNumber: Int,
-         resultsHandler: @escaping () -> (Any),
-         callBack: @escaping (FlowOpResult) -> Void,
+         resultsHandler: FlowOperationResults,
          run: @escaping FlowTypeBlocks.RunBlock) {
         order = orderNumber
-        flowCallback = callBack
         runQueue = DispatchQueue(
             label: "com.slip.flowOp.runQueue",
             qos: qos
         )
         runBlock = run
         resultHandler = resultsHandler
-    }
-
-    init(orderNumber: Int, callBack: @escaping (FlowOpResult)->()) {
-        order = orderNumber
-        flowCallback = callBack
-        runQueue = DispatchQueue(
-            label: "com.slip.flowOp.runQueue",
-            qos: .background
-        )
-        runBlock = { _ in }
-        resultHandler = { return [] }
     }
 }
 
@@ -87,7 +73,8 @@ extension FlowOp {
 
         runQueue.async { //[weak self] in
             let strongSelf = self //guard  else { return }
-            strongSelf.runBlock(strongSelf, strongSelf.order, strongSelf.resultHandler())
+            let results = strongSelf.resultHandler.currentResults
+            strongSelf.runBlock(strongSelf, strongSelf.order, results.map { $0.result })
         }
     }
 
@@ -118,13 +105,13 @@ extension FlowOp: BlockOp {
 
     func finish<R>(_ result: R) {
         guard !isCancelled else { return }
-        flowCallback(FlowOpResult(order: order, result: result, error: nil))
+        resultHandler.addNewResult(FlowOpResult(order: order, result: result, error: nil))
         markAsFinished()
     }
 
     func finish(_ error: Error) {
         guard !isCancelled else { return }
-        flowCallback(FlowOpResult(order: order, result: nil, error: error))
+        resultHandler.addNewResult(FlowOpResult(order: order, result: nil, error: error))
         markAsFinished()
     }
 }
