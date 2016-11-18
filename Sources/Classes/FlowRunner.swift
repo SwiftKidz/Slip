@@ -30,30 +30,16 @@ internal final class FlowRunner<T> {
     fileprivate var rawResults: [FlowOpResult] = []
     fileprivate let runnerQueue: DispatchQueue
     fileprivate let opQueue: OperationQueue
-    fileprivate var finishHandler: (Result<[FlowOpResult]>) -> Void
-
-    private var rHandler: FlowOperationResults?
-
-    fileprivate var resultsHandler: FlowOperationResults {
-        if rHandler == nil {
-            rHandler = FlowOperationResults(maxOps: 1) { results, error in
-                self.handleRun(results: results, error: error)
-            }
-        }
-        return rHandler!
-    }
+    fileprivate var finishHandler: (Result<[T]>) -> Void
 
     var onRunSucceed: () -> Void = {}
     var onTestSucceed: () -> Void = {}
-    var testFlow: Bool = false
     var testPassResult: Bool = true
     var verbose: Bool = false
 
-    var safeQueue: DispatchQueue = DispatchQueue(label: "com.slip.flow.flowRunnerQueue", attributes: DispatchQueue.Attributes.concurrent)
-
     init(maxSimultaneousOps: Int,
          qos: QualityOfService,
-         onFinish: @escaping (Result<[FlowOpResult]>) -> Void) {
+         onFinish: @escaping (Result<[T]>) -> Void) {
         runnerQueue = DispatchQueue(label: "com.slip.flow.flowRunnerQueue", attributes: DispatchQueue.Attributes.concurrent)
         opQueue = OperationQueue()
         opQueue.maxConcurrentOperationCount = maxSimultaneousOps
@@ -61,28 +47,30 @@ internal final class FlowRunner<T> {
         finishHandler = onFinish
     }
 
-    func cancelRunner() {
-        stopRunner()
+    func cancel() {
+        runnerQueue.async(flags: .barrier) {
+            self.handleStop(error: nil, results: self.rawResults)
+        }
     }
 }
 
 extension FlowRunner {
 
-    fileprivate var currentResults: [FlowOpResult] {
-        return resultsHandler.currentResults
+    fileprivate var current: [FlowOpResult] {
+        var res: [FlowOpResult]!
+        runnerQueue.sync { res = self.rawResults }
+        return res
     }
 
-    fileprivate func getCurrentResults() -> [T] {
-        return currentResults.flatMap { $0.result as? T }
-    }
-
-    fileprivate func addNewResult(result: FlowOpResult) {
-        resultsHandler.addNewResult(result)
+    fileprivate func add(_ results: [FlowOpResult]) {
+        runnerQueue.async(flags: .barrier) {
+            self.rawResults.append(contentsOf: results)
+        }
     }
 
 }
 
-extension FlowRunner: Safe {
+extension FlowRunner {
 
     var shouldStop: Bool {
         get {
@@ -97,29 +85,19 @@ extension FlowRunner: Safe {
         }
     }
 
-    fileprivate func finishWith(result: Result<[FlowOpResult]>) {
+    fileprivate func finishWith(result: Result<[T]>) {
         self.finishHandler(result)
-        self.finishHandler = { _ in }
     }
 }
 
 extension FlowRunner {
 
-    func runClosure(runBlock: @escaping TestFlowApi.RunBlock, onFinish: @escaping () -> Void) {
-        let run: FlowOp = FlowOp(qos: .background,
-                                 orderNumber: rawResults.count,
-                                 resultsHandler: resultsHandler,
-                                 run: runBlock)
-
-        opQueue.addOperation(run)
-    }
-
     func runFlowOfBlocks(blocks: [FlowTypeBlocks.RunBlock]) {
         guard !blocks.isEmpty else { finishWith(result: Result.success([])); return }
 
-        let handler = FlowOperationResults(maxOps: blocks.count) { results, error in
+        let handler = FlowOperationResultsHandler(maxOps: blocks.count) { results, error in
             guard let error = error else {
-                self.finishWith(result: Result.success(results))
+                self.finishWith(result: Result.success(results.flatMap { $0.result as? T }))
                 return
             }
             self.finishWith(result: Result.failure(error))
@@ -137,9 +115,22 @@ extension FlowRunner {
 
 extension FlowRunner {
 
-    func runTest(testBlock: @escaping FlowTypeTests.TestBlock, onFinish: @escaping () -> Void) {
-        let execute: (FlowTestResult) -> Void = { (res) in
-            self.finishedTest(with: res)
+    func runClosure(runBlock: @escaping TestFlowApi.RunBlock) {
+        let handler = FlowOperationResultsHandler(maxOps: 1) { results, error in
+            self.handleRun(results: results, error: error)
+        }
+
+        let run: FlowOp = FlowOp(qos: .background,
+                                 orderNumber: rawResults.count,
+                                 resultsHandler: handler,
+                                 run: runBlock)
+
+        opQueue.addOperation(run)
+    }
+
+    func runTest(testBlock: @escaping FlowTypeTests.TestBlock) {
+        let execute: (FlowTestResult) -> Void = { (result) in
+            self.handle(test: result)
         }
         opQueue.addOperation(FlowTest(qos: .background, callBack: execute, test: testBlock))
     }
@@ -147,7 +138,7 @@ extension FlowRunner {
 
 extension FlowRunner {
 
-    func handleRun(results: [FlowOpResult], error: Error?) {
+    fileprivate func handleRun(results: [FlowOpResult], error: Error?) {
         guard !shouldStop else {
             if verbose {
                 print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
@@ -156,26 +147,19 @@ extension FlowRunner {
         }
 
         guard error == nil else {
-            handleStop(error: error!, results: currentResults)
+            handleStop(error: error!, results: current)
             return
         }
 
-        guard testFlow else { return }
+        add(results)
 
         let runSucceed = onRunSucceed
         DispatchQueue.global(qos: .default).async {
             runSucceed()
         }
     }
-}
 
-extension FlowRunner: FlowTestHandler {
-
-    func finishedTest(with res: FlowTestResult) {
-        self.handle(test: res)
-    }
-
-    func handle(test res: FlowTestResult) {
+    fileprivate func handle(test res: FlowTestResult) {
         guard !shouldStop else {
             if verbose {
                 print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
@@ -184,16 +168,14 @@ extension FlowRunner: FlowTestHandler {
         }
 
         guard res.error == nil else {
-            handleStop(error: res.error!, results: currentResults)
+            handleStop(error: res.error!, results: current)
             return
         }
 
         guard testPassResult == res.success else {
-            handleStop(error: nil, results: currentResults)
+            handleStop(error: nil, results: current)
             return
         }
-
-        guard testFlow else { return }
 
         let testSucceed = onTestSucceed
         DispatchQueue.global(qos: .default).async {
@@ -204,12 +186,8 @@ extension FlowRunner: FlowTestHandler {
 
 extension FlowRunner {
 
-    func stopRunner(error: Error? = nil) {
-        handleStop(error: nil, results: currentResults)
-    }
-
-    func handleStop(error: Error?, results: [FlowOpResult]) {
-        let result = error == nil ? Result.success(results) : Result.failure(error!)
+    fileprivate func handleStop(error: Error?, results: [FlowOpResult]) {
+        let result = error == nil ? Result.success(results.flatMap { $0.result as? T }) : Result.failure(error!)
         shouldStop = true
         opQueue.cancelAllOperations()
         finishWith(result: result)

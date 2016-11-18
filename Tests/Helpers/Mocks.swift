@@ -28,6 +28,10 @@ import Foundation
 
 enum TestConfig {
 
+    static var stressValue: Int {
+        return 100
+    }
+
     static var operationNumber: Int {
         return 1000
     }
@@ -48,11 +52,11 @@ struct MockFlow: FlowControl {
 }
 
 enum MockErrors: Error {
-    case errorOnFlow, errorOnTest
+    case errorOnFlow, errorOnTest, errorOnOperation
 }
 
 
-class MockFlowHandler<T>: FlowTestHandler, FlowOpHandler {
+class MockFlowHandler<T> {
 
     var hasStopped: Bool
     var results: Any?
@@ -61,8 +65,4 @@ class MockFlowHandler<T>: FlowTestHandler, FlowOpHandler {
         hasStopped = canceled
         self.results = results
     }
-
-    func finishedOp(with: FlowOpResult) {}
-
-    func finishedTest(with: FlowTestResult) {}
 }

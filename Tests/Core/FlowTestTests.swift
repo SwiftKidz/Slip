@@ -21,84 +21,102 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // */
-//
-//import XCTest
-//
-//@testable import Slip
-//
-//class FlowTestsTests: XCTestCase {
-//
-////    func testCancelTest() {
-////        let expectation = self.expectation(description: name ?? "Test")
-////
-////        let queue = OperationQueue()
-////
-////        let handler = MockFlowHandler<Any>(canceled: true, results: nil)
-////
-////        let t = FlowTest { (res) in
-////            XCTFail()
-////        }
-////
-////        let block: FlowTypeTests.TestBlock = { test in
-////
-////        }
-////
-////        let op = BlockOperation { [weak self] in
-////            self?.testBlock(tHandler)
-////        }
-////
-////        let bop = BlockOperation {
-////            expectation.fulfill()
-////        }
-////
-////        bop.addDependency(op)
-////        queue.addOperations([op, bop], waitUntilFinished: false)
-////
-////        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
-////    }
-////
-////    func testCanceledAfterRunTest() {
-////        let expectation = self.expectation(description: name ?? "Test")
-////
-////        let queue = OperationQueue()
-////
-////        let handler = MockFlowHandler(canceled: false, results: nil)
-////
-////        let op = FlowTest(flowHandler: handler) { test in
-////            handler.hasStopped = true
-////            test.complete(success: true, error: nil)
-////        }.operation
-////
-////        let bop = BlockOperation {
-////            expectation.fulfill()
-////        }
-////
-////        bop.addDependency(op)
-////        queue.addOperations([op, bop], waitUntilFinished: false)
-////
-////        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
-////    }
-////
-////    func testCanceledAfterRunWithErrorOp() {
-////        let expectation = self.expectation(description: name ?? "Test")
-////
-////        let queue = OperationQueue()
-////
-////        let handler = MockFlowHandler(canceled: false, results: nil)
-////
-////        let op = FlowTest(flowHandler: handler) { test in
-////            handler.hasStopped = true
-////            test.complete(success: true, error: MockErrors.errorOnTest)
-////        }.operation
-////
-////        let bop = BlockOperation {
-////            expectation.fulfill()
-////        }
-////
-////        bop.addDependency(op)
-////        queue.addOperations([op, bop], waitUntilFinished: false)
-////
-////        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
-////    }
-//
-//}
+
+import XCTest
+
+@testable import Slip
+
+class FlowTestsTests: XCTestCase {
+
+    func testFunctionality() {
+        let expectation = self.expectation(description: name ?? "Test")
+
+        let queue = OperationQueue()
+
+        let testing: Int = 0
+
+        let block1: FlowTypeTests.TestBlock = { test in
+            test.complete(success: testing == 0, error: nil)
+        }
+
+        let block2: FlowTypeTests.TestBlock = { test in
+            test.complete(success: testing != 0, error: nil)
+        }
+
+        let block3: FlowTypeTests.TestBlock = { test in
+            test.complete(success: false, error: MockErrors.errorOnTest)
+        }
+
+        let op1 = FlowTest(callBack: { (result) in
+            XCTAssertNil(result.error)
+            XCTAssertTrue(result.success)
+        }, test: block1)
+
+        let op2 = FlowTest(callBack: { (result) in
+            XCTAssertNil(result.error)
+            XCTAssertFalse(result.success)
+        }, test: block2)
+
+        let op3 = FlowTest(callBack: { (result) in
+            XCTAssertNotNil(result.error)
+            XCTAssertFalse(result.success)
+        }, test: block3)
+
+        let bop = BlockOperation {
+            expectation.fulfill()
+        }
+
+        bop.addDependency(op1)
+        bop.addDependency(op2)
+        bop.addDependency(op3)
+
+        queue.addOperations([op1, op2, op3, bop], waitUntilFinished: false)
+
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
+    }
+
+    func testCanceledOperation() {
+        let expectation = self.expectation(description: name ?? "Test")
+
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 1
+        let testing: Int = 0
+
+        let block1: FlowTypeTests.TestBlock = { test in
+            sleep(2)
+            test.complete(success: testing == 0, error: nil)
+        }
+
+        let block2: FlowTypeTests.TestBlock = { test in
+            XCTFail("Should never run")
+        }
+
+        let block3: FlowTypeTests.TestBlock = { test in
+            XCTFail("Should never run")
+        }
+
+        let op1 = FlowTest(callBack: { (result) in
+            XCTFail("Should never run")
+        }, test: block1)
+
+        let op2 = FlowTest(callBack: { (result) in
+            XCTFail("Should never run")
+        }, test: block2)
+
+        let op3 = FlowTest(callBack: { (result) in
+            XCTFail("Should never run")
+        }, test: block3)
+
+        queue.addOperations([op1, op2, op3], waitUntilFinished: false)
+
+        DispatchQueue.global().asyncAfter(deadline: DispatchTime.now() + 1) {
+            queue.cancelAllOperations()
+        }
+
+        DispatchQueue.global().asyncAfter(deadline: DispatchTime.now() + 2) {
+            expectation.fulfill()
+        }
+
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
+    }
+}

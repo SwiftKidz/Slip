@@ -24,52 +24,29 @@
 
 import Foundation
 
-protocol FlowRun: class, FlowCoreApi, FlowTypeTests, FlowOutcome {
+protocol FlowRun: class, FlowCoreApi, FlowTypeTests {
     var flowRunner: FlowRunner<T> { get }
     var opQueue: OperationQueue { get }
 }
 
-extension FlowRun where Self: FlowTestHandler {
+extension FlowRun {
 
-    func runTest(onFinish: @escaping (FlowTestResult) -> Void) {
-        flowRunner.runTest(testBlock: testBlock) {
-            self.safeState = .running
-        }
-        //opQueue.addOperation(FlowTest(qos: .background, callBack: onFinish, test: testBlock))
+    func runClosure() {
+        flowRunner.onRunSucceed = { self.safeState = .testing }
+        flowRunner.runClosure(runBlock: runBlock)
+    }
+
+    func runTest() {
+        flowRunner.testPassResult = testPassResult
+        flowRunner.onTestSucceed = { self.safeState = .running }
+        flowRunner.runTest(testBlock: testBlock)
     }
 }
 
-extension FlowRun where Self: FlowOpHandler {
+extension FlowRun {
 
-    func runClosure(onFinish: @escaping (FlowOpResult) -> Void) {
-        flowRunner.runClosure(runBlock: runBlock) {
-            guard self.testFlow else { return }
-            self.safeState = .testing
-        }
-        /*
-        let run: FlowOp = FlowOp(qos: .background,
-                                  orderNumber: rawResults.count,
-                                  resultsHandler: { [weak self] in self?.getCurrentResults() ?? [] },
-                                  callBack: onFinish,
-                                  run: runBlock)
-
-        opQueue.addOperation(run)
-         */
-    }
-
-    func runFlowOfBlocks(onFinish: @escaping (FlowOpResult) -> Void) {
+    func runFlowOfBlocks() {
         flowRunner.runFlowOfBlocks(blocks: blocks)
-        /*
-        guard !blocks.isEmpty else { safeState = .finished; return }
-
-        for i in 0..<blocks.count {
-            opQueue.addOperation(FlowOp(qos: .background,
-                                        orderNumber: i,
-                                        resultsHandler: { [weak self] in self?.getCurrentResults() ?? [] },
-                                        callBack: onFinish,
-                                        run: blocks[i]))
-        }
-        */
         blocks.removeAll()
     }
 }

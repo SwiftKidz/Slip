@@ -28,28 +28,103 @@ import XCTest
 
 class FlowOpTests: XCTestCase {
 
-    func testCancelOp() {
-//        let expectation = self.expectation(description: name ?? "Test")
-//
-//        let queue = OperationQueue()
-//
-//        let handler = MockFlowHandler(canceled: true, results: nil)
-//
-//        let op = FlowOp(orderNumber: 0, flowHandler: handler) { (operation, iteration, result) in
-//            XCTFail()
-//        }.operation
-//
-//        let bop = BlockOperation {
-//            expectation.fulfill()
-//        }
-//
-//        bop.addDependency(op)
-//        queue.addOperations([op, bop], waitUntilFinished: false)
-//
-//        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
+    func testRunOpFinishResult() {
+        let expectation = self.expectation(description: name ?? "Test")
+
+        let queue = OperationQueue()
+
+        let flowHandler: FlowOperationResultsHandler = FlowOperationResultsHandler(maxOps: 1) { results, error in
+            XCTAssertNil(error)
+            XCTAssertFalse(results.isEmpty)
+            XCTAssert(results.flatMap { $0.result as? Int } == [0])
+            expectation.fulfill()
+        }
+
+        let op = FlowOp(orderNumber: 0, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+            f.finish(i)
+        }
+
+        queue.addOperations([op], waitUntilFinished: false)
+
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
+    }
+
+    func testRunOpFinishError() {
+        let expectation = self.expectation(description: name ?? "Test")
+
+        let queue = OperationQueue()
+
+        let flowHandler: FlowOperationResultsHandler = FlowOperationResultsHandler(maxOps: 1) { results, error in
+            XCTAssertNotNil(error)
+            XCTAssertTrue(results.isEmpty)
+            expectation.fulfill()
+        }
+
+        let op = FlowOp(orderNumber: 0, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+            f.finish(MockErrors.errorOnOperation)
+        }
+
+        queue.addOperations([op], waitUntilFinished: false)
+
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
     func testCanceledAfterRunOp() {
+        let concurrentQueue = OperationQueue()
+        let serialQueue = OperationQueue()
+        serialQueue.maxConcurrentOperationCount = 1
+        let flowHandler: FlowOperationResultsHandler = FlowOperationResultsHandler(maxOps: 2) { results, error in
+            XCTFail("It should never get here")
+        }
+
+        let op1 = FlowOp(orderNumber: 0, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+            sleep(1)
+            f.finish(i)
+        }
+
+        let op2 = FlowOp(orderNumber: 1, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+            sleep(1)
+            f.finish(MockErrors.errorOnOperation)
+        }
+
+        let op3 = FlowOp(orderNumber: 0, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+            f.finish(i)
+        }
+
+        let op4 = FlowOp(orderNumber: 1, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+            sleep(1)
+            f.finish(MockErrors.errorOnOperation)
+        }
+
+
+        concurrentQueue.addOperations([op1, op2], waitUntilFinished: false)
+        concurrentQueue.cancelAllOperations()
+
+        serialQueue.addOperations([op4, op3], waitUntilFinished: false)
+        serialQueue.cancelAllOperations()
+    }
+
+    func testCanceledBeforeRunOp() {
+        let queue = OperationQueue()
+        let flowHandler: FlowOperationResultsHandler = FlowOperationResultsHandler(maxOps: 2) { results, error in
+            XCTFail("It should never get here")
+        }
+
+        let op1 = FlowOp(orderNumber: 0, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+            sleep(1)
+            f.finish(i)
+        }
+
+        let op2 = FlowOp(orderNumber: 1, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+            f.finish(MockErrors.errorOnOperation)
+        }
+        queue.maxConcurrentOperationCount = 1
+        queue.addOperations([op1, op2], waitUntilFinished: false)
+        queue.cancelAllOperations()
+    }
+
+
+    func testCanceledAfterRunaOp() {
 //        let expectation = self.expectation(description: name ?? "Test")
 //
 //        let queue = OperationQueue()

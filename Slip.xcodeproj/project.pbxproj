@@ -140,14 +140,17 @@
 		C4153D331DC7C8A700EBC3AD /* Flow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4153D311DC7C8A700EBC3AD /* Flow.swift */; };
 		C4153D341DC7C8A700EBC3AD /* Flow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4153D311DC7C8A700EBC3AD /* Flow.swift */; };
 		C4153D351DC7C8A700EBC3AD /* Flow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4153D311DC7C8A700EBC3AD /* Flow.swift */; };
+		C4340EA81DDF3E9C00D4E2EE /* FlowOperationResultsHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4340EA71DDF3E9C00D4E2EE /* FlowOperationResultsHandlerTests.swift */; };
+		C4340EA91DDF3E9C00D4E2EE /* FlowOperationResultsHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4340EA71DDF3E9C00D4E2EE /* FlowOperationResultsHandlerTests.swift */; };
+		C4340EAA1DDF3E9C00D4E2EE /* FlowOperationResultsHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4340EA71DDF3E9C00D4E2EE /* FlowOperationResultsHandlerTests.swift */; };
 		C438D9131DD0A2FA0073C250 /* FlowStopped.swift in Sources */ = {isa = PBXBuildFile; fileRef = C438D9121DD0A2FA0073C250 /* FlowStopped.swift */; };
 		C438D9141DD0A2FA0073C250 /* FlowStopped.swift in Sources */ = {isa = PBXBuildFile; fileRef = C438D9121DD0A2FA0073C250 /* FlowStopped.swift */; };
 		C438D9151DD0A2FA0073C250 /* FlowStopped.swift in Sources */ = {isa = PBXBuildFile; fileRef = C438D9121DD0A2FA0073C250 /* FlowStopped.swift */; };
 		C438D9161DD0A2FA0073C250 /* FlowStopped.swift in Sources */ = {isa = PBXBuildFile; fileRef = C438D9121DD0A2FA0073C250 /* FlowStopped.swift */; };
-		C453F2AF1DDCDD0F00AB1452 /* FlowOperationResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = C453F2AE1DDCDD0F00AB1452 /* FlowOperationResults.swift */; };
-		C453F2B01DDCDD0F00AB1452 /* FlowOperationResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = C453F2AE1DDCDD0F00AB1452 /* FlowOperationResults.swift */; };
-		C453F2B11DDCDD0F00AB1452 /* FlowOperationResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = C453F2AE1DDCDD0F00AB1452 /* FlowOperationResults.swift */; };
-		C453F2B21DDCDD0F00AB1452 /* FlowOperationResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = C453F2AE1DDCDD0F00AB1452 /* FlowOperationResults.swift */; };
+		C453F2AF1DDCDD0F00AB1452 /* FlowOperationResultsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C453F2AE1DDCDD0F00AB1452 /* FlowOperationResultsHandler.swift */; };
+		C453F2B01DDCDD0F00AB1452 /* FlowOperationResultsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C453F2AE1DDCDD0F00AB1452 /* FlowOperationResultsHandler.swift */; };
+		C453F2B11DDCDD0F00AB1452 /* FlowOperationResultsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C453F2AE1DDCDD0F00AB1452 /* FlowOperationResultsHandler.swift */; };
+		C453F2B21DDCDD0F00AB1452 /* FlowOperationResultsHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C453F2AE1DDCDD0F00AB1452 /* FlowOperationResultsHandler.swift */; };
 		C4565B041DC7ADBC007C0943 /* FlowError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4565B031DC7ADBC007C0943 /* FlowError.swift */; };
 		C4565B051DC7ADBC007C0943 /* FlowError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4565B031DC7ADBC007C0943 /* FlowError.swift */; };
 		C4565B061DC7ADBC007C0943 /* FlowError.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4565B031DC7ADBC007C0943 /* FlowError.swift */; };
@@ -311,8 +314,9 @@
 		C4153D311DC7C8A700EBC3AD /* Flow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Flow.swift; sourceTree = "<group>"; };
 		C42D691F1DBA68480074CE5A /* Series.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Series.swift; sourceTree = "<group>"; };
 		C42D692F1DBA7AA10074CE5A /* SeriesTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SeriesTests.swift; sourceTree = "<group>"; };
+		C4340EA71DDF3E9C00D4E2EE /* FlowOperationResultsHandlerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowOperationResultsHandlerTests.swift; sourceTree = "<group>"; };
 		C438D9121DD0A2FA0073C250 /* FlowStopped.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowStopped.swift; sourceTree = "<group>"; };
-		C453F2AE1DDCDD0F00AB1452 /* FlowOperationResults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowOperationResults.swift; sourceTree = "<group>"; };
+		C453F2AE1DDCDD0F00AB1452 /* FlowOperationResultsHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowOperationResultsHandler.swift; sourceTree = "<group>"; };
 		C4565B031DC7ADBC007C0943 /* FlowError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowError.swift; sourceTree = "<group>"; };
 		C4565B081DC7B055007C0943 /* FlowOutcome.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowOutcome.swift; sourceTree = "<group>"; };
 		C4653ACF1DBFA4C400AF9B35 /* Forever.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Forever.swift; sourceTree = "<group>"; };
@@ -510,10 +514,11 @@
 		81752CBE1DBB6F7A00C64D2A /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				C4053C4C1DDB2E1C003A63B2 /* FlowRunnerTests.swift */,
 				C46E314C1DBFB40400FE5F49 /* FlowStateTests.swift */,
-				810129221DC920CC00A7807F /* FlowTestTests.swift */,
+				C4340EA71DDF3E9C00D4E2EE /* FlowOperationResultsHandlerTests.swift */,
 				8101291E1DC91AB200A7807F /* FlowOpTests.swift */,
+				810129221DC920CC00A7807F /* FlowTestTests.swift */,
+				C4053C4C1DDB2E1C003A63B2 /* FlowRunnerTests.swift */,
 				C4C4DA0D1DC36EEB00CB8A30 /* FlowHandlerTests.swift */,
 			);
 			path = Core;
@@ -651,9 +656,9 @@
 			children = (
 				C4851AF41DC221B700CE614E /* FlowOp.swift */,
 				C49F11A91DC75BDE001E7430 /* FlowTest.swift */,
-				C4C4D9E31DC25A5800CB8A30 /* FlowHandler.swift */,
+				C453F2AE1DDCDD0F00AB1452 /* FlowOperationResultsHandler.swift */,
 				81E40EDB1DD8C26200391C89 /* FlowRunner.swift */,
-				C453F2AE1DDCDD0F00AB1452 /* FlowOperationResults.swift */,
+				C4C4D9E31DC25A5800CB8A30 /* FlowHandler.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -1185,7 +1190,7 @@
 				C4C4D9F41DC2650C00CB8A30 /* FlowOpResult.swift in Sources */,
 				81AA79E01DCEC5DA00AAF4D8 /* Forever.swift in Sources */,
 				81AA79AE1DCE6E3900AAF4D8 /* Sequential.swift in Sources */,
-				C453F2AF1DDCDD0F00AB1452 /* FlowOperationResults.swift in Sources */,
+				C453F2AF1DDCDD0F00AB1452 /* FlowOperationResultsHandler.swift in Sources */,
 				C4C4D9FE1DC267E400CB8A30 /* FlowResults.swift in Sources */,
 				C4153D321DC7C8A700EBC3AD /* Flow.swift in Sources */,
 				C4C4D9E41DC25A5800CB8A30 /* FlowHandler.swift in Sources */,
@@ -1235,7 +1240,7 @@
 				C4C4D9F71DC2650C00CB8A30 /* FlowOpResult.swift in Sources */,
 				81AA79E31DCEC5DE00AAF4D8 /* Forever.swift in Sources */,
 				81AA79AB1DCE6E3700AAF4D8 /* Sequential.swift in Sources */,
-				C453F2B21DDCDD0F00AB1452 /* FlowOperationResults.swift in Sources */,
+				C453F2B21DDCDD0F00AB1452 /* FlowOperationResultsHandler.swift in Sources */,
 				C4C4DA011DC267E400CB8A30 /* FlowResults.swift in Sources */,
 				C4153D351DC7C8A700EBC3AD /* Flow.swift in Sources */,
 				C4C4D9E71DC25A5800CB8A30 /* FlowHandler.swift in Sources */,
@@ -1285,7 +1290,7 @@
 				C4C4D9F51DC2650C00CB8A30 /* FlowOpResult.swift in Sources */,
 				81AA79E11DCEC5DB00AAF4D8 /* Forever.swift in Sources */,
 				81AA79AD1DCE6E3800AAF4D8 /* Sequential.swift in Sources */,
-				C453F2B01DDCDD0F00AB1452 /* FlowOperationResults.swift in Sources */,
+				C453F2B01DDCDD0F00AB1452 /* FlowOperationResultsHandler.swift in Sources */,
 				C4C4D9FF1DC267E400CB8A30 /* FlowResults.swift in Sources */,
 				C4153D331DC7C8A700EBC3AD /* Flow.swift in Sources */,
 				C4C4D9E51DC25A5800CB8A30 /* FlowHandler.swift in Sources */,
@@ -1335,7 +1340,7 @@
 				C4C4D9F61DC2650C00CB8A30 /* FlowOpResult.swift in Sources */,
 				81AA79E21DCEC5DC00AAF4D8 /* Forever.swift in Sources */,
 				81AA79AC1DCE6E3800AAF4D8 /* Sequential.swift in Sources */,
-				C453F2B11DDCDD0F00AB1452 /* FlowOperationResults.swift in Sources */,
+				C453F2B11DDCDD0F00AB1452 /* FlowOperationResultsHandler.swift in Sources */,
 				C4C4DA001DC267E400CB8A30 /* FlowResults.swift in Sources */,
 				C4153D341DC7C8A700EBC3AD /* Flow.swift in Sources */,
 				C4C4D9E61DC25A5800CB8A30 /* FlowHandler.swift in Sources */,
@@ -1391,6 +1396,7 @@
 				81AA79A41DCBE7A400AAF4D8 /* WaterfallTests.swift in Sources */,
 				81AA79E41DCEC68A00AAF4D8 /* ForeverTests.swift in Sources */,
 				81AA79BB1DCE73D800AAF4D8 /* UntilTests.swift in Sources */,
+				C4340EA81DDF3E9C00D4E2EE /* FlowOperationResultsHandlerTests.swift in Sources */,
 				810129311DC954DB00A7807F /* BlockFlowTests.swift in Sources */,
 				81212FAB1DBB7862005F550B /* Mocks.swift in Sources */,
 				81AA79DD1DCE7B7100AAF4D8 /* DoDuringTests.swift in Sources */,
@@ -1418,6 +1424,7 @@
 				81AA79A61DCBE7A500AAF4D8 /* WaterfallTests.swift in Sources */,
 				81AA79E61DCEC68D00AAF4D8 /* ForeverTests.swift in Sources */,
 				81AA79B91DCE73D700AAF4D8 /* UntilTests.swift in Sources */,
+				C4340EAA1DDF3E9C00D4E2EE /* FlowOperationResultsHandlerTests.swift in Sources */,
 				810129331DC954DB00A7807F /* BlockFlowTests.swift in Sources */,
 				81212FAD1DBB7862005F550B /* Mocks.swift in Sources */,
 				81AA79DF1DCE7B7200AAF4D8 /* DoDuringTests.swift in Sources */,
@@ -1445,6 +1452,7 @@
 				81AA79A51DCBE7A500AAF4D8 /* WaterfallTests.swift in Sources */,
 				81AA79E51DCEC68C00AAF4D8 /* ForeverTests.swift in Sources */,
 				81AA79BA1DCE73D800AAF4D8 /* UntilTests.swift in Sources */,
+				C4340EA91DDF3E9C00D4E2EE /* FlowOperationResultsHandlerTests.swift in Sources */,
 				810129321DC954DB00A7807F /* BlockFlowTests.swift in Sources */,
 				81212FAC1DBB7862005F550B /* Mocks.swift in Sources */,
 				81AA79DE1DCE7B7100AAF4D8 /* DoDuringTests.swift in Sources */,

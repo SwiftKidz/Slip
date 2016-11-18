@@ -35,7 +35,7 @@ extension FlowStopped {
     }
 
     var isFinished: Bool {
-        return unsafeState == State.finished
+        if case .finished(_) = unsafeState { return true } else { return false }
     }
 
     var hasFailed: Bool {

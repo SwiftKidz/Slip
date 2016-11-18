@@ -28,7 +28,7 @@ final class FlowTest: Operation {
 
     fileprivate enum ChangeKey: String { case isFinished, isExecuting }
 
-    fileprivate let runQueue: DispatchQueue
+    fileprivate let testQueue: DispatchQueue
     fileprivate let testBlock: FlowTypeTests.TestBlock
     fileprivate let flowCallback: (FlowTestResult) -> Void
 
@@ -54,8 +54,8 @@ final class FlowTest: Operation {
          callBack: @escaping (FlowTestResult) -> Void,
          test: @escaping FlowTypeTests.TestBlock) {
         flowCallback = callBack
-        runQueue = DispatchQueue(
-            label: "com.slip.flowTest.runQueue",
+        testQueue = DispatchQueue(
+            label: "com.slip.flowTest.testQueue",
             qos: qos
         )
         testBlock = test
@@ -69,9 +69,9 @@ extension FlowTest {
         guard !isCancelled else { return }
         executingOp = true
 
-        runQueue.async { [weak self] in
-            guard let strongSelf = self else { return }
-            strongSelf.testBlock(strongSelf)
+        testQueue.async { [unowned self] in
+            let testHandler: Test = self
+            self.testBlock(testHandler)
         }
     }
 
@@ -101,6 +101,7 @@ extension FlowTest {
 extension FlowTest: Test {
 
     func complete(success: Bool, error: Error?) {
+        guard !isCancelled else { return }
         flowCallback(FlowTestResult(success: success, error: error))
         markAsFinished()
     }

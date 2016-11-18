@@ -31,7 +31,7 @@ final class FlowOp: Operation {
     fileprivate let runQueue: DispatchQueue
     fileprivate let runBlock: FlowTypeBlocks.RunBlock
     fileprivate let order: Int
-    fileprivate let resultHandler: FlowOperationResults
+    fileprivate let resultHandler: FlowOperationResultsHandler
 
     var finishedOp: Bool = false {
         didSet {
@@ -53,7 +53,7 @@ final class FlowOp: Operation {
 
     init(qos: DispatchQoS = .background,
          orderNumber: Int,
-         resultsHandler: FlowOperationResults,
+         resultsHandler: FlowOperationResultsHandler,
          run: @escaping FlowTypeBlocks.RunBlock) {
         order = orderNumber
         runQueue = DispatchQueue(
@@ -71,10 +71,11 @@ extension FlowOp {
         guard !isCancelled else { return }
         executingOp = true
 
-        runQueue.async { //[weak self] in
-            let strongSelf = self //guard  else { return }
-            let results = strongSelf.resultHandler.currentResults
-            strongSelf.runBlock(strongSelf, strongSelf.order, results.map { $0.result })
+        runQueue.async { [unowned self] in
+            let results = self.resultHandler.currentResults
+            let order: Int = self.order
+            let blockOp: BlockOp = self
+            self.runBlock(blockOp, order, results.map { $0.result })
         }
     }
 

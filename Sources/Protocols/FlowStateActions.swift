@@ -24,7 +24,7 @@
 
 import Foundation
 
-protocol FlowStateActions: class, FlowState, FlowTypeBlocks, FlowRun, FlowOpHandler, FlowTestHandler, FlowHandlerBlocks {}
+protocol FlowStateActions: class, FlowCoreApi, FlowState, FlowTypeBlocks, FlowRun, FlowHandlerBlocks {}
 
 extension FlowStateActions {
 
@@ -35,16 +35,11 @@ extension FlowStateActions {
     }
 
     func testing() {
-        runTest { (res) in
-            self.finishedTest(with: res)
-        }
+        runTest ()
     }
 
     func running() {
-        let execute: (FlowOpResult) -> Void = { (res) in
-            self.finishedOp(with: res)
-        }
-        testFlow ? runClosure(onFinish: execute) : runFlowOfBlocks(onFinish: execute)
+        testFlow ? runClosure() : runFlowOfBlocks()
     }
 
     func failed() {
@@ -78,8 +73,11 @@ extension FlowStateActions {
     }
 
     func finished() {
+        let state = self.unsafeState
+        let result = state.error == nil ? Result.success((state.value as? [T]) ?? []) : Result.failure(state.error!)
+
         DispatchQueue.main.async {
-            self.finishBlock(self.unsafeState, self.endResult)
+            self.finishBlock(state, result)
             self.finishBlock = { _ in }
         }
     }

@@ -31,14 +31,19 @@ public enum State {
     case running
     case canceled
     case failed(Error)
-    case finished
+    case finished(Any)
 }
 
 extension State {
 
-    var error: Error? {
+    public var error: Error? {
         guard case .failed(let error) = self else { return nil }
         return error
+    }
+
+    public var value: Any? {
+        guard case .finished(let res) = self else { return nil }
+        return res
     }
 }
 

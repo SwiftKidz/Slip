@@ -24,7 +24,7 @@
 
 import Foundation
 
-final class FlowOperationResults {
+final class FlowOperationResultsHandler {
 
     fileprivate var rawResults: [FlowOpResult] = []
     fileprivate let resultsQueue: DispatchQueue
@@ -33,17 +33,14 @@ final class FlowOperationResults {
     fileprivate var stop: Bool = false
 
     init(maxOps: Int = -1, onFinish: @escaping ([FlowOpResult], Error?) -> Void) {
-        resultsQueue = DispatchQueue(label: "com.slip.flow.FlowOperationResults.resultsQueue")//, attributes: DispatchQueue.Attributes.concurrent)
+        resultsQueue = DispatchQueue(label: "com.slip.flow.flowOperationResultsHandler.resultsQueue")
         finishHandler = onFinish
         numberOfResultsToFinish = maxOps
     }
 }
 
-extension FlowOperationResults {
+extension FlowOperationResultsHandler {
 
-    func getCurrentResults() -> [FlowOpResult] {
-        return currentResults
-    }
     var currentResults: [FlowOpResult] {
         var res: [FlowOpResult]!
         resultsQueue.sync { res = rawResults }
@@ -52,24 +49,23 @@ extension FlowOperationResults {
     }
 }
 
-extension FlowOperationResults {
+extension FlowOperationResultsHandler {
 
     func addNewResult(_ result: FlowOpResult) {
-        resultsQueue.sync {//(flags: .barrier) { [unowned self] in
+        resultsQueue.sync {
             guard !self.stop else { return }
             guard result.error == nil else {
                 self.finish(result.error)
                 return
             }
             self.rawResults.append(result)
-            //print("\(self.rawResults.count) - \(self.numberOfResultsToFinish)")
             guard self.rawResults.count == self.numberOfResultsToFinish else { return }
             self.finish()
         }
     }
 }
 
-extension FlowOperationResults {
+extension FlowOperationResultsHandler {
 
     func finish(_ error: Error? = nil) {
         stop = true
@@ -80,5 +76,4 @@ extension FlowOperationResults {
             handler(results, error)
         }
     }
-
 }

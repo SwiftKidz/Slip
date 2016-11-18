@@ -41,8 +41,15 @@ class StateTests: XCTestCase {
         XCTAssertTrue(state == State.failed(MockErrors.errorOnFlow))
         state = .canceled
         XCTAssertTrue(state == State.canceled)
-        state = .finished
-        XCTAssertTrue(state == State.finished)
+        state = .finished([])
+        XCTAssertTrue(state == State.finished([]))
         XCTAssertTrue(state != State.failed(MockErrors.errorOnFlow))
+    }
+
+    func testError() {
+        var state: State = .ready
+        XCTAssertNil(state.error)
+        state = .failed(MockErrors.errorOnFlow)
+        XCTAssertNotNil(state.error)
     }
 }

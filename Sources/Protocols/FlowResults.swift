@@ -24,30 +24,30 @@
 
 import Foundation
 
-protocol FlowResults: class, Safe {
-    var resultsQueue: DispatchQueue { get }
-    var numberOfRunningBlocks: Int { get }
-    var rawResults: [FlowOpResult] { get set }
-}
-
-extension FlowResults {
-
-    var safeResults: [FlowOpResult] {
-        var val: [FlowOpResult]!
-        readSafe(queue: resultsQueue) {
-            val = self.rawResults
-        }
-        return val
-    }
-
-    func addNew(result: FlowOpResult, onCompletion: @escaping (Bool) -> ()) {
-        writeSafe(queue: resultsQueue) {
-            self.rawResults.append(result)
-            //print("\(self.rawResults.count) - \(self.numberOfRunningBlocks) : \(self.rawResults.count == self.numberOfRunningBlocks)")
-            let shouldFinish = self.rawResults.count == self.numberOfRunningBlocks
-            DispatchQueue.global(qos: .default).async {
-                onCompletion(shouldFinish)
-            }
-        }
-    }
-}
+//protocol FlowResults: class, Safe {
+//    var resultsQueue: DispatchQueue { get }
+//    var numberOfRunningBlocks: Int { get }
+//    var rawResults: [FlowOpResult] { get set }
+//}
+//
+//extension FlowResults {
+//
+//    var safeResults: [FlowOpResult] {
+//        var val: [FlowOpResult]!
+//        readSafe(queue: resultsQueue) {
+//            val = self.rawResults
+//        }
+//        return val
+//    }
+//
+//    func addNew(result: FlowOpResult, onCompletion: @escaping (Bool) -> ()) {
+//        writeSafe(queue: resultsQueue) {
+//            self.rawResults.append(result)
+//            //print("\(self.rawResults.count) - \(self.numberOfRunningBlocks) : \(self.rawResults.count == self.numberOfRunningBlocks)")
+//            let shouldFinish = self.rawResults.count == self.numberOfRunningBlocks
+//            DispatchQueue.global(qos: .default).async {
+//                onCompletion(shouldFinish)
+//            }
+//        }
+//    }
+//}

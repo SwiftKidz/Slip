@@ -24,11 +24,11 @@
 
 import Foundation
 
-protocol FlowError: class, FlowState {}
-
-extension FlowError {
-
-    var unsafeError: Error? {
-        return unsafeState.error
-    }
-}
+//protocol FlowError: class, FlowState {}
+//
+//extension FlowError {
+//
+//    var unsafeError: Error? {
+//        return unsafeState.error
+//    }
+//}

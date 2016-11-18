@@ -37,6 +37,7 @@ internal class FlowHandler<T>: FlowCoreApi {
 
     var rawState: State
     var rawResults: [FlowOpResult]
+    var finalResults: [T]
 
     var blocks: [FlowTypeBlocks.RunBlock]
     let numberOfRunningBlocks: Int
@@ -52,7 +53,6 @@ internal class FlowHandler<T>: FlowCoreApi {
     let safeQueue: DispatchQueue = DispatchQueue(label: "com.slip.flow.safeQueue", attributes: DispatchQueue.Attributes.concurrent)
 
     let stateQueue: DispatchQueue = DispatchQueue(label: "com.slip.flow.stateQueue", attributes: DispatchQueue.Attributes.concurrent)
-    let resultsQueue: DispatchQueue = DispatchQueue(label: "com.slip.flow.resultsQueue", attributes: DispatchQueue.Attributes.concurrent)
 
     lazy var opQueue: OperationQueue = {
         let queue = OperationQueue()
@@ -80,6 +80,7 @@ internal class FlowHandler<T>: FlowCoreApi {
         qos = runQoS
         synchronous = sync
         rawResults = []
+        finalResults = []
         rawState = .ready
         changedTo(rawState)
     }
@@ -99,6 +100,7 @@ internal class FlowHandler<T>: FlowCoreApi {
         qos = runQoS
         synchronous = sync
         rawResults = []
+        finalResults = []
         testFlow = true
         rawState = .ready
         changedTo(rawState)
@@ -107,11 +109,10 @@ internal class FlowHandler<T>: FlowCoreApi {
 
 extension FlowHandler {
 
-    func process(result: Result<[FlowOpResult]>) {
+    func process(result: Result<[T]>) {
         switch result {
         case .success(let results):
-            rawResults = results
-            safeState = .finished
+            safeState = .finished(results)
         case .failure(let error):
             safeState = .failed(error)
         }
@@ -142,9 +143,9 @@ extension FlowHandler: FlowState, FlowStateActions {
     }
 }
 
-extension FlowHandler: FlowError {}
+//extension FlowHandler: FlowError {}
 
-extension FlowHandler: FlowStopped {}
+//extension FlowHandler: FlowStopped {}
 
 extension FlowHandler: FlowHandlerBlocks {}
 
@@ -153,14 +154,6 @@ extension FlowHandler: FlowTypeBlocks {}
 extension FlowHandler: FlowTypeTests {}
 
 extension FlowHandler: FlowRun {}
-
-extension FlowHandler: FlowResults {}
-
-extension FlowHandler: FlowOutcome {}
-
-extension FlowHandler: FlowOpHandler {}
-
-extension FlowHandler: FlowTestHandler {}
 
 extension FlowHandler {
 
@@ -192,7 +185,7 @@ extension FlowHandler {
     }
 
     public func cancel() {
-        guard case .running = safeState else { print("Cannot cancel a flow that is not running") ; return }
-        safeState = .canceled
+//        guard case .running = safeState else { print("Cannot cancel a flow that is not running") ; return }
+//        safeState = .canceled
     }
 }

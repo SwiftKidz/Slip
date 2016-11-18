@@ -24,21 +24,21 @@
 
 import Foundation
 
-protocol FlowOutcome: class, Safe, FlowCoreApi, FlowError, FlowResults {}
-
-extension FlowOutcome {
-
-    func getCurrentResults() -> [T] {
-//        objc_sync_enter(self)
-//        defer { objc_sync_exit(self) }
-//        return rawResults.flatMap { $0.result as? T }
-        return safeResults.flatMap { $0.result as? T }
-    }
-
-    var endResult: Result<[T]> {
-        let error = unsafeError
-        guard error == nil else { return Result.failure(error!) }
-
-        return Result.success(rawResults.flatMap { $0.result as? T })
-    }
-}
+//protocol FlowOutcome: class, Safe, FlowCoreApi, FlowError, FlowResults {}
+//
+//extension FlowOutcome {
+//
+//    func getCurrentResults() -> [T] {
+////        objc_sync_enter(self)
+////        defer { objc_sync_exit(self) }
+////        return rawResults.flatMap { $0.result as? T }
+//        return safeResults.flatMap { $0.result as? T }
+//    }
+//
+//    var endResult: Result<[T]> {
+//        let error = unsafeError
+//        guard error == nil else { return Result.failure(error!) }
+//
+//        return Result.success(rawResults.flatMap { $0.result as? T })
+//    }
+//}

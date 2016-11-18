@@ -24,24 +24,24 @@
 
 import Foundation
 
-protocol FlowTestHandler: class {
-    func finishedTest(with: FlowTestResult)
-}
-
-extension FlowTestHandler where Self: FlowStopped & FlowTypeTests {
-
-    func finishedTest(with res: FlowTestResult) {
-        guard !hasStopped else {
-            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
-            return
-        }
-
-        guard res.error == nil else {
-            safeState = .failed(res.error!)
-            return
-        }
-
-        guard testPassResult == res.success else { safeState = .finished; return }
-        safeState = .running
-    }
-}
+//protocol FlowTestHandler: class {
+//    func finishedTest(with: FlowTestResult)
+//}
+//
+//extension FlowTestHandler where Self: FlowStopped & FlowTypeTests {
+//
+//    func finishedTest(with res: FlowTestResult) {
+//        guard !hasStopped else {
+//            print("Flow has been stoped, either by error or manually canceled. Ignoring result of unfinished operation")
+//            return
+//        }
+//
+//        guard res.error == nil else {
+//            safeState = .failed(res.error!)
+//            return
+//        }
+//
+//        guard testPassResult == res.success else { safeState = .finished; return }
+//        safeState = .running
+//    }
+//}
