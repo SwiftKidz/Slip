@@ -27,6 +27,14 @@ import Slip
 
 class BlockFlowTests: XCTestCase {
 
+    func testQueues() {
+        let queue = DispatchQueue(label: "Queue", attributes: .concurrent)
+        let key = DispatchSpecificKey<String>()
+        queue.setSpecific(key: key, value: "Concurrent")
+
+        print(queue.getSpecific(key: key) ?? "Nothing")
+    }
+
     func testFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 

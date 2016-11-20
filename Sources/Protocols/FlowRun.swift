@@ -24,29 +24,29 @@
 
 import Foundation
 
-protocol FlowRun: class, FlowCoreApi, FlowTypeTests {
-    var flowRunner: FlowRunner<T> { get }
-    var opQueue: OperationQueue { get }
-}
-
-extension FlowRun {
-
-    func runClosure() {
-        flowRunner.onRunSucceed = { self.safeState = .testing }
-        flowRunner.runClosure(runBlock: runBlock)
-    }
-
-    func runTest() {
-        flowRunner.testPassResult = testPassResult
-        flowRunner.onTestSucceed = { self.safeState = .running }
-        flowRunner.runTest(testBlock: testBlock)
-    }
-}
-
-extension FlowRun {
-
-    func runFlowOfBlocks() {
-        flowRunner.runFlowOfBlocks(blocks: blocks)
-        blocks.removeAll()
-    }
-}
+//protocol FlowRun: class, FlowCoreApi, FlowTypeTests {
+//    var flowRunner: FlowRunner<T> { get }
+//    var opQueue: OperationQueue { get }
+//}
+//
+//extension FlowRun {
+//
+//    func runClosure() {
+//        flowRunner.onRunSucceed = { self.safeState = .testing }
+//        flowRunner.runClosure(runBlock: runBlock)
+//    }
+//
+//    func runTest() {
+//        flowRunner.testPassResult = testPassResult
+//        flowRunner.onTestSucceed = { self.safeState = .running }
+//        flowRunner.runTest(testBlock: testBlock)
+//    }
+//}
+//
+//extension FlowRun {
+//
+//    func runFlowOfBlocks() {
+//        flowRunner.runFlowOfBlocks(blocks: blocks)
+//        blocks.removeAll()
+//    }
+//}

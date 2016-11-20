@@ -93,51 +93,51 @@ class FlowHandlerTests: XCTestCase {
     }
 
     func testFlowHandlerCancelFunctionality() {
-//        let expectation = self.expectation(description: name ?? "Test")
-//
-//        let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
-//            return { (f: BlockOp, i: Int, r: Any?) in
-//                sleep(2)
-//                f.finish()
-//            }
-//        }
-//
-//        let flowHandler = FlowHandler<Void>(runBlocks: blocks)
-//
-//        flowHandler.onFinish { state, result in
-//            XCTAssert(state == .canceled)
-//            XCTAssertNil(result.error)
-//            XCTAssertNotNil(result.value)
-//            print("Cancel value \(result.value ?? [])")
-//            expectation.fulfill()
-//        }.start()
-//
-//        flowHandler.cancel()
-//
-//        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
+        let expectation = self.expectation(description: name ?? "Test")
+
+        let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
+            return { (f: BlockOp, i: Int, r: Any?) in
+                sleep(2)
+                f.finish()
+            }
+        }
+
+        let flowHandler = FlowHandler<Void>(runBlocks: blocks)
+
+        flowHandler.onFinish { state, result in
+            XCTAssert(state == .canceled)
+            XCTAssertNil(result.error)
+            XCTAssertNotNil(result.value)
+            print("Cancel value \(result.value ?? [])")
+            expectation.fulfill()
+        }.start()
+
+        flowHandler.cancel()
+
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
     func testFlowHandlerCancelBlockFunctionality() {
-//        let expectation = self.expectation(description: name ?? "Test")
-//
-//        let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
-//            return { (f: BlockOp, i: Int, r: Any?) in
-//                sleep(1)
-//                f.finish()
-//            }
-//        }
-//
-//        let flowHandler = FlowHandler<Void>(runBlocks: blocks)
-//
-//        flowHandler.onCancel {
-//            expectation.fulfill()
-//        }.onFinish { state, result in
-//            XCTFail()
-//        }.start()
-//
-//        flowHandler.cancel()
-//
-//        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
+        let expectation = self.expectation(description: name ?? "Test")
+
+        let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
+            return { (f: BlockOp, i: Int, r: Any?) in
+                sleep(1)
+                f.finish()
+            }
+        }
+
+        let flowHandler = FlowHandler<Void>(runBlocks: blocks)
+
+        flowHandler.onCancel {
+            expectation.fulfill()
+        }.onFinish { state, result in
+            XCTFail()
+        }.start()
+
+        flowHandler.cancel()
+
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
     func testFlowTesterNoErrorFunctionality() {

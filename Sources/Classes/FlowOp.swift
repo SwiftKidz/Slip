@@ -24,81 +24,22 @@
 
 import Foundation
 
-final class FlowOp: Operation {
+final class FlowOp: AsyncOperation {
 
-    fileprivate enum ChangeKey: String { case isFinished, isExecuting }
-
-    fileprivate let runQueue: DispatchQueue
-    fileprivate let runBlock: FlowTypeBlocks.RunBlock
-    fileprivate let order: Int
-    fileprivate let resultHandler: FlowOperationResultsHandler
-
-    var finishedOp: Bool = false {
-        didSet {
-            didChangeValue(forKey: ChangeKey.isFinished.rawValue)
-        }
-        willSet {
-            willChangeValue(forKey: ChangeKey.isFinished.rawValue)
-        }
-    }
-
-    var executingOp: Bool = false {
-        didSet {
-            didChangeValue(forKey: ChangeKey.isExecuting.rawValue)
-        }
-        willSet {
-            willChangeValue(forKey: ChangeKey.isExecuting.rawValue)
-        }
-    }
+    fileprivate let resultHandler: FlowResultsHandler
 
     init(qos: DispatchQoS = .background,
          orderNumber: Int,
-         resultsHandler: FlowOperationResultsHandler,
+         resultsHandler: FlowResultsHandler,
          run: @escaping FlowTypeBlocks.RunBlock) {
-        order = orderNumber
-        runQueue = DispatchQueue(
-            label: "com.slip.flowOp.runQueue",
-            qos: qos
-        )
-        runBlock = run
         resultHandler = resultsHandler
-    }
-}
-
-extension FlowOp {
-
-    override func start() {
-        guard !isCancelled else { return }
-        executingOp = true
-
-        runQueue.async { [unowned self] in
+        super.init(qos: qos, orderNumber: orderNumber)
+        asyncBlock = { [unowned self] in
             let results = self.resultHandler.currentResults
             let order: Int = self.order
             let blockOp: BlockOp = self
-            self.runBlock(blockOp, order, results.map { $0.result })
+            run(blockOp, order, results.map { $0.result })
         }
-    }
-
-    func markAsFinished() {
-        executingOp = false
-        finishedOp = true
-    }
-}
-
-extension FlowOp {
-
-    override var isAsynchronous: Bool {
-        return true
-    }
-
-    override var isFinished: Bool {
-        get { return finishedOp }
-        set { finishedOp = newValue }
-    }
-
-    override var isExecuting: Bool {
-        get { return executingOp }
-        set { executingOp = newValue }
     }
 }
 

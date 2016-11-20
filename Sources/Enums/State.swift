@@ -26,7 +26,6 @@ import Foundation
 
 public enum State {
     case ready
-    case queued
     case testing
     case running
     case canceled
@@ -51,7 +50,6 @@ extension State: Equatable {
     public static func==(lhs: State, rhs: State) -> Bool {
         switch (lhs, rhs) {
         case (.ready, .ready): return true
-        case (.queued, .queued): return true
         case (.testing, .testing): return true
         case (.canceled, .canceled): return true
         case (.failed(_), .failed(_)): return true

@@ -95,7 +95,7 @@ extension FlowRunner {
     func runFlowOfBlocks(blocks: [FlowTypeBlocks.RunBlock]) {
         guard !blocks.isEmpty else { finishWith(result: Result.success([])); return }
 
-        let handler = FlowOperationResultsHandler(maxOps: blocks.count) { results, error in
+        let handler = FlowResultsHandler(maxOps: blocks.count) { results, error in
             guard let error = error else {
                 self.finishWith(result: Result.success(results.flatMap { $0.result as? T }))
                 return
@@ -116,7 +116,7 @@ extension FlowRunner {
 extension FlowRunner {
 
     func runClosure(runBlock: @escaping TestFlowApi.RunBlock) {
-        let handler = FlowOperationResultsHandler(maxOps: 1) { results, error in
+        let handler = FlowResultsHandler(maxOps: 1) { results, error in
             self.handleRun(results: results, error: error)
         }
 
@@ -154,7 +154,7 @@ extension FlowRunner {
         add(results)
 
         let runSucceed = onRunSucceed
-        DispatchQueue.global(qos: .default).async {
+        DispatchQueue.global().async {
             runSucceed()
         }
     }
@@ -178,7 +178,7 @@ extension FlowRunner {
         }
 
         let testSucceed = onTestSucceed
-        DispatchQueue.global(qos: .default).async {
+        DispatchQueue.global().async {
             testSucceed()
         }
     }

@@ -24,77 +24,18 @@
 
 import Foundation
 
-final class FlowTest: Operation {
+final class FlowTest: AsyncOperation {
 
     fileprivate enum ChangeKey: String { case isFinished, isExecuting }
 
-    fileprivate let testQueue: DispatchQueue
-    fileprivate let testBlock: FlowTypeTests.TestBlock
     fileprivate let flowCallback: (FlowTestResult) -> Void
-
-    var finishedOp: Bool = false {
-        didSet {
-            didChangeValue(forKey: ChangeKey.isFinished.rawValue)
-        }
-        willSet {
-            willChangeValue(forKey: ChangeKey.isFinished.rawValue)
-        }
-    }
-
-    var executingOp: Bool = false {
-        didSet {
-            didChangeValue(forKey: ChangeKey.isExecuting.rawValue)
-        }
-        willSet {
-            willChangeValue(forKey: ChangeKey.isExecuting.rawValue)
-        }
-    }
 
     init(qos: DispatchQoS = .background,
          callBack: @escaping (FlowTestResult) -> Void,
          test: @escaping FlowTypeTests.TestBlock) {
         flowCallback = callBack
-        testQueue = DispatchQueue(
-            label: "com.slip.flowTest.testQueue",
-            qos: qos
-        )
-        testBlock = test
-    }
-
-}
-
-extension FlowTest {
-
-    override func start() {
-        guard !isCancelled else { return }
-        executingOp = true
-
-        testQueue.async { [unowned self] in
-            let testHandler: Test = self
-            self.testBlock(testHandler)
-        }
-    }
-
-    func markAsFinished() {
-        executingOp = false
-        finishedOp = true
-    }
-}
-
-extension FlowTest {
-
-    override var isAsynchronous: Bool {
-        return true
-    }
-
-    override var isFinished: Bool {
-        get { return finishedOp }
-        set { finishedOp = newValue }
-    }
-
-    override var isExecuting: Bool {
-        get { return executingOp }
-        set { executingOp = newValue }
+        super.init(qos: qos, orderNumber: 0)
+        asyncBlock = { [unowned self] in test(self) }
     }
 }
 

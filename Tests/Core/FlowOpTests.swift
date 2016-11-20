@@ -33,7 +33,7 @@ class FlowOpTests: XCTestCase {
 
         let queue = OperationQueue()
 
-        let flowHandler: FlowOperationResultsHandler = FlowOperationResultsHandler(maxOps: 1) { results, error in
+        let flowHandler: FlowResultsHandler = FlowResultsHandler(maxOps: 1) { results, error in
             XCTAssertNil(error)
             XCTAssertFalse(results.isEmpty)
             XCTAssert(results.flatMap { $0.result as? Int } == [0])
@@ -54,7 +54,7 @@ class FlowOpTests: XCTestCase {
 
         let queue = OperationQueue()
 
-        let flowHandler: FlowOperationResultsHandler = FlowOperationResultsHandler(maxOps: 1) { results, error in
+        let flowHandler: FlowResultsHandler = FlowResultsHandler(maxOps: 1) { results, error in
             XCTAssertNotNil(error)
             XCTAssertTrue(results.isEmpty)
             expectation.fulfill()
@@ -73,7 +73,7 @@ class FlowOpTests: XCTestCase {
         let concurrentQueue = OperationQueue()
         let serialQueue = OperationQueue()
         serialQueue.maxConcurrentOperationCount = 1
-        let flowHandler: FlowOperationResultsHandler = FlowOperationResultsHandler(maxOps: 2) { results, error in
+        let flowHandler: FlowResultsHandler = FlowResultsHandler(maxOps: 2) { results, error in
             XCTFail("It should never get here")
         }
 
@@ -106,7 +106,7 @@ class FlowOpTests: XCTestCase {
 
     func testCanceledBeforeRunOp() {
         let queue = OperationQueue()
-        let flowHandler: FlowOperationResultsHandler = FlowOperationResultsHandler(maxOps: 2) { results, error in
+        let flowHandler: FlowResultsHandler = FlowResultsHandler(maxOps: 2) { results, error in
             XCTFail("It should never get here")
         }
 
@@ -124,7 +124,7 @@ class FlowOpTests: XCTestCase {
     }
 
 
-    func testCanceledAfterRunaOp() {
+    func testCanceledAfterRunAnOp() {
 //        let expectation = self.expectation(description: name ?? "Test")
 //
 //        let queue = OperationQueue()

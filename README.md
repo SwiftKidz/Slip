@@ -30,7 +30,7 @@
 $ gem install cocoapods
 ```
 
-> CocoaPods 1.1.0+ is required to build Slip 0.0.4+.
+> CocoaPods 1.1.0+ is required to build Slip 0.0.5+.
 
 To integrate Slip into your Xcode project using CocoaPods, specify it in your `Podfile`:
 
@@ -39,7 +39,7 @@ source 'https://github.com/CocoaPods/Specs.git'
 platform :ios, '8.0'
 use_frameworks!
 
-pod 'Slip', '~> 0.0.4'
+pod 'Slip', '~> 0.0.5'
 ```
 
 Then, run the following command:
@@ -74,7 +74,7 @@ import PackageDescription
 let package = Package(
     name: "Slip",
     dependencies: [
-        .Package(url: "https://github.com/SwiftKidz/Slip.git", "0.0.4")
+        .Package(url: "https://github.com/SwiftKidz/Slip.git", "0.0.5")
     ]
 )
 ```

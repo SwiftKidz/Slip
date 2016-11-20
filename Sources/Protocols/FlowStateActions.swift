@@ -24,61 +24,61 @@
 
 import Foundation
 
-protocol FlowStateActions: class, FlowCoreApi, FlowState, FlowTypeBlocks, FlowRun, FlowHandlerBlocks {}
-
-extension FlowStateActions {
-
-    func queued() {
-        guard testFlow else { unsafeState = .running; return }
-        guard testAtBeginning else { unsafeState = .running; return }
-        unsafeState = .testing
-    }
-
-    func testing() {
-        runTest ()
-    }
-
-    func running() {
-        testFlow ? runClosure() : runFlowOfBlocks()
-    }
-
-    func failed() {
-        opQueue.cancelAllOperations()
-        guard
-            let _ = errorBlock,
-            let error = unsafeState.error
-        else {
-            finished()
-            return
-        }
-        DispatchQueue.main.async {
-            self.errorBlock?(error)
-            self.errorBlock = nil
-            self.finishBlock = { _ in }
-        }
-    }
-
-    func canceled() {
-        opQueue.cancelAllOperations()
-        guard let _ = cancelBlock else {
-            finished()
-            return
-        }
-        DispatchQueue.main.async {
-            self.cancelBlock?()
-            self.cancelBlock = nil
-            self.finishBlock = { _ in }
-        }
-
-    }
-
-    func finished() {
-        let state = self.unsafeState
-        let result = state.error == nil ? Result.success((state.value as? [T]) ?? []) : Result.failure(state.error!)
-
-        DispatchQueue.main.async {
-            self.finishBlock(state, result)
-            self.finishBlock = { _ in }
-        }
-    }
-}
+//protocol FlowStateActions: class, FlowCoreApi, FlowState, FlowTypeBlocks, FlowRun, FlowHandlerBlocks {}
+//
+//extension FlowStateActions {
+//
+//    func queued() {
+//        guard testFlow else { unsafeState = .running; return }
+//        guard testAtBeginning else { unsafeState = .running; return }
+//        unsafeState = .testing
+//    }
+//
+//    func testing() {
+//        runTest ()
+//    }
+//
+//    func running() {
+//        testFlow ? runClosure() : runFlowOfBlocks()
+//    }
+//
+//    func failed() {
+//        opQueue.cancelAllOperations()
+//        guard
+//            let _ = errorBlock,
+//            let error = unsafeState.error
+//        else {
+//            finished()
+//            return
+//        }
+//        DispatchQueue.main.async {
+//            self.errorBlock?(error)
+//            self.errorBlock = nil
+//            self.finishBlock = { _ in }
+//        }
+//    }
+//
+//    func canceled() {
+//        opQueue.cancelAllOperations()
+//        guard let _ = cancelBlock else {
+//            finished()
+//            return
+//        }
+//        DispatchQueue.main.async {
+//            self.cancelBlock?()
+//            self.cancelBlock = nil
+//            self.finishBlock = { _ in }
+//        }
+//
+//    }
+//
+//    func finished() {
+//        let state = self.unsafeState
+//        let result = state.error == nil ? Result.success((state.value as? [T]) ?? []) : Result.failure(state.error!)
+//
+//        DispatchQueue.main.async {
+//            self.finishBlock(state, result)
+//            self.finishBlock = { _ in }
+//        }
+//    }
+//}

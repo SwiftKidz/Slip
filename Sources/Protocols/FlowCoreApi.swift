@@ -12,7 +12,7 @@ public protocol FlowCoreApi {
 
     associatedtype T
 
-    typealias FinishBlock = (State, Result<[T]>) -> Void//(Flow) -> ()
+    typealias FinishBlock = (State, Result<[T]>) -> Void
     typealias ErrorBlock = (Error) -> Void
     typealias CancelBlock = () -> Void
 

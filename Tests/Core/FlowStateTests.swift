@@ -31,8 +31,6 @@ class StateTests: XCTestCase {
     func testEquatableFlowState() {
         var state: State = .ready
         XCTAssertTrue(state == State.ready)
-        state = .queued
-        XCTAssertTrue(state == State.queued)
         state = .testing
         XCTAssertTrue(state == State.testing)
         state = .running

@@ -24,7 +24,7 @@
 
 import Foundation
 
-final class FlowOperationResultsHandler {
+final class FlowResultsHandler {
 
     fileprivate var rawResults: [FlowOpResult] = []
     fileprivate let resultsQueue: DispatchQueue
@@ -39,7 +39,7 @@ final class FlowOperationResultsHandler {
     }
 }
 
-extension FlowOperationResultsHandler {
+extension FlowResultsHandler {
 
     var currentResults: [FlowOpResult] {
         var res: [FlowOpResult]!
@@ -49,7 +49,7 @@ extension FlowOperationResultsHandler {
     }
 }
 
-extension FlowOperationResultsHandler {
+extension FlowResultsHandler {
 
     func addNewResult(_ result: FlowOpResult) {
         resultsQueue.sync {
@@ -65,7 +65,7 @@ extension FlowOperationResultsHandler {
     }
 }
 
-extension FlowOperationResultsHandler {
+extension FlowResultsHandler {
 
     func finish(_ error: Error? = nil) {
         stop = true

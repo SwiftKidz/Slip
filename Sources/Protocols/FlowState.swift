@@ -24,37 +24,37 @@
 
 import Foundation
 
-protocol FlowState: class, Safe {
-    var stateQueue: DispatchQueue { get }
-    var rawState: State { get set }
-    func changedTo(_ state: State)
-}
-
-extension FlowState {
-
-    var safeState: State {
-        get {
-            var val: State!
-            readSafe(queue: stateQueue) {
-                val = self.rawState
-            }
-            return val
-        }
-        set {
-            writeSafe(queue: stateQueue) {
-                self.rawState = newValue
-                self.changedTo(self.rawState)
-            }
-        }
-    }
-
-    var unsafeState: State {
-        get {
-            return self.rawState
-        }
-        set {
-            self.rawState = newValue
-            changedTo(self.rawState)
-        }
-    }
-}
+//protocol FlowState: class {//, Safe {
+//    var stateQueue: DispatchQueue { get }
+//    var rawState: State { get set }
+//    func changedTo(_ state: State)
+//}
+//
+//extension FlowState {
+//
+////    var safeState: State {
+////        get {
+////            var val: State!
+////            readSafe(queue: stateQueue) {
+////                val = self.rawState
+////            }
+////            return val
+////        }
+////        set {
+////            writeSafe(queue: stateQueue) {
+////                self.rawState = newValue
+////                self.changedTo(self.rawState)
+////            }
+////        }
+////    }
+////
+////    var unsafeState: State {
+////        get {
+////            return self.rawState
+////        }
+////        set {
+////            self.rawState = newValue
+////            changedTo(self.rawState)
+////        }
+////    }
+//}
