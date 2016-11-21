@@ -26,8 +26,8 @@ import Foundation
 
 public final class DoDuring<T>: FlowHandler<T> {
 
-    public typealias AsyncTest = (Test) -> ()
-    public typealias Run = (BlockOp) -> ()
+    public typealias AsyncTest = (TestOp) -> ()
+    public typealias Run = (AsyncOp) -> ()
 
     public convenience init(run: @escaping Run,
                             test: @escaping AsyncTest,

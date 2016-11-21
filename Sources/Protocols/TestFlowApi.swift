@@ -26,8 +26,8 @@ import Foundation
 
 public protocol TestFlowApi {
 
-    typealias RunBlock = (BlockOp, Int, Any) -> ()
-    typealias TestBlock = (Test) -> ()
+    typealias RunBlock = (AsyncOp, Int, Any) -> ()
+    typealias TestBlock = (TestOp) -> ()
 
     var testBeforeRun: Bool { get set }
     var testPassingResult: Bool { get set }

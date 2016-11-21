@@ -24,4 +24,7 @@
 
 import Foundation
 
-public protocol BlockOp: FlowControl {}
+public protocol AsyncOp {
+    func finish<R>(_ result: R)
+    func finish(_ error: Error)
+}

@@ -26,7 +26,7 @@ import Foundation
 
 public final class Times<T>: FlowHandler<T> {
 
-    public typealias Block = (BlockOp, Int) -> ()
+    public typealias Block = (AsyncOp, Int) -> ()
 
     public convenience init(number: Int,
                             run: @escaping Block,

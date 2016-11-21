@@ -26,7 +26,7 @@ import Foundation
 
 protocol FlowTypeTests: class, FlowTypeBlocks {
 
-    typealias TestBlock = (Test) -> Void
+    typealias TestBlock = (TestOp) -> Void
 
     var testFlow: Bool { get }
     var testAtBeginning: Bool { get }
@@ -35,6 +35,11 @@ protocol FlowTypeTests: class, FlowTypeBlocks {
     var testBlock: TestBlock { get set }
     var runBlock: FlowTypeBlocks.RunBlock { get set }
 }
+
+protocol TestOpFlow {
+    typealias Block = (TestOp) -> Void
+}
+
 //
 //extension FlowTypeTests {
 //

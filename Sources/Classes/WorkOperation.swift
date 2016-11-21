@@ -24,31 +24,19 @@
 
 import Foundation
 
-public final class DoUntil<T>: FlowHandler<T> {
+final class WorkOperation: AsyncOperation {
 
-    public typealias Test = () -> (Bool)
-    public typealias Run = (AsyncOp) -> ()
-
-    public convenience init(run: @escaping Run,
-                            test: @escaping Test,
-                            runQoS: QualityOfService = .background,
-                            sync: Bool = false) {
-        let convertedTest: FlowTypeTests.TestBlock = { testHandler in
-            testHandler.success(test())
+    init(qos: DispatchQoS = .background,
+         retryTimes: Int = 0,
+         orderNumber: Int = 0,
+         store: AsyncOpResultStore? = nil,
+         run: @escaping WorkOpFlow.Block
+        ) {
+        super.init(qos: qos,
+                   retryTimes: retryTimes,
+                   orderNumber: orderNumber,
+                   store: store) { asyncOp in
+            run(asyncOp, orderNumber, store?.current ?? [])
         }
-        let convertedRun: FlowTypeBlocks.RunBlock = { (blockOp, _, _) in
-            run(blockOp)
-        }
-        self.init(run: convertedRun, test: convertedTest, limit: 1, runQoS: runQoS, sync: sync)
-    }
-
-    private override init(run: @escaping FlowTypeBlocks.RunBlock,
-                          test: @escaping FlowTypeTests.TestBlock,
-                          limit: Int,
-                          runQoS: QualityOfService,
-                          sync: Bool) {
-        super.init(run: run, test: test, limit: limit, runQoS: runQoS, sync: sync)
-        testAtBeginning = false
-        testPassResult = false
     }
 }

@@ -10,15 +10,15 @@ import XCTest
 
 @testable import Slip
 
-class FlowResultsHandlerTests: XCTestCase {
+class ResultsHandlerTests: XCTestCase {
 
     func testStressAdd() {
         let expectation = self.expectation(description: name ?? "Test")
 
         let stressFactor: Int = TestConfig.stressValue
 
-        let flowResultsHandler: FlowResultsHandler =
-            FlowResultsHandler(maxOps: TestConfig.operationNumber*stressFactor) { results, error in
+        let flowResultsHandler: ResultsHandler =
+            ResultsHandler(maxOps: TestConfig.operationNumber*stressFactor) { results, error in
             XCTAssert(results.count == stressFactor*TestConfig.operationNumber)
             XCTAssertNil(error)
             expectation.fulfill()
@@ -26,7 +26,7 @@ class FlowResultsHandlerTests: XCTestCase {
 
         let blocks: [BlockOperation] = [Int](0..<TestConfig.operationNumber*stressFactor).map { n in
             return BlockOperation {
-                flowResultsHandler.addNewResult(FlowOpResult(order: n, result: n, error: nil))
+                flowResultsHandler.addNewResult(AsyncOpResult(order: n, result: n, error: nil))
             }
         }
 
@@ -44,8 +44,8 @@ class FlowResultsHandlerTests: XCTestCase {
 
         let stressFactor: Int = TestConfig.stressValue
 
-        let flowResultsHandler: FlowResultsHandler =
-            FlowResultsHandler(maxOps: TestConfig.operationNumber*stressFactor) { results, error in
+        let flowResultsHandler: ResultsHandler =
+            ResultsHandler(maxOps: TestConfig.operationNumber*stressFactor) { results, error in
                 XCTAssert(results.count == stressFactor*TestConfig.operationNumber)
                 XCTAssertNil(error)
                 expectation.fulfill()
@@ -53,8 +53,8 @@ class FlowResultsHandlerTests: XCTestCase {
 
         let blocks: [BlockOperation] = [Int](0..<TestConfig.operationNumber*stressFactor).map { n in
             return BlockOperation {
-                let currentResultsCount = flowResultsHandler.currentResults.count
-                flowResultsHandler.addNewResult(FlowOpResult(order: n, result: currentResultsCount, error: nil))
+                let currentResultsCount = flowResultsHandler.current.count
+                flowResultsHandler.addNewResult(AsyncOpResult(order: n, result: currentResultsCount, error: nil))
             }
         }
 
@@ -72,8 +72,8 @@ class FlowResultsHandlerTests: XCTestCase {
 
         let stressFactor: Int = TestConfig.stressValue
 
-        let flowResultsHandler: FlowResultsHandler =
-            FlowResultsHandler(maxOps: TestConfig.operationNumber*stressFactor) { results, error in
+        let flowResultsHandler: ResultsHandler =
+            ResultsHandler(maxOps: TestConfig.operationNumber*stressFactor) { results, error in
                 XCTAssert(results.count < stressFactor*TestConfig.operationNumber)
                 XCTAssertNotNil(error)
                 expectation.fulfill()
@@ -82,10 +82,10 @@ class FlowResultsHandlerTests: XCTestCase {
         let blocks: [BlockOperation] = [Int](0..<TestConfig.operationNumber*stressFactor).map { n in
             return BlockOperation {
                 guard n < TestConfig.operationNumber*stressFactor/2 else {
-                    flowResultsHandler.addNewResult(FlowOpResult(order: n, result: nil, error: MockErrors.errorOnOperation))
+                    flowResultsHandler.addNewResult(AsyncOpResult(order: n, result: nil, error: MockErrors.errorOnOperation))
                     return
                 }
-                flowResultsHandler.addNewResult(FlowOpResult(order: n, result: n, error: nil))
+                flowResultsHandler.addNewResult(AsyncOpResult(order: n, result: n, error: nil))
             }
         }
 

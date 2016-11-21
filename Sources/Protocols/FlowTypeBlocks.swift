@@ -25,9 +25,14 @@
 import Foundation
 
 protocol FlowTypeBlocks: class {
-    typealias RunBlock = (BlockOp, Int, Any) -> ()
+    typealias WorkBlock = (AsyncOp, Int, Any) -> ()
+    typealias RunBlock = WorkBlock
 
-    var blocks: [RunBlock] { get set }
+    var blocks: [WorkBlock] { get set }
 
     var limitOfSimultaneousOps: Int { get }
+}
+
+protocol WorkOpFlow {
+    typealias Block = (AsyncOp, Int, Any) -> ()
 }

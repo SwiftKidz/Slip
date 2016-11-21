@@ -26,21 +26,21 @@ import XCTest
 
 @testable import Slip
 
-class FlowOpTests: XCTestCase {
+class WorkOperationTests: XCTestCase {
 
     func testRunOpFinishResult() {
         let expectation = self.expectation(description: name ?? "Test")
 
         let queue = OperationQueue()
 
-        let flowHandler: FlowResultsHandler = FlowResultsHandler(maxOps: 1) { results, error in
+        let store: ResultsHandler = ResultsHandler(maxOps: 1) { results, error in
             XCTAssertNil(error)
             XCTAssertFalse(results.isEmpty)
             XCTAssert(results.flatMap { $0.result as? Int } == [0])
             expectation.fulfill()
         }
 
-        let op = FlowOp(orderNumber: 0, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+        let op = WorkOperation(orderNumber: 0, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             f.finish(i)
         }
 
@@ -54,13 +54,13 @@ class FlowOpTests: XCTestCase {
 
         let queue = OperationQueue()
 
-        let flowHandler: FlowResultsHandler = FlowResultsHandler(maxOps: 1) { results, error in
+        let store: ResultsHandler = ResultsHandler(maxOps: 1) { results, error in
             XCTAssertNotNil(error)
             XCTAssertTrue(results.isEmpty)
             expectation.fulfill()
         }
 
-        let op = FlowOp(orderNumber: 0, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+        let op = WorkOperation(orderNumber: 0, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             f.finish(MockErrors.errorOnOperation)
         }
 
@@ -73,25 +73,25 @@ class FlowOpTests: XCTestCase {
         let concurrentQueue = OperationQueue()
         let serialQueue = OperationQueue()
         serialQueue.maxConcurrentOperationCount = 1
-        let flowHandler: FlowResultsHandler = FlowResultsHandler(maxOps: 2) { results, error in
+        let store: ResultsHandler = ResultsHandler(maxOps: 2) { results, error in
             XCTFail("It should never get here")
         }
 
-        let op1 = FlowOp(orderNumber: 0, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+        let op1 = WorkOperation(orderNumber: 0, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             sleep(1)
             f.finish(i)
         }
 
-        let op2 = FlowOp(orderNumber: 1, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+        let op2 = WorkOperation(orderNumber: 1, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             sleep(1)
             f.finish(MockErrors.errorOnOperation)
         }
 
-        let op3 = FlowOp(orderNumber: 0, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+        let op3 = WorkOperation(orderNumber: 0, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             f.finish(i)
         }
 
-        let op4 = FlowOp(orderNumber: 1, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+        let op4 = WorkOperation(orderNumber: 1, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             sleep(1)
             f.finish(MockErrors.errorOnOperation)
         }
@@ -106,16 +106,16 @@ class FlowOpTests: XCTestCase {
 
     func testCanceledBeforeRunOp() {
         let queue = OperationQueue()
-        let flowHandler: FlowResultsHandler = FlowResultsHandler(maxOps: 2) { results, error in
+        let store: ResultsHandler = ResultsHandler(maxOps: 2) { results, error in
             XCTFail("It should never get here")
         }
 
-        let op1 = FlowOp(orderNumber: 0, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+        let op1 = WorkOperation(orderNumber: 0, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             sleep(1)
             f.finish(i)
         }
 
-        let op2 = FlowOp(orderNumber: 1, resultsHandler: flowHandler) { (f: BlockOp, i: Int, r: Any?) in
+        let op2 = WorkOperation(orderNumber: 1, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             f.finish(MockErrors.errorOnOperation)
         }
         queue.maxConcurrentOperationCount = 1

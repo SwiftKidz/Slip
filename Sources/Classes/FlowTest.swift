@@ -24,26 +24,26 @@
 
 import Foundation
 
-final class FlowTest: AsyncOperation {
+//final class FlowTest {
+//
+//    fileprivate enum ChangeKey: String { case isFinished, isExecuting }
+//
+//    fileprivate let flowCallback: (FlowTestResult) -> Void
+//
+//    init(qos: DispatchQoS = .background,
+//         callBack: @escaping (FlowTestResult) -> Void,
+//         test: @escaping FlowTypeTests.TestBlock) {
+//        flowCallback = callBack
+////        super.init(qos: qos, orderNumber: 0)
+////        asyncBlock = { [unowned self] in test(self) }
+//    }
+//}
 
-    fileprivate enum ChangeKey: String { case isFinished, isExecuting }
-
-    fileprivate let flowCallback: (FlowTestResult) -> Void
-
-    init(qos: DispatchQoS = .background,
-         callBack: @escaping (FlowTestResult) -> Void,
-         test: @escaping FlowTypeTests.TestBlock) {
-        flowCallback = callBack
-        super.init(qos: qos, orderNumber: 0)
-        asyncBlock = { [unowned self] in test(self) }
-    }
-}
-
-extension FlowTest: Test {
-
-    func complete(success: Bool, error: Error?) {
-        guard !isCancelled else { return }
-        flowCallback(FlowTestResult(success: success, error: error))
-        markAsFinished()
-    }
-}
+//extension FlowTest: Test {
+//
+//    func complete(success: Bool, error: Error?) {
+////        guard !isCancelled else { return }
+////        flowCallback(FlowTestResult(success: success, error: error))
+////        markAsFinished()
+//    }
+//}

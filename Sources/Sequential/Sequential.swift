@@ -26,7 +26,7 @@ import Foundation
 
 public final class Sequential<T>: FlowHandler<T> {
 
-    public typealias Block = (BlockOp, T?) -> ()
+    public typealias Block = (AsyncOp, T?) -> ()
 
     public convenience init(runBlocks: [Block],
                             runQoS: QualityOfService = .background,

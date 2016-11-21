@@ -45,7 +45,7 @@ public final class TestFlow<T>: FlowHandler<T>, TestFlowApi {
     }
 
     public override init(run: @escaping TestFlowApi.RunBlock = { $0.0.finish() },
-         test: @escaping TestFlowApi.TestBlock = { $0.complete(success: false, error: nil) },
+         test: @escaping TestFlowApi.TestBlock = { $0.success(false) },
          limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
          runQoS: QualityOfService = .background,
          sync: Bool = false) {

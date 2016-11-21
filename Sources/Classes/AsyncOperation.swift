@@ -26,11 +26,16 @@ import Foundation
 
 class AsyncOperation: Operation {
 
-    fileprivate enum ChangeKey: String { case isFinished, isExecuting }
-    let runQueue: DispatchQueue
-    let order: Int
-    var asyncBlock: () -> Void
+    typealias AsyncBlock = (AsyncOp) -> Void
 
+    fileprivate enum ChangeKey: String { case isFinished, isExecuting }
+
+    fileprivate let runQueue: DispatchQueue
+    fileprivate let order: Int
+
+    fileprivate var retryNumber: Int
+    fileprivate var asyncBlock: AsyncBlock
+    fileprivate var store: AsyncOpResultStore?
 
     var finishedOp: Bool = false {
         didSet {
@@ -51,24 +56,32 @@ class AsyncOperation: Operation {
     }
 
     init(qos: DispatchQoS = .background,
-         orderNumber: Int) {
+         retryTimes: Int = 0,
+         orderNumber: Int = 0,
+         store: AsyncOpResultStore? = nil,
+         run: @escaping AsyncBlock
+        ) {
+        retryNumber = retryTimes
         order = orderNumber
-        runQueue = DispatchQueue(
-            label: "com.slip.asyncOperation.runQueue",
-            qos: qos
-        )
-        asyncBlock = {}
+        runQueue = DispatchQueue(label: "com.slip.asyncOperation.runQueue", qos: qos)
+        self.store = store
+        asyncBlock = run
     }
 }
+
+
 
 extension AsyncOperation {
 
     override func start() {
-        guard !isCancelled else { return }
+        guard !isCancelled else { print("CanceledOp"); return }
         executingOp = true
+        runOperation()
+    }
 
+    func runOperation() {
         runQueue.async { [unowned self] in
-            self.asyncBlock()
+            self.asyncBlock(self)
         }
     }
 
@@ -92,5 +105,31 @@ extension AsyncOperation {
     override var isExecuting: Bool {
         get { return executingOp }
         set { executingOp = newValue }
+    }
+}
+
+extension AsyncOperation {
+
+    func retry() -> Bool {
+        guard retryNumber > 0 else { return false }
+        retryNumber -= 1
+        runOperation()
+        return true
+    }
+}
+
+extension AsyncOperation: AsyncOp {
+
+    func finish<R>(_ result: R) {
+        guard !isCancelled else { return }
+        store?.addNewResult(AsyncOpResult(order: order, result: result, error: nil))
+        markAsFinished()
+    }
+
+    func finish(_ error: Error) {
+        guard !isCancelled else { return }
+        guard !retry() else { return }
+        store?.addNewResult(AsyncOpResult(order: order, result: nil, error: error))
+        markAsFinished()
     }
 }

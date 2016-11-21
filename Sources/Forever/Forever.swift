@@ -26,13 +26,13 @@ import Foundation
 
 public final class Forever<T>: FlowHandler<T> {
 
-    public typealias Run = (BlockOp) -> ()
+    public typealias Run = (AsyncOp) -> ()
 
     public convenience init(run: @escaping Run,
                             runQoS: QualityOfService = .background,
                             sync: Bool = false) {
         let convertedTest: FlowTypeTests.TestBlock = { testHandler in
-            testHandler.complete(success: true, error: nil)
+            testHandler.success(true)
         }
         let convertedRun: FlowTypeBlocks.RunBlock = { (blockOp, _, _) in
             run(blockOp)

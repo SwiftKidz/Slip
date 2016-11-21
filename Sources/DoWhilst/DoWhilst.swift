@@ -27,14 +27,14 @@ import Foundation
 public final class DoWhilst<T>: FlowHandler<T> {
 
     public typealias Test = () -> (Bool)
-    public typealias Run = (BlockOp) -> ()
+    public typealias Run = (AsyncOp) -> ()
 
     public convenience init(run: @escaping Run,
                             test: @escaping Test,
                             runQoS: QualityOfService = .background,
                             sync: Bool = false) {
         let convertedTest: FlowTypeTests.TestBlock = { testHandler in
-            testHandler.complete(success: test(), error: nil)
+            testHandler.success(test())
         }
         let convertedRun: FlowTypeBlocks.RunBlock = { (blockOp, _, _) in
             run(blockOp)

@@ -33,7 +33,7 @@ class DuringTests: XCTestCase {
 
         var count: Int = 0
 
-        During<Int>(test: { $0.complete(success: count < 5, error: nil) }, run: { (opHandler) in
+        During<Int>(test: { $0.success(count < 5) }, run: { (opHandler) in
             count += 1
             opHandler.finish(count)
         }).onFinish { (state, result) in
@@ -46,7 +46,7 @@ class DuringTests: XCTestCase {
 
         let expectationNotRun = self.expectation(description: name ?? "Test")
 
-        During<Int>(test: { $0.complete(success: count < 5, error: nil) }, run: { (opHandler) in
+        During<Int>(test: { $0.success(count < 5) }, run: { (opHandler) in
             count += 1
             opHandler.finish(count)
         }).onFinish { (state, result) in

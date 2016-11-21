@@ -25,5 +25,5 @@
 import Foundation
 
 public protocol BlockFlowApi {
-    typealias RunBlock = (BlockOp, Int, Any) -> ()
+    typealias RunBlock = (AsyncOp, Int, Any) -> ()
 }

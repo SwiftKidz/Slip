@@ -26,13 +26,13 @@ import XCTest
 
 @testable import Slip
 
-class FlowRunnerTests: XCTestCase {
+class AsyncOperationRunnerTests: XCTestCase {
 
     func testFlowRunnerNoRunBlocksFunctionality() {
 
-        let expectation = self.expectation(description: name ?? "Test")
+        let expectation = self.expectation(description: name ?? "TestOp")
 
-        let flowRunner = FlowRunner<Void>(maxSimultaneousOps: OperationQueue.defaultMaxConcurrentOperationCount,
+        let flowRunner = AsyncOperationRunner<Void>(maxSimultaneousOps: OperationQueue.defaultMaxConcurrentOperationCount,
                                           qos: .background) { res in
                                             switch res {
                                             case .failure(_): XCTFail()
@@ -47,15 +47,15 @@ class FlowRunnerTests: XCTestCase {
     }
 
     func testFlowRunnerNoErrorFunctionality() {
-        let expectation = self.expectation(description: name ?? "Test")
+        let expectation = self.expectation(description: name ?? "TestOp")
 
         var blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
-            return { (f: BlockOp, i: Int, r: Any?) in
+            return { (f: AsyncOp, i: Int, r: Any?) in
                 f.finish()
             }
         }
 
-        let flowRunner = FlowRunner<Void>(maxSimultaneousOps: OperationQueue.defaultMaxConcurrentOperationCount,
+        let flowRunner = AsyncOperationRunner<Void>(maxSimultaneousOps: OperationQueue.defaultMaxConcurrentOperationCount,
                                           qos: .background) { res in
                                             switch res {
                                             case .failure(_): XCTFail()
@@ -73,10 +73,10 @@ class FlowRunnerTests: XCTestCase {
     }
 
     func testFlowRunnerErrorFunctionality() {
-        let expectation = self.expectation(description: name ?? "Test")
+        let expectation = self.expectation(description: name ?? "TestOp")
 
         var blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
-            return { (f: BlockOp, i: Int, r: Any?) in
+            return { (f: AsyncOp, i: Int, r: Any?) in
                 guard i < TestConfig.operationNumber/2 else { f.finish(MockErrors.errorOnOperation); return }
                 f.finish()
             }
@@ -101,47 +101,46 @@ class FlowRunnerTests: XCTestCase {
     }
 
     func testFlowRunnerCancelFunctionality() {
-//        let expectation = self.expectation(description: name ?? "Test")
-//
-//        let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
-//            return { (f: BlockOp, i: Int, r: Any?) in
-//                sleep(2)
-//                f.finish(i)
-//            }
-//        }
-//
-//        let flowRunner = FlowRunner<Void>(maxSimultaneousOps: OperationQueue.defaultMaxConcurrentOperationCount,
-//                                          qos: .background) { res in
-//                                            switch res {
-//                                            case .failure(_): XCTFail()
-//                                            case .success(let results):
-//                                                XCTAssertTrue(results.isEmpty)
-//                                            }
-//                                            expectation.fulfill()
-//                                        }
-//
-//        flowRunner.verbose = true
-//        flowRunner.runFlowOfBlocks(blocks: blocks)
-//
-//        DispatchQueue.global().asyncAfter(deadline: DispatchTime.now()+1) {
-//            flowRunner.cancel()
-//        }
-//
-//        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
+        let expectation = self.expectation(description: name ?? "TestOp")
+
+        let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
+            return { (f: AsyncOp, i: Int, r: Any?) in
+                sleep(1)
+                f.finish(i)
+            }
+        }
+
+        let flowRunner = FlowRunner<Void>(maxSimultaneousOps: OperationQueue.defaultMaxConcurrentOperationCount,
+                                          qos: .background) { res in
+                                            switch res {
+                                            case .failure(_): XCTFail()
+                                            case .success(let results):
+                                                XCTAssertTrue(results.isEmpty)
+                                            }
+                                            expectation.fulfill()
+                                        }
+
+        flowRunner.verbose = true
+        flowRunner.runFlowOfBlocks(blocks: blocks)
+        DispatchQueue.global().asyncAfter(deadline: DispatchTime.now()+1) {
+            flowRunner.cancel()
+        }
+
+        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
 
     func testFlowRunnerTestNoErrorFunctionality() {
-        let expectation = self.expectation(description: name ?? "Test")
+        let expectation = self.expectation(description: name ?? "TestOp")
 
         var count: Int = 0
 
-        let block: FlowTypeBlocks.RunBlock = { (flow: BlockOp, iteration: Int, result: Any?) in
+        let block: FlowTypeBlocks.RunBlock = { (flow: AsyncOp, iteration: Int, result: Any?) in
             count += 1
             flow.finish(count-1)
         }
 
-        let testt: FlowTypeTests.TestBlock = { (test: Test) in
-            test.complete(success: count < 5, error: nil)
+        let testt: FlowTypeTests.TestBlock = { (testHandler: TestOp) in
+            testHandler.success(count < 5)
         }
 
         let flowRunner = FlowRunner<Int>(maxSimultaneousOps: OperationQueue.defaultMaxConcurrentOperationCount,
@@ -170,17 +169,17 @@ class FlowRunnerTests: XCTestCase {
     }
 
     func testFlowRunnerTestErrorFunctionality() {
-        let expectation = self.expectation(description: name ?? "Test")
+        let expectation = self.expectation(description: name ?? "TestOp")
 
         var count: Int = 0
 
-        let block: FlowTypeBlocks.RunBlock = { (flow: BlockOp, iteration: Int, result: Any?) in
+        let block: FlowTypeBlocks.RunBlock = { (flow: AsyncOp, iteration: Int, result: Any?) in
             count += 1
             flow.finish(count-1)
         }
 
-        let testt: FlowTypeTests.TestBlock = { (test: Test) in
-            test.complete(success: count < 5, error: MockErrors.errorOnTest)
+        let testt: FlowTypeTests.TestBlock = { (testHandler: TestOp) in
+            testHandler.failed(MockErrors.errorOnTest)
         }
 
         let flowRunner = FlowRunner<Void>(maxSimultaneousOps: OperationQueue.defaultMaxConcurrentOperationCount,
@@ -209,18 +208,18 @@ class FlowRunnerTests: XCTestCase {
     }
 
     func testFlowRunnerTestCancelFunctionality() {
-        let expectation = self.expectation(description: name ?? "Test")
+        let expectation = self.expectation(description: name ?? "TestOp")
 
         var count: Int = 0
 
-        let block: FlowTypeBlocks.RunBlock = { (flow: BlockOp, iteration: Int, result: Any?) in
+        let block: FlowTypeBlocks.RunBlock = { (flow: AsyncOp, iteration: Int, result: Any?) in
             sleep(2)
             count += 1
             flow.finish(count-1)
         }
 
-        let testt: FlowTypeTests.TestBlock = { (test: Test) in
-            test.complete(success: count < 5, error: nil)
+        let testt: FlowTypeTests.TestBlock = { (testHandler: TestOp) in
+            testHandler.success(count < 5)
         }
 
         let flowRunner = FlowRunner<Void>(maxSimultaneousOps: OperationQueue.defaultMaxConcurrentOperationCount,

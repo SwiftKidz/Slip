@@ -28,3 +28,13 @@ public protocol FlowControl {
     func finish<R>(_ result: R)
     func finish(_ error: Error)
 }
+
+public protocol WorkControl {
+    func finish<R>(_ result: R)
+    func finish(_ error: Error)
+}
+
+public protocol TestControl {
+    func finish(_ success: Bool)
+    func finish(_ error: Error)
+}

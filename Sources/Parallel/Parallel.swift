@@ -27,7 +27,7 @@ import Foundation
 
 public final class Parallel<T>: FlowHandler<T> {
 
-    public typealias Block = (BlockOp) -> ()
+    public typealias Block = (AsyncOp) -> ()
 
     public convenience init(runBlocks: [Block],
                             runQoS: QualityOfService = .background,

@@ -27,14 +27,14 @@ import Foundation
 public final class Until<T>: FlowHandler<T> {
 
     public typealias Test = () -> (Bool)
-    public typealias Run = (BlockOp) -> ()
+    public typealias Run = (AsyncOp) -> ()
 
     public convenience init(test: @escaping Test,
                             run: @escaping Run,
                           runQoS: QualityOfService = .background,
                           sync: Bool = false) {
         let convertedTest: FlowTypeTests.TestBlock = { testHandler in
-            testHandler.complete(success: test(), error: nil)
+            testHandler.success(test())
         }
         let convertedRun: FlowTypeBlocks.RunBlock = { (blockOp, _, _) in
             run(blockOp)

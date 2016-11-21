@@ -26,7 +26,7 @@ import XCTest
 
 @testable import Slip
 
-class FlowTestsTests: XCTestCase {
+class TestOperationTests: XCTestCase {
 
     func testFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
@@ -35,32 +35,36 @@ class FlowTestsTests: XCTestCase {
 
         let testing: Int = 0
 
+        let store1: ResultsHandler = ResultsHandler(maxOps: 1) { results, error in
+            XCTAssertNil(error)
+            XCTAssertTrue(results.first?.success ?? false)
+        }
+
+        let store2: ResultsHandler = ResultsHandler(maxOps: 1) { results, error in
+            XCTAssertNil(error)
+            XCTAssertFalse(results.first?.success ?? true)
+        }
+
+        let store3: ResultsHandler = ResultsHandler(maxOps: 1) { results, error in
+            XCTAssertNotNil(error)
+            XCTAssert(results.isEmpty)
+        }
+
         let block1: FlowTypeTests.TestBlock = { test in
-            test.complete(success: testing == 0, error: nil)
+            test.success(testing == 0)
         }
 
         let block2: FlowTypeTests.TestBlock = { test in
-            test.complete(success: testing != 0, error: nil)
+            test.success(testing != 0)
         }
 
         let block3: FlowTypeTests.TestBlock = { test in
-            test.complete(success: false, error: MockErrors.errorOnTest)
+            test.failed(MockErrors.errorOnTest)
         }
 
-        let op1 = FlowTest(callBack: { (result) in
-            XCTAssertNil(result.error)
-            XCTAssertTrue(result.success)
-        }, test: block1)
-
-        let op2 = FlowTest(callBack: { (result) in
-            XCTAssertNil(result.error)
-            XCTAssertFalse(result.success)
-        }, test: block2)
-
-        let op3 = FlowTest(callBack: { (result) in
-            XCTAssertNotNil(result.error)
-            XCTAssertFalse(result.success)
-        }, test: block3)
+        let op1 = TestOperation(store: store1, test: block1)
+        let op2 = TestOperation(store: store2, test: block2)
+        let op3 = TestOperation(store: store3, test: block3)
 
         let bop = BlockOperation {
             expectation.fulfill()
@@ -82,9 +86,13 @@ class FlowTestsTests: XCTestCase {
         queue.maxConcurrentOperationCount = 1
         let testing: Int = 0
 
+        let storeCancel: ResultsHandler = ResultsHandler(maxOps: 1) { results, error in
+            XCTFail("Should never run")
+        }
+
         let block1: FlowTypeTests.TestBlock = { test in
             sleep(2)
-            test.complete(success: testing == 0, error: nil)
+            test.success(testing == 0)
         }
 
         let block2: FlowTypeTests.TestBlock = { test in
@@ -95,17 +103,9 @@ class FlowTestsTests: XCTestCase {
             XCTFail("Should never run")
         }
 
-        let op1 = FlowTest(callBack: { (result) in
-            XCTFail("Should never run")
-        }, test: block1)
-
-        let op2 = FlowTest(callBack: { (result) in
-            XCTFail("Should never run")
-        }, test: block2)
-
-        let op3 = FlowTest(callBack: { (result) in
-            XCTFail("Should never run")
-        }, test: block3)
+        let op1 = TestOperation(store: storeCancel, test: block1)
+        let op2 = TestOperation(store: storeCancel, test: block2)
+        let op3 = TestOperation(store: storeCancel, test: block3)
 
         queue.addOperations([op1, op2, op3], waitUntilFinished: false)
 

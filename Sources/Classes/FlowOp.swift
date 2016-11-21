@@ -23,37 +23,42 @@
  */
 
 import Foundation
-
-final class FlowOp: AsyncOperation {
-
-    fileprivate let resultHandler: FlowResultsHandler
-
-    init(qos: DispatchQoS = .background,
-         orderNumber: Int,
-         resultsHandler: FlowResultsHandler,
-         run: @escaping FlowTypeBlocks.RunBlock) {
-        resultHandler = resultsHandler
-        super.init(qos: qos, orderNumber: orderNumber)
-        asyncBlock = { [unowned self] in
-            let results = self.resultHandler.currentResults
-            let order: Int = self.order
-            let blockOp: BlockOp = self
-            run(blockOp, order, results.map { $0.result })
-        }
-    }
-}
-
-extension FlowOp: BlockOp {
-
-    func finish<R>(_ result: R) {
-        guard !isCancelled else { return }
-        resultHandler.addNewResult(FlowOpResult(order: order, result: result, error: nil))
-        markAsFinished()
-    }
-
-    func finish(_ error: Error) {
-        guard !isCancelled else { return }
-        resultHandler.addNewResult(FlowOpResult(order: order, result: nil, error: error))
-        markAsFinished()
-    }
-}
+//
+//final class FlowOp {
+//
+//    fileprivate let resultHandler: FlowResultsHandler
+//    fileprivate var retryCount: Int
+//
+//    init(qos: DispatchQoS = .background,
+//         retryTimes: Int,
+//         orderNumber: Int,
+//         resultsHandler: FlowResultsHandler,
+//         run: @escaping FlowTypeBlocks.RunBlock) {
+//        retryCount = retryTimes
+//        resultHandler = resultsHandler
+////        super.init(qos: qos, orderNumber: orderNumber) {
+////
+////        }
+////        asyncBlock = { [unowned self] in
+////            let results = self.resultHandler.currentResults
+////            let order: Int = self.order
+////            let blockOp: BlockOp = self
+////            run(blockOp, order, results.map { $0.result })
+////        }
+//    }
+//}
+//
+//extension FlowOp: BlockOp {
+//
+//    func finish<R>(_ result: R) {
+////        guard !isCancelled else { return }
+////        resultHandler.addNewResult(FlowOpResult(order: order, result: result, error: nil))
+////        markAsFinished()
+//    }
+//
+//    func finish(_ error: Error) {
+////        guard !isCancelled else { return }
+////        resultHandler.addNewResult(FlowOpResult(order: order, result: nil, error: error))
+////        markAsFinished()
+//    }
+//}

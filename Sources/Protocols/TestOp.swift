@@ -24,6 +24,7 @@
 
 import Foundation
 
-public protocol Test {
-    func complete(success: Bool, error: Error?)
+public protocol TestOp {
+    func success(_ result: Bool)
+    func failed(_ error: Error)
 }

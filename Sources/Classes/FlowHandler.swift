@@ -62,7 +62,7 @@ internal class FlowHandler<T>: FlowCoreApi {
         finishBlock = { _ in }
         blocks = runBlocks
         runBlock = { $0.0.finish() }
-        testBlock = { $0.complete(success: false, error: nil) }
+        testBlock = { $0.success(false) }
         limitOfSimultaneousOps = limit
         qos = runQoS
         synchronous = sync

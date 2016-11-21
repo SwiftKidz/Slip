@@ -24,56 +24,56 @@
 
 import Foundation
 
-final class FlowResultsHandler {
-
-    fileprivate var rawResults: [FlowOpResult] = []
-    fileprivate let resultsQueue: DispatchQueue
-    fileprivate let finishHandler: ([FlowOpResult], Error?) -> Void
-    fileprivate let numberOfResultsToFinish: Int
-    fileprivate var stop: Bool = false
-
-    init(maxOps: Int = -1, onFinish: @escaping ([FlowOpResult], Error?) -> Void) {
-        resultsQueue = DispatchQueue(label: "com.slip.flow.flowOperationResultsHandler.resultsQueue")
-        finishHandler = onFinish
-        numberOfResultsToFinish = maxOps
-    }
-}
-
-extension FlowResultsHandler {
-
-    var currentResults: [FlowOpResult] {
-        var res: [FlowOpResult]!
-        resultsQueue.sync { res = rawResults }
-        res = rawResults
-        return res
-    }
-}
-
-extension FlowResultsHandler {
-
-    func addNewResult(_ result: FlowOpResult) {
-        resultsQueue.sync {
-            guard !self.stop else { return }
-            guard result.error == nil else {
-                self.finish(result.error)
-                return
-            }
-            self.rawResults.append(result)
-            guard self.rawResults.count == self.numberOfResultsToFinish else { return }
-            self.finish()
-        }
-    }
-}
-
-extension FlowResultsHandler {
-
-    func finish(_ error: Error? = nil) {
-        stop = true
-        let handler = finishHandler
-        let results = rawResults
-        let error = error
-        DispatchQueue.global().async {
-            handler(results, error)
-        }
-    }
-}
+//final class FlowResultsHandler {
+//
+//    fileprivate var rawResults: [FlowOpResult] = []
+//    fileprivate let resultsQueue: DispatchQueue
+//    fileprivate let finishHandler: ([FlowOpResult], Error?) -> Void
+//    fileprivate let numberOfResultsToFinish: Int
+//    fileprivate var stop: Bool = false
+//
+//    init(maxOps: Int = -1, onFinish: @escaping ([FlowOpResult], Error?) -> Void) {
+//        resultsQueue = DispatchQueue(label: "com.slip.flow.flowOperationResultsHandler.resultsQueue")
+//        finishHandler = onFinish
+//        numberOfResultsToFinish = maxOps
+//    }
+//}
+//
+//extension FlowResultsHandler {
+//
+//    var currentResults: [FlowOpResult] {
+//        var res: [FlowOpResult]!
+//        resultsQueue.sync { res = rawResults }
+//        res = rawResults
+//        return res
+//    }
+//}
+//
+//extension FlowResultsHandler {
+//
+//    func addNewResult(_ result: FlowOpResult) {
+//        resultsQueue.sync {
+//            guard !self.stop else { return }
+//            guard result.error == nil else {
+//                self.finish(result.error)
+//                return
+//            }
+//            self.rawResults.append(result)
+//            guard self.rawResults.count == self.numberOfResultsToFinish else { return }
+//            self.finish()
+//        }
+//    }
+//}
+//
+//extension FlowResultsHandler {
+//
+//    func finish(_ error: Error? = nil) {
+//        stop = true
+//        let handler = finishHandler
+//        let results = rawResults
+//        let error = error
+//        DispatchQueue.global().async {
+//            handler(results, error)
+//        }
+//    }
+//}
