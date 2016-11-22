@@ -59,13 +59,13 @@ class AsyncOperation: Operation {
          retryTimes: Int = 0,
          orderNumber: Int = 0,
          store: AsyncOpResultStore? = nil,
-         run: @escaping AsyncBlock
+         async: @escaping AsyncBlock
         ) {
         retryNumber = retryTimes
         order = orderNumber
         runQueue = DispatchQueue(label: "com.slip.asyncOperation.runQueue", qos: qos)
         self.store = store
-        asyncBlock = run
+        asyncBlock = async
     }
 }
 

@@ -24,19 +24,20 @@
 
 import Foundation
 
-final class WorkOperation: AsyncOperation {
+extension AsyncOperation {
 
-    init(qos: DispatchQoS = .background,
-         retryTimes: Int = 0,
-         orderNumber: Int = 0,
-         store: AsyncOpResultStore? = nil,
-         run: @escaping WorkOpFlow.Block
-        ) {
-        super.init(qos: qos,
-                   retryTimes: retryTimes,
-                   orderNumber: orderNumber,
-                   store: store) { asyncOp in
-            run(asyncOp, orderNumber, store?.current ?? [])
-        }
+    static func work(qos: DispatchQoS = .background,
+                     retryTimes: Int = 0,
+                     orderNumber: Int = 0,
+                     store: AsyncOpResultStore? = nil,
+                     run: @escaping WorkOpFlow.Block)
+        -> AsyncOperation {
+            return AsyncOperation(qos: qos,
+                                  retryTimes: retryTimes,
+                                  orderNumber: orderNumber,
+                                  store: store,
+                                  async: { asyncOp in
+                                    run(asyncOp, orderNumber, store?.current ?? [])
+            })
     }
 }

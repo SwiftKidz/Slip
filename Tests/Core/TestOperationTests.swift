@@ -62,9 +62,9 @@ class TestOperationTests: XCTestCase {
             test.failed(MockErrors.errorOnTest)
         }
 
-        let op1 = TestOperation(store: store1, test: block1)
-        let op2 = TestOperation(store: store2, test: block2)
-        let op3 = TestOperation(store: store3, test: block3)
+        let op1 = AsyncOperation.test(store: store1, test: block1)
+        let op2 = AsyncOperation.test(store: store2, test: block2)
+        let op3 = AsyncOperation.test(store: store3, test: block3)
 
         let bop = BlockOperation {
             expectation.fulfill()
@@ -103,9 +103,9 @@ class TestOperationTests: XCTestCase {
             XCTFail("Should never run")
         }
 
-        let op1 = TestOperation(store: storeCancel, test: block1)
-        let op2 = TestOperation(store: storeCancel, test: block2)
-        let op3 = TestOperation(store: storeCancel, test: block3)
+        let op1 = AsyncOperation.test(store: storeCancel, test: block1)
+        let op2 = AsyncOperation.test(store: storeCancel, test: block2)
+        let op3 = AsyncOperation.test(store: storeCancel, test: block3)
 
         queue.addOperations([op1, op2, op3], waitUntilFinished: false)
 

@@ -115,7 +115,7 @@ extension AsyncOperationRunner {
         let store: AsyncOpResultStore = resultStore(for: blocks.count)
 
         for i in 0..<blocks.count {
-            let op = WorkOperation(qos: .background, retryTimes: 0, orderNumber: i, store: store, run: blocks[i])
+            let op = AsyncOperation.work(qos: .background, retryTimes: 0, orderNumber: i, store: store, run: blocks[i])
             opQueue.addOperation(op)
         }
     }
@@ -126,14 +126,14 @@ extension AsyncOperationRunner {
     func runClosure(runBlock: @escaping TestFlowApi.RunBlock) {
         let store: AsyncOpResultStore = resultStore(for: 1)
 
-        let op = WorkOperation(qos: .background, retryTimes: 0, orderNumber: testStore.current.count, store: store, run: runBlock)
+        let op = AsyncOperation.work(qos: .background, retryTimes: 0, orderNumber: testStore.current.count, store: store, run: runBlock)
         opQueue.addOperation(op)
     }
 
     func runTest(testBlock: @escaping FlowTypeTests.TestBlock) {
         let store: AsyncOpResultStore = resultStore(for: 1, isTest: true)
 
-        let op = TestOperation(qos: .background, retryTimes: 0, orderNumber: testStore.current.count, store: store, test: testBlock)
+        let op = AsyncOperation.test(qos: .background, retryTimes: 0, orderNumber: testStore.current.count, store: store, test: testBlock)
         opQueue.addOperation(op)
     }
 }
@@ -179,7 +179,7 @@ extension AsyncOperationRunner {
             self.stopRunner(error: error, results: results)
         }
     }
-    
+
     private func stopRunner(error: Error?, results: [AsyncOpResult]) {
         let result = error == nil ? Result.success(results.flatMap { $0.result as? T }) : Result.failure(error!)
         stop = true

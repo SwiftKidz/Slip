@@ -24,19 +24,22 @@
 
 import Foundation
 
-final class TestOperation: AsyncOperation {
+extension AsyncOperation {
 
-    init(qos: DispatchQoS = .background,
-         retryTimes: Int = 0,
-         orderNumber: Int = 0,
-         store: AsyncOpResultStore? = nil,
-         test: @escaping TestOpFlow.Block
-        ) {
-
-        super.init(qos: qos,
-                   retryTimes: retryTimes,
-                   orderNumber: orderNumber,
-                   store: store) { test($0 as! TestOp) }
+    static func test(qos: DispatchQoS = .background,
+        retryTimes: Int = 0,
+        orderNumber: Int = 0,
+        store: AsyncOpResultStore? = nil,
+        test: @escaping TestOpFlow.Block)
+        -> AsyncOperation {
+          return AsyncOperation(qos: qos,
+                      retryTimes: retryTimes,
+                      orderNumber: orderNumber,
+                      store: store,
+                      async: { op in
+                        guard let top = op as? TestOp else { op.finish(); return }
+                        test(top)
+          })
     }
 }
 

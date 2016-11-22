@@ -40,7 +40,7 @@ class WorkOperationTests: XCTestCase {
             expectation.fulfill()
         }
 
-        let op = WorkOperation(orderNumber: 0, store: store) { (f: AsyncOp, i: Int, r: Any?) in
+        let op = AsyncOperation.work(orderNumber: 0, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             f.finish(i)
         }
 
@@ -60,7 +60,7 @@ class WorkOperationTests: XCTestCase {
             expectation.fulfill()
         }
 
-        let op = WorkOperation(orderNumber: 0, store: store) { (f: AsyncOp, i: Int, r: Any?) in
+        let op = AsyncOperation.work(orderNumber: 0, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             f.finish(MockErrors.errorOnOperation)
         }
 
@@ -77,21 +77,21 @@ class WorkOperationTests: XCTestCase {
             XCTFail("It should never get here")
         }
 
-        let op1 = WorkOperation(orderNumber: 0, store: store) { (f: AsyncOp, i: Int, r: Any?) in
+        let op1 = AsyncOperation.work(orderNumber: 0, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             sleep(1)
             f.finish(i)
         }
 
-        let op2 = WorkOperation(orderNumber: 1, store: store) { (f: AsyncOp, i: Int, r: Any?) in
+        let op2 = AsyncOperation.work(orderNumber: 1, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             sleep(1)
             f.finish(MockErrors.errorOnOperation)
         }
 
-        let op3 = WorkOperation(orderNumber: 0, store: store) { (f: AsyncOp, i: Int, r: Any?) in
+        let op3 = AsyncOperation.work(orderNumber: 0, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             f.finish(i)
         }
 
-        let op4 = WorkOperation(orderNumber: 1, store: store) { (f: AsyncOp, i: Int, r: Any?) in
+        let op4 = AsyncOperation.work(orderNumber: 1, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             sleep(1)
             f.finish(MockErrors.errorOnOperation)
         }
@@ -110,12 +110,12 @@ class WorkOperationTests: XCTestCase {
             XCTFail("It should never get here")
         }
 
-        let op1 = WorkOperation(orderNumber: 0, store: store) { (f: AsyncOp, i: Int, r: Any?) in
+        let op1 = AsyncOperation.work(orderNumber: 0, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             sleep(1)
             f.finish(i)
         }
 
-        let op2 = WorkOperation(orderNumber: 1, store: store) { (f: AsyncOp, i: Int, r: Any?) in
+        let op2 = AsyncOperation.work(orderNumber: 1, store: store) { (f: AsyncOp, i: Int, r: Any?) in
             f.finish(MockErrors.errorOnOperation)
         }
         queue.maxConcurrentOperationCount = 1
