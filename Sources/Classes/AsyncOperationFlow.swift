@@ -27,56 +27,60 @@ import Foundation
 internal class AsyncOperationFlow<T>: FlowCoreApi {
 
     public typealias FinishBlock = (State, Result<[T]>) -> ()
+    public typealias ValueBlock = ([T]) -> ()
 
-    fileprivate var finishBlock: FinishBlock
-    fileprivate var errorBlock: FlowCoreApi.ErrorBlock?
-    fileprivate var cancelBlock: FlowCoreApi.CancelBlock?
+    var finishBlock: FinishBlock?
+    var valueBlock: ValueBlock?
+    var errorBlock: FlowCoreApi.ErrorBlock?
+    var cancelBlock: FlowCoreApi.CancelBlock?
 
-    fileprivate var rawState: State
+    var rawblocks: [FlowTypeBlocks.RunBlock]
+    var testBlock: FlowTypeTests.TestBlock?
 
-    init() {
-        finishBlock = { _ in }
+    var rawState: State
+
+    var testEnabled: Bool = false
+    var testFirst: Bool = true
+    var testPassResult: Bool = true
+
+    let queue: DispatchQueue = DispatchQueue(label: "com.slip.flow.AsyncOperationFlow", attributes: .concurrent)
+
+    let limitOfSimultaneousOps: Int
+    let qos: QualityOfService
+    let synchronous: Bool
+
+    let flowResults: ResultsHandler<T>
+
+    lazy var flowRunner: AsyncOperationRunner<T> = {
+        return AsyncOperationRunner<T>(maxSimultaneousOps: self.limitOfSimultaneousOps,
+                             qos: self.qos,
+                             onFinish: self.process)
+    }()
+
+    init(limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
+        runQoS: QualityOfService = .background,
+        sync: Bool = false) {
+        limitOfSimultaneousOps = limit
+        qos = runQoS
+        synchronous = sync
         rawState = .ready
+        rawblocks = []
+        flowResults = ResultsHandler.unlimited()
     }
 
-}
-
-extension AsyncOperationFlow {
-
-    public var state: State {
-        get {
-            var val: State!
-            val = self.rawState
-            return val
-        }
-        set {
-            self.rawState = newValue
-        }
-    }
 }
 
 extension AsyncOperationFlow {
 
     func start() {
-
+        guard case .ready = state
+        else { print("Cannot start flow twice") ; return }
+        state = shouldStartWithTest ? .testing : .running
     }
 
     func cancel() {
-
-    }
-}
-
-extension AsyncOperationFlow {
-
-    func onFinish(_ block: @escaping FinishBlock) -> Self {
-        return self
-    }
-
-    func onError(_ block: @escaping FlowCoreApi.ErrorBlock) -> Self {
-        return self
-    }
-
-    func onCancel(_ block: @escaping FlowCoreApi.CancelBlock) -> Self {
-        return self
+        guard (.running == state || .testing == state)
+        else { print("Cannot cancel a flow that is not running") ; return }
+        state = .canceled
     }
 }

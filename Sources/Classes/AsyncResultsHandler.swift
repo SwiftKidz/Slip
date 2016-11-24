@@ -24,26 +24,29 @@
 
 import Foundation
 
-//final class FlowTest {
-//
-//    fileprivate enum ChangeKey: String { case isFinished, isExecuting }
-//
-//    fileprivate let flowCallback: (FlowTestResult) -> Void
-//
-//    init(qos: DispatchQoS = .background,
-//         callBack: @escaping (FlowTestResult) -> Void,
-//         test: @escaping FlowTypeTests.TestBlock) {
-//        flowCallback = callBack
-////        super.init(qos: qos, orderNumber: 0)
-////        asyncBlock = { [unowned self] in test(self) }
-//    }
-//}
+final class AsyncResultsHandler: ResultsHandler<AsyncOpResult>, AsyncOpResultStore {
 
-//extension FlowTest: Test {
-//
-//    func complete(success: Bool, error: Error?) {
-////        guard !isCancelled else { return }
-////        flowCallback(FlowTestResult(success: success, error: error))
-////        markAsFinished()
-//    }
-//}
+    convenience required init(maxOps: Int = 1, onFinish: @escaping ([AsyncOpResult], Error?) -> Void = { _ in }) {
+        self.init(maxOps: maxOps, onFinish: onFinish)
+    }
+}
+
+extension AsyncResultsHandler {
+
+    var current: [AsyncOpResult] {
+        return stored
+    }
+
+    func addNewResult(_ result: AsyncOpResult) {
+        resultsQueue.sync {
+            guard !self.stop else { return }
+            guard result.error == nil else {
+                self.finish(result.error)
+                return
+            }
+            self.rawResults.append(result)
+            guard self.rawResults.count == self.numberOfResultsToFinish else { return }
+            self.finish()
+        }
+    }
+}

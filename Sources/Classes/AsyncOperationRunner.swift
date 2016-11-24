@@ -32,12 +32,12 @@ internal final class AsyncOperationRunner<T> {
 
     fileprivate var stop: Bool = false
     fileprivate var rawResults: [AsyncOpResult] = []
-    fileprivate let runnerQueue: DispatchQueue
+    fileprivate let queue: DispatchQueue
     fileprivate let opQueue: OperationQueue
     fileprivate var finishHandler: (Result<[T]>) -> Void
 
     fileprivate lazy var testStore: AsyncOpResultStore = {
-        return ResultsHandler() { _, _ in }
+        return AsyncResultsHandler.unlimited()
     }()
 
     var onRunSucceed: Block = {}
@@ -51,7 +51,7 @@ internal final class AsyncOperationRunner<T> {
     init(maxSimultaneousOps: Int,
          qos: QualityOfService,
          onFinish: @escaping (Result<[T]>) -> Void) {
-        runnerQueue = DispatchQueue(label: "com.slip.flow.flowRunnerQueue", attributes: .concurrent)
+        queue = DispatchQueue(label: "com.slip.flow.flowRunnerQueue", attributes: .concurrent)
         opQueue = OperationQueue()
         opQueue.maxConcurrentOperationCount = maxSimultaneousOps
         opQueue.qualityOfService = qos
@@ -65,14 +65,14 @@ internal final class AsyncOperationRunner<T> {
 
 extension AsyncOperationRunner {
 
-    fileprivate func resultStore(for maxOps: Int, isTest: Bool = false) -> AsyncOpResultStore {
+    fileprivate func resultStore(for maxOps: Int, isTest: Bool = false) -> AsyncResultsHandler {
         guard maxOps != 1 else {
-            return ResultsHandler() { results, error in
+            return AsyncResultsHandler() { results, error in
                 self.handleRun(result: results.first, error: error, isTest: isTest)
             }
         }
 
-        return ResultsHandler(maxOps: maxOps) { results, error in
+        return AsyncResultsHandler(maxOps: maxOps) { results, error in
             guard !self.shouldStop else { return }
 
             guard let error = error else {
@@ -90,11 +90,11 @@ extension AsyncOperationRunner {
     var shouldStop: Bool {
         get {
             var isStopped: Bool!
-            runnerQueue.sync { isStopped = stop }
+            queue.sync { isStopped = stop }
             return isStopped
         }
         set {
-            runnerQueue.async(flags: .barrier) {
+            queue.async(flags: .barrier) {
                 self.stop = newValue
             }
         }
@@ -175,7 +175,7 @@ extension AsyncOperationRunner {
 extension AsyncOperationRunner {
 
     fileprivate func handleStop(error: Error?, results: [AsyncOpResult]) {
-        runnerQueue.async(flags: .barrier) {
+        queue.async(flags: .barrier) {
             self.stopRunner(error: error, results: results)
         }
     }

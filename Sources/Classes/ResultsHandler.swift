@@ -24,43 +24,30 @@
 
 import Foundation
 
-final class ResultsHandler {
-    fileprivate var rawResults: [AsyncOpResult] = []
-    fileprivate let resultsQueue: DispatchQueue
-    fileprivate let finishHandler: ([AsyncOpResult], Error?) -> Void
-    fileprivate let numberOfResultsToFinish: Int
-    fileprivate var stop: Bool = false
+class ResultsHandler<T> {
+    var rawResults: [T] = []
+    let resultsQueue: DispatchQueue
+    let finishHandler: ([T], Error?) -> Void
+    let numberOfResultsToFinish: Int
+    var stop: Bool = false
 
-    init(maxOps: Int = 1, onFinish: @escaping ([AsyncOpResult], Error?) -> Void) {
+    required init(maxOps: Int, onFinish: @escaping ([T], Error?) -> Void) {
         resultsQueue = DispatchQueue(label: "com.slip.flow.flowOperationResultsHandler.resultsQueue")
         finishHandler = onFinish
         numberOfResultsToFinish = maxOps
+    }
+
+    static func unlimited() -> Self {
+        return self.init(maxOps: -1, onFinish: { _ in })
     }
 }
 
 extension ResultsHandler {
 
-    var current: [AsyncOpResult] {
-        var res: [AsyncOpResult]!
+    var stored: [T] {
+        var res: [T]!
         resultsQueue.sync { res = rawResults }
-        res = rawResults
         return res
-    }
-}
-
-extension ResultsHandler: AsyncOpResultStore {
-
-    func addNewResult(_ result: AsyncOpResult) {
-        resultsQueue.sync {
-            guard !self.stop else { return }
-            guard result.error == nil else {
-                self.finish(result.error)
-                return
-            }
-            self.rawResults.append(result)
-            guard self.rawResults.count == self.numberOfResultsToFinish else { return }
-            self.finish()
-        }
     }
 }
 
@@ -73,6 +60,18 @@ extension ResultsHandler {
         let error = error
         DispatchQueue.global().async {
             handler(results, error)
+        }
+    }
+}
+
+extension ResultsHandler {
+
+    func add(_ results: [T]) {
+        resultsQueue.sync {
+            guard !self.stop else { return }
+            self.rawResults.append(contentsOf: results)
+            guard self.rawResults.count == self.numberOfResultsToFinish else { return }
+            self.finish()
         }
     }
 }
