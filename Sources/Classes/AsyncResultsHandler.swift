@@ -24,14 +24,14 @@
 
 import Foundation
 
-final class AsyncResultsHandler: ResultsHandler<AsyncOpResult>, AsyncOpResultStore {
+final class AsyncResultsHandler: ResultsHandler<AsyncOpResult> {
 
-    convenience required init(maxOps: Int = 1, onFinish: @escaping ([AsyncOpResult], Error?) -> Void = { _ in }) {
-        self.init(maxOps: maxOps, onFinish: onFinish)
+    required init(maxOps: Int = 1, onFinish: @escaping ([AsyncOpResult], Error?) -> Void = { _ in }) {
+        super.init(maxOps: maxOps, onFinish: onFinish)
     }
 }
 
-extension AsyncResultsHandler {
+extension AsyncResultsHandler: AsyncOpResultStore {
 
     var current: [AsyncOpResult] {
         return stored

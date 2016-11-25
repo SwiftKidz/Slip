@@ -34,8 +34,8 @@ internal class AsyncOperationFlow<T>: FlowCoreApi {
     var errorBlock: FlowCoreApi.ErrorBlock?
     var cancelBlock: FlowCoreApi.CancelBlock?
 
-    var rawblocks: [FlowTypeBlocks.RunBlock]
-    var testBlock: FlowTypeTests.TestBlock?
+    var rawblocks: [FlowCoreApi.WorkBlock]
+    var testBlock: FlowCoreApi.TestBlock?
 
     var rawState: State
 
@@ -43,7 +43,7 @@ internal class AsyncOperationFlow<T>: FlowCoreApi {
     var testFirst: Bool = true
     var testPassResult: Bool = true
 
-    let queue: DispatchQueue = DispatchQueue(label: "com.slip.flow.AsyncOperationFlow", attributes: .concurrent)
+    let queue: DispatchQueue = DispatchQueue(label: "com.slip.flow.AsyncOperationFlow")//, attributes: .concurrent)
 
     let limitOfSimultaneousOps: Int
     let qos: QualityOfService
@@ -63,9 +63,10 @@ internal class AsyncOperationFlow<T>: FlowCoreApi {
         limitOfSimultaneousOps = limit
         qos = runQoS
         synchronous = sync
-        rawState = .ready
         rawblocks = []
         flowResults = ResultsHandler.unlimited()
+        rawState = .ready
+        changedTo(.ready)
     }
 
 }
@@ -79,7 +80,7 @@ extension AsyncOperationFlow {
     }
 
     func cancel() {
-        guard (.running == state || .testing == state)
+        guard .running == state || .testing == state
         else { print("Cannot cancel a flow that is not running") ; return }
         state = .canceled
     }

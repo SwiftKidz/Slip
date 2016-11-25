@@ -25,28 +25,28 @@
 
 import Foundation
 
-public final class Series<T>: FlowHandler<T> {
+public final class Series<T>: AsyncOperationFlow<T> {
 
     public typealias Block = (AsyncOp) -> ()
 
-    public convenience init(runBlocks: [Block],
-                            runQoS: QualityOfService = .background,
-                            sync: Bool = false) {
-
-        func toRunBlock(run: @escaping Block) -> BlockFlowApi.RunBlock {
-            return { (operation, _, _) in
-                run(operation)
-            }
-        }
-        let convertedBlocks: [BlockFlowApi.RunBlock] = runBlocks.map(toRunBlock)
-
-        self.init(runBlocks: convertedBlocks, limit: 1, runQoS: runQoS, sync: sync)
+    public init(runQoS: QualityOfService = .background,
+                         sync: Bool = false) {
+        super.init(limit: 1, runQoS: runQoS, sync: sync)
     }
 
-    private override init(runBlocks: [BlockFlowApi.RunBlock],
-                          limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
-                          runQoS: QualityOfService = .background,
-                          sync: Bool = false) {
-        super.init(runBlocks: runBlocks, limit: limit, runQoS: runQoS, sync: sync)
+    @discardableResult
+    public func run(workBlocks: [Block]) -> Self {
+        return blocks(workBlocks.map { block in
+            return { (operation, _, _) in
+                block(operation)
+            }
+        })
+    }
+
+    @discardableResult
+    public func run(workBlock: @escaping Block) -> Self {
+        return run({ (operation, _, _) in
+            workBlock(operation)
+        })
     }
 }

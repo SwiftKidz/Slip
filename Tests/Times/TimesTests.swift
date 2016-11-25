@@ -30,13 +30,15 @@ class TimesTests: XCTestCase {
     func testFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        Times<Int>(number: TestConfig.operationNumber, run: { control, iteration in
-            control.finish(iteration)
-        }).onFinish { state, result in
-            XCTAssertNotNil(result.value)
-            XCTAssert(result.value?.count == TestConfig.operationNumber)
-            expectation.fulfill()
-        }.start()
+        Times<Int>()
+            .run(number: TestConfig.operationNumber) { control, iteration in
+                control.finish(iteration)
+            }
+            .onFinish { state, result in
+                XCTAssertNotNil(result.value)
+                XCTAssert(result.value?.count == TestConfig.operationNumber)
+                expectation.fulfill()
+            }.start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
@@ -44,14 +46,16 @@ class TimesTests: XCTestCase {
     func testLimitFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        Times<Int>.limit(number: TestConfig.operationNumber, limit: 1, run: { control, iteration in
-            control.finish(iteration)
-        }).onFinish { state, result in
-            XCTAssertNotNil(result.value)
-            XCTAssert(result.value?.count == TestConfig.operationNumber)
-            XCTAssert(result.value! == [Int](0..<TestConfig.operationNumber))
-            expectation.fulfill()
-        }.start()
+        Times<Int>.limit(number: TestConfig.operationNumber, limit: 1) { control, iteration in
+                control.finish(iteration)
+            }
+            .onFinish { state, result in
+                XCTAssertNotNil(result.value)
+                XCTAssert(result.value?.count == TestConfig.operationNumber)
+                XCTAssert(result.value! == [Int](0..<TestConfig.operationNumber))
+                expectation.fulfill()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
@@ -59,14 +63,16 @@ class TimesTests: XCTestCase {
     func testSeriesFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        Times<Int>.series(number: TestConfig.operationNumber, run: { control, iteration in
+        Times<Int>.series(number: TestConfig.operationNumber) { control, iteration in
             control.finish(iteration)
-        }).onFinish { state, result in
-            XCTAssertNotNil(result.value)
-            XCTAssert(result.value?.count == TestConfig.operationNumber)
-            XCTAssert(result.value! == [Int](0..<TestConfig.operationNumber))
-            expectation.fulfill()
-            }.start()
+            }
+            .onFinish { state, result in
+                XCTAssertNotNil(result.value)
+                XCTAssert(result.value?.count == TestConfig.operationNumber)
+                XCTAssert(result.value! == [Int](0..<TestConfig.operationNumber))
+                expectation.fulfill()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }

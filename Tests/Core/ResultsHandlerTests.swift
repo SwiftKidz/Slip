@@ -17,8 +17,8 @@ class ResultsHandlerTests: XCTestCase {
 
         let stressFactor: Int = TestConfig.stressValue
 
-        let flowResultsHandler: ResultsHandler =
-            ResultsHandler(maxOps: TestConfig.operationNumber*stressFactor) { results, error in
+        let flowResultsHandler: ResultsHandler<AsyncOpResult> =
+            ResultsHandler<AsyncOpResult>(maxOps: TestConfig.operationNumber*stressFactor) { results, error in
             XCTAssert(results.count == stressFactor*TestConfig.operationNumber)
             XCTAssertNil(error)
             expectation.fulfill()
@@ -26,7 +26,7 @@ class ResultsHandlerTests: XCTestCase {
 
         let blocks: [BlockOperation] = [Int](0..<TestConfig.operationNumber*stressFactor).map { n in
             return BlockOperation {
-                flowResultsHandler.addNewResult(AsyncOpResult(order: n, result: n, error: nil))
+                flowResultsHandler.add(AsyncOpResult(order: n, result: n, error: nil))
             }
         }
 
@@ -44,8 +44,8 @@ class ResultsHandlerTests: XCTestCase {
 
         let stressFactor: Int = TestConfig.stressValue
 
-        let flowResultsHandler: ResultsHandler =
-            ResultsHandler(maxOps: TestConfig.operationNumber*stressFactor) { results, error in
+        let flowResultsHandler: ResultsHandler<AsyncOpResult> =
+            ResultsHandler<AsyncOpResult>(maxOps: TestConfig.operationNumber*stressFactor) { results, error in
                 XCTAssert(results.count == stressFactor*TestConfig.operationNumber)
                 XCTAssertNil(error)
                 expectation.fulfill()
@@ -53,8 +53,8 @@ class ResultsHandlerTests: XCTestCase {
 
         let blocks: [BlockOperation] = [Int](0..<TestConfig.operationNumber*stressFactor).map { n in
             return BlockOperation {
-                let currentResultsCount = flowResultsHandler.current.count
-                flowResultsHandler.addNewResult(AsyncOpResult(order: n, result: currentResultsCount, error: nil))
+                let currentResultsCount = flowResultsHandler.stored.count
+                flowResultsHandler.add(AsyncOpResult(order: n, result: currentResultsCount, error: nil))
             }
         }
 
@@ -66,36 +66,4 @@ class ResultsHandlerTests: XCTestCase {
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
-
-    func testRunUntilError() {
-        let expectation = self.expectation(description: name ?? "Test")
-
-        let stressFactor: Int = TestConfig.stressValue
-
-        let flowResultsHandler: ResultsHandler =
-            ResultsHandler(maxOps: TestConfig.operationNumber*stressFactor) { results, error in
-                XCTAssert(results.count < stressFactor*TestConfig.operationNumber)
-                XCTAssertNotNil(error)
-                expectation.fulfill()
-        }
-
-        let blocks: [BlockOperation] = [Int](0..<TestConfig.operationNumber*stressFactor).map { n in
-            return BlockOperation {
-                guard n < TestConfig.operationNumber*stressFactor/2 else {
-                    flowResultsHandler.addNewResult(AsyncOpResult(order: n, result: nil, error: MockErrors.errorOnOperation))
-                    return
-                }
-                flowResultsHandler.addNewResult(AsyncOpResult(order: n, result: n, error: nil))
-            }
-        }
-
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = OperationQueue.defaultMaxConcurrentOperationCount
-        queue.qualityOfService = .background
-
-        queue.addOperations(blocks, waitUntilFinished: false)
-
-        waitForExpectations(timeout: TestConfig.timeout, handler: nil)
-    }
-
 }

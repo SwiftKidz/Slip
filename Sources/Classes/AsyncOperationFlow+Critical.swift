@@ -33,8 +33,13 @@ extension AsyncOperationFlow {
             return val
         }
         set {
-            queue.async(flags: .barrier) {
+            queue.sync {//(flags: .barrier) {
+                guard self.validChange(from: self.rawState, to: newValue) else { return }
                 self.rawState = newValue
+//                print("newValue \(newValue)")
+                DispatchQueue.global().async {
+                    self.changedTo(newValue)
+                }
             }
         }
     }
@@ -42,28 +47,28 @@ extension AsyncOperationFlow {
 
 extension AsyncOperationFlow {
 
-    var blocks: [FlowTypeBlocks.RunBlock] {
+    var blocksToRun: [FlowCoreApi.WorkBlock] {
         get {
-            var val: [FlowTypeBlocks.RunBlock]!
+            var val: [FlowCoreApi.WorkBlock]!
             queue.sync { val = self.rawblocks }
             return val
         }
     }
 
-    func addBlock(_ block: @escaping FlowTypeBlocks.RunBlock) {
-        queue.async(flags: .barrier) {
+    func addBlock(_ block: @escaping FlowCoreApi.WorkBlock) {
+        queue.sync {//(flags: .barrier) {
             self.rawblocks.append(block)
         }
     }
 
-    func addBlocks(_ blocks: [FlowTypeBlocks.RunBlock]) {
-        queue.async(flags: .barrier) {
+    func addBlocks(_ blocks: [FlowCoreApi.WorkBlock]) {
+        queue.sync {//(flags: .barrier) {
             self.rawblocks.append(contentsOf: blocks)
         }
     }
 
     func removeAllBlocks() {
-        queue.async(flags: .barrier) {
+        queue.sync {//(flags: .barrier) {
             self.rawblocks.removeAll()
         }
     }
@@ -79,7 +84,7 @@ extension AsyncOperationFlow {
             return val
         }
         set {
-            queue.async(flags: .barrier) {
+            queue.sync {//(flags: .barrier) {
                 self.testEnabled = newValue
             }
         }
@@ -92,7 +97,7 @@ extension AsyncOperationFlow {
             return val
         }
         set {
-            queue.async(flags: .barrier) {
+            queue.sync {//(flags: .barrier) {
                 self.testFirst = newValue
             }
         }

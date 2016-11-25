@@ -20,11 +20,34 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
+
+ case ready
+ case testing
+ case running
+ case canceled
+ case failed(Error)
+ case finished(Any)
+
  */
 
 import Foundation
 
 extension AsyncOperationFlow {
+
+    func validChange(from oldState: State, to newState: State) -> Bool {
+        switch (oldState, newState) {
+        case (.ready, _): return true
+        case (.running, .testing): return true
+        case (.running, .failed(_)): return true
+        case (.running, .finished(_)): return true
+        case (.running, .canceled): return true
+        case (.testing, .running): return true
+        case (.testing, .failed(_)): return true
+        case (.testing, .finished(_)): return true
+        case (.testing, .canceled): return true
+        default: return false
+        }
+    }
 
     func changedTo(_ state: State) {
         switch state {
@@ -58,6 +81,7 @@ extension AsyncOperationFlow {
     }
 
     func canceled() {
+        flowRunner.cancel()
         guard let cancelBlock = cancelBlock else { finished(); return }
         onMain { cancelBlock() }
     }

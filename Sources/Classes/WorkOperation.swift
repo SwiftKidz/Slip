@@ -30,14 +30,14 @@ extension AsyncOperation {
                      retryTimes: Int = 0,
                      orderNumber: Int = 0,
                      store: AsyncOpResultStore? = nil,
-                     run: @escaping WorkOpFlow.Block)
+                     run: @escaping FlowCoreApi.WorkBlock)
         -> AsyncOperation {
             return AsyncOperation(qos: qos,
                                   retryTimes: retryTimes,
                                   orderNumber: orderNumber,
                                   store: store,
                                   async: { asyncOp in
-                                    run(asyncOp, orderNumber, store?.current ?? [])
+                                    run(asyncOp, orderNumber, store?.current.flatMap{ $0.result } ?? [])
             })
     }
 }

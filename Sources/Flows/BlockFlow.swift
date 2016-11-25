@@ -24,12 +24,21 @@
 
 import Foundation
 
-public final class BlockFlow<T>: FlowHandler<T>, BlockFlowApi {
+public class BlockFlow<T>: AsyncOperationFlow<T> {
 
-    public override init(runBlocks: [BlockFlowApi.RunBlock],
-         limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
-         runQoS: QualityOfService = .background,
-         sync: Bool = false) {
-        super.init(runBlocks: runBlocks, limit: limit, runQoS: runQoS, sync: sync)
+    public override init(limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
+                         runQoS: QualityOfService = .background,
+                         sync: Bool = false) {
+        super.init(limit: limit, runQoS: runQoS, sync: sync)
+    }
+
+    @discardableResult
+    public func run(workBlocks: [FlowCoreApi.WorkBlock]) -> Self {
+        return blocks(workBlocks)
+    }
+
+    @discardableResult
+    public func run(workBlock: @escaping FlowCoreApi.WorkBlock) -> Self {
+        return run(workBlock)
     }
 }

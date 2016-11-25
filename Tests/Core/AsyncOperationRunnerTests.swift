@@ -49,7 +49,7 @@ class AsyncOperationRunnerTests: XCTestCase {
     func testFlowRunnerNoErrorFunctionality() {
         let expectation = self.expectation(description: name ?? "TestOp")
 
-        var blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
+        var blocks: [FlowCoreApi.WorkBlock] = [Int](0..<TestConfig.operationNumber).map { n in
             return { (f: AsyncOp, i: Int, r: Any?) in
                 f.finish()
             }
@@ -75,7 +75,7 @@ class AsyncOperationRunnerTests: XCTestCase {
     func testFlowRunnerErrorFunctionality() {
         let expectation = self.expectation(description: name ?? "TestOp")
 
-        var blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
+        var blocks: [FlowCoreApi.WorkBlock] = [Int](0..<TestConfig.operationNumber).map { n in
             return { (f: AsyncOp, i: Int, r: Any?) in
                 guard i < TestConfig.operationNumber/2 else { f.finish(MockErrors.errorOnOperation); return }
                 f.finish()
@@ -103,7 +103,7 @@ class AsyncOperationRunnerTests: XCTestCase {
     func testFlowRunnerCancelFunctionality() {
         let expectation = self.expectation(description: name ?? "TestOp")
 
-        let blocks: [FlowTypeBlocks.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
+        let blocks: [FlowCoreApi.WorkBlock] = [Int](0..<TestConfig.operationNumber).map { n in
             return { (f: AsyncOp, i: Int, r: Any?) in
                 sleep(1)
                 f.finish(i)
@@ -134,12 +134,12 @@ class AsyncOperationRunnerTests: XCTestCase {
 
         var count: Int = 0
 
-        let block: FlowTypeBlocks.RunBlock = { (flow: AsyncOp, iteration: Int, result: Any?) in
+        let block: FlowCoreApi.WorkBlock = { (flow: AsyncOp, iteration: Int, result: Any?) in
             count += 1
             flow.finish(count-1)
         }
 
-        let testt: FlowTypeTests.TestBlock = { (testHandler: TestOp) in
+        let testt: FlowCoreApi.TestBlock = { (testHandler: TestOp) in
             testHandler.success(count < 5)
         }
 
@@ -173,12 +173,12 @@ class AsyncOperationRunnerTests: XCTestCase {
 
         var count: Int = 0
 
-        let block: FlowTypeBlocks.RunBlock = { (flow: AsyncOp, iteration: Int, result: Any?) in
+        let block: FlowCoreApi.WorkBlock = { (flow: AsyncOp, iteration: Int, result: Any?) in
             count += 1
             flow.finish(count-1)
         }
 
-        let testt: FlowTypeTests.TestBlock = { (testHandler: TestOp) in
+        let testt: FlowCoreApi.TestBlock = { (testHandler: TestOp) in
             testHandler.failed(MockErrors.errorOnTest)
         }
 
@@ -212,13 +212,13 @@ class AsyncOperationRunnerTests: XCTestCase {
 
         var count: Int = 0
 
-        let block: FlowTypeBlocks.RunBlock = { (flow: AsyncOp, iteration: Int, result: Any?) in
+        let block: FlowCoreApi.WorkBlock = { (flow: AsyncOp, iteration: Int, result: Any?) in
             sleep(2)
             count += 1
             flow.finish(count-1)
         }
 
-        let testt: FlowTypeTests.TestBlock = { (testHandler: TestOp) in
+        let testt: FlowCoreApi.TestBlock = { (testHandler: TestOp) in
             testHandler.success(count < 5)
         }
 

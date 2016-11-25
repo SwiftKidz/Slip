@@ -74,4 +74,14 @@ extension ResultsHandler {
             self.finish()
         }
     }
+
+    func add(_ result: T) {
+        resultsQueue.sync {
+            guard !self.stop else { return }
+            self.rawResults.append(result)
+            guard self.rawResults.count == self.numberOfResultsToFinish else { return }
+            self.finish()
+        }
+    }
+
 }

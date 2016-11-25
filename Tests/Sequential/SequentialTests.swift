@@ -53,13 +53,15 @@ class SequentialTests: XCTestCase {
             control.finish(count)
         }
 
-        Sequential<Int>(runBlocks: [b1, b2, b3])
+        Sequential<Int>()
+            .run(workBlocks: [b1, b2, b3])
             .onFinish { state, result in
                 XCTAssertNil(result.error)
                 XCTAssertNotNil(result.value)
                 XCTAssertTrue([1, 2, 3] == result.value!)
                 expectationOne.fulfill()
-            }.start()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }

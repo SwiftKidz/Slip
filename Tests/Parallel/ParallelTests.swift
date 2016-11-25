@@ -40,11 +40,14 @@ class ParallelTests: XCTestCase {
 
         let blocks: [Parallel.Block] = [Int](0..<TestConfig.operationNumber).map { n in return b }
 
-        Parallel<Int>(runBlocks: blocks).onFinish { state, result in
-            XCTAssertNotNil(result.value)
-            XCTAssert(result.value?.count == TestConfig.operationNumber)
-            expectation.fulfill()
-        }.start()
+        Parallel<Int>()
+            .run(workBlocks: blocks)
+            .onFinish { state, result in
+                XCTAssertNotNil(result.value)
+                XCTAssert(result.value?.count == TestConfig.operationNumber)
+                expectation.fulfill()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
@@ -62,12 +65,15 @@ class ParallelTests: XCTestCase {
 
         let blocks: [Parallel.Block] = [Int](0..<TestConfig.operationNumber).map { n in return b }
 
-        Parallel<Int>.limit(runBlocks: blocks, limit: 1).onFinish { state, result in
-            XCTAssertNotNil(result.value)
-            XCTAssert(result.value?.count == TestConfig.operationNumber)
-            XCTAssert(result.value! == [Int](1..<TestConfig.operationNumber+1))
-            expectation.fulfill()
-        }.start()
+        Parallel<Int>.limit(1)
+            .run(workBlocks: blocks)
+            .onFinish { state, result in
+                XCTAssertNotNil(result.value)
+                XCTAssert(result.value?.count == TestConfig.operationNumber)
+                XCTAssert(result.value! == [Int](1..<TestConfig.operationNumber+1))
+                expectation.fulfill()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }

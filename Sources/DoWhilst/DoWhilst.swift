@@ -24,31 +24,35 @@
 
 import Foundation
 
-public final class DoWhilst<T>: FlowHandler<T> {
+public final class DoWhilst<T>: AsyncOperationFlow<T> {
 
     public typealias Test = () -> (Bool)
     public typealias Run = (AsyncOp) -> ()
 
-    public convenience init(run: @escaping Run,
-                            test: @escaping Test,
-                            runQoS: QualityOfService = .background,
-                            sync: Bool = false) {
-        let convertedTest: FlowTypeTests.TestBlock = { testHandler in
-            testHandler.success(test())
-        }
-        let convertedRun: FlowTypeBlocks.RunBlock = { (blockOp, _, _) in
-            run(blockOp)
-        }
-        self.init(run: convertedRun, test: convertedTest, limit: 1, runQoS: runQoS, sync: sync)
+    public override init(limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
+                         runQoS: QualityOfService = .background,
+                         sync: Bool = false) {
+        super.init(limit: limit, runQoS: runQoS, sync: sync)
     }
 
-    private override init(run: @escaping FlowTypeBlocks.RunBlock,
-                          test: @escaping FlowTypeTests.TestBlock,
-                          limit: Int,
-                          runQoS: QualityOfService,
-                          sync: Bool) {
-        super.init(run: run, test: test, limit: limit, runQoS: runQoS, sync: sync)
-        testAtBeginning = false
-        testPassResult = true
+    @discardableResult
+    public func run(workBlocks: [Run]) -> Self {
+        return blocks(workBlocks.map { runBlock in
+            return { asyncOp, _, _ in
+                runBlock(asyncOp)
+            }
+        })
+    }
+
+    @discardableResult
+    public func run(workBlock: @escaping Run) -> Self {
+        return run({ asyncOp, _, _ in
+            workBlock(asyncOp)
+        })
+    }
+
+    @discardableResult
+    public func test(_ testBlock: @escaping Test) -> Self {
+        return test(beforeRun: false, expectedToPass: true, { $0.success(testBlock()) })
     }
 }

@@ -50,4 +50,11 @@ class StateTests: XCTestCase {
         state = .failed(MockErrors.errorOnFlow)
         XCTAssertNotNil(state.error)
     }
+
+    func testValue() {
+        var state: State = .ready
+        XCTAssertNil(state.value)
+        state = .finished([1])
+        XCTAssertNotNil(state.value)
+    }
 }

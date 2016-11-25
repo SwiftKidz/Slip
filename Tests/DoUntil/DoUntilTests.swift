@@ -32,29 +32,34 @@ class DoUntilTests: XCTestCase {
 
         var count: Int = 0
 
-        DoUntil<Int>(run: { (opHandler) in
-            count += 1
-            opHandler.finish(count)
-        }, test: { return count > 5 })
+        DoUntil<Int>()
+            .test { count > 5 }
+            .run { opHandler in
+                count += 1
+                opHandler.finish(count)
+            }
             .onFinish { (state, result) in
                 XCTAssertNotNil(result.value)
                 XCTAssert(result.value! == [1, 2, 3, 4, 5, 6])
                 expectationRun.fulfill()
-            }.start()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
 
         let expectationRunOnce = self.expectation(description: name ?? "Test")
-
-        DoUntil<Int>(run: { (opHandler) in
-            count += 1
-            opHandler.finish(count)
-        }, test: { return count > 5 })
+        DoUntil<Int>()
+            .test { count > 5 }
+            .run { opHandler in
+                count += 1
+                opHandler.finish(count)
+            }
             .onFinish { (state, result) in
                 XCTAssertNotNil(result.value)
                 XCTAssert(result.value! == [7])
                 expectationRunOnce.fulfill()
-            }.start()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }

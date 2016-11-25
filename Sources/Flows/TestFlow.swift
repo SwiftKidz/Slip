@@ -24,35 +24,26 @@
 
 import Foundation
 
-public final class TestFlow<T>: FlowHandler<T>, TestFlowApi {
+public class TestFlow<T>: AsyncOperationFlow<T> {
 
-    public var testBeforeRun: Bool {
-        get {
-            return testAtBeginning
-        }
-        set {
-            testAtBeginning = newValue
-        }
+    public override init(limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
+                         runQoS: QualityOfService = .background,
+                         sync: Bool = false) {
+        super.init(limit: limit, runQoS: runQoS, sync: sync)
     }
 
-    public var testPassingResult: Bool {
-        get {
-            return testPassResult
-        }
-        set {
-            testPassResult = newValue
-        }
+    @discardableResult
+    public func run(workBlocks: [FlowCoreApi.WorkBlock]) -> Self {
+        return blocks(workBlocks)
     }
 
-    public override init(run: @escaping TestFlowApi.RunBlock = { $0.0.finish() },
-         test: @escaping TestFlowApi.TestBlock = { $0.success(false) },
-         limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
-         runQoS: QualityOfService = .background,
-         sync: Bool = false) {
-        super.init(run: run,
-                  test: test,
-                  limit: limit,
-                  runQoS: runQoS,
-                  sync: sync)
+    @discardableResult
+    public func run(workBlock: @escaping FlowCoreApi.WorkBlock) -> Self {
+        return run(workBlock)
+    }
+
+    @discardableResult
+    public func test(beforeRun: Bool = true, toPass: Bool = true, _ testBlock: @escaping FlowCoreApi.TestBlock) -> Self {
+        return test(beforeRun: beforeRun, expectedToPass: toPass, testBlock)
     }
 }

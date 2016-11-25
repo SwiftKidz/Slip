@@ -27,35 +27,31 @@ import Slip
 
 class BlockFlowTests: XCTestCase {
 
-    func testQueues() {
-        let queue = DispatchQueue(label: "Queue", attributes: .concurrent)
-        let key = DispatchSpecificKey<String>()
-        queue.setSpecific(key: key, value: "Concurrent")
-
-        print(queue.getSpecific(key: key) ?? "Nothing")
-    }
-
     func testFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let blocks: [BlockFlowApi.RunBlock] = [Int](0..<TestConfig.operationNumber).map { n in
-            return { (f: BlockOp, i: Int, r: Any?) in
+        let blocks: [FlowCoreApi.WorkBlock] = [Int](0..<TestConfig.operationNumber).map { n in
+            return { (f: AsyncOp, i: Int, r: Any?) in
                 f.finish(i)
             }
         }
 
-        let flow = BlockFlow<Int>(runBlocks: blocks, limit: 10)
-        .onFinish { state, result in
-//            XCTAssert(state == State.finished(_))
-            XCTAssertNotNil(result.value)
-            XCTAssert(result.value?.count == TestConfig.operationNumber)
-            expectation.fulfill()
-        }
-        flow.onCancel {
-            XCTFail()
-        }.onError { _ in
-            XCTFail()
-        }.start()
+        let flow = BlockFlow<Int>(limit: 10)
+            flow
+                .run(workBlocks: blocks)
+                .onFinish { state, result in
+//                  XCTAssert(state == State.finished(_))
+                    XCTAssertNotNil(result.value)
+                    XCTAssert(result.value?.count == TestConfig.operationNumber)
+                    expectation.fulfill()
+                }
+                .onCancel {
+                    XCTFail()
+                }
+                .onError { _ in
+                    XCTFail()
+                }
+                .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
@@ -63,11 +59,14 @@ class BlockFlowTests: XCTestCase {
     func testNoBlocksFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let blocks = BlockFlow<Int>(runBlocks: [])
-        .onFinish { state, result in
-            expectation.fulfill()
-        }
-        blocks.start()
+        let blockFlow = BlockFlow<Int>()
+
+        blockFlow
+            .run(workBlocks: [])
+            .onFinish { state, result in
+                expectation.fulfill()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }

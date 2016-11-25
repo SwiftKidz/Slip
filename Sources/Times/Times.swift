@@ -24,22 +24,29 @@
 
 import Foundation
 
-public final class Times<T>: FlowHandler<T> {
+public final class Times<T>: AsyncOperationFlow<T> {
 
     public typealias Block = (AsyncOp, Int) -> ()
 
-    public convenience init(number: Int,
-                            run: @escaping Block,
-                            runQoS: QualityOfService = .background,
-                            sync: Bool = false) {
+    private override init(limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
+                          runQoS: QualityOfService = .background,
+                          sync: Bool = false) {
+        super.init(limit: limit, runQoS: runQoS, sync: sync)
+    }
 
-        let convertedBlocks: [BlockFlowApi.RunBlock] = [Int](0..<number).map { n in
+    public init(runQoS: QualityOfService = .background,
+                sync: Bool = false) {
+        super.init(limit: OperationQueue.defaultMaxConcurrentOperationCount, runQoS: runQoS, sync: sync)
+    }
+
+    @discardableResult
+    public func run(number: Int, workBlock: @escaping Block) -> Self {
+        let convertedBlocks: [FlowCoreApi.WorkBlock] = [Int](0..<number).map { n in
             return { (operation, iteration, _) in
-                run(operation, iteration)
+                workBlock(operation, iteration)
             }
         }
-
-        self.init(runBlocks: convertedBlocks, limit: OperationQueue.defaultMaxConcurrentOperationCount, runQoS: runQoS, sync: sync)
+        return blocks(convertedBlocks)
     }
 
     public static func limit(number: Int,
@@ -47,34 +54,13 @@ public final class Times<T>: FlowHandler<T> {
                              runQoS: QualityOfService = .background,
                              sync: Bool = false,
                              run: @escaping Block) -> Times<T> {
-
-        let convertedBlocks: [BlockFlowApi.RunBlock] = [Int](0..<number).map { n in
-            return { (operation, iteration, _) in
-                run(operation, iteration)
-            }
-        }
-
-        return Times<T>(runBlocks: convertedBlocks, limit: limit, runQoS: runQoS, sync: sync)
+        return Times<T>(limit: limit, runQoS: runQoS, sync: sync).run(number: number, workBlock: run)
     }
 
     public static func series(number: Int,
                              runQoS: QualityOfService = .background,
                              sync: Bool = false,
                              run: @escaping Block) -> Times<T> {
-
-        let convertedBlocks: [BlockFlowApi.RunBlock] = [Int](0..<number).map { n in
-            return { (operation, iteration, _) in
-                run(operation, iteration)
-            }
-        }
-
-        return Times<T>(runBlocks: convertedBlocks, limit: 1, runQoS: runQoS, sync: sync)
-    }
-
-    private override init(runBlocks: [BlockFlowApi.RunBlock],
-                          limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
-                          runQoS: QualityOfService = .background,
-                          sync: Bool = false) {
-        super.init(runBlocks: runBlocks, limit: limit, runQoS: runQoS, sync: sync)
+        return Times<T>(limit: 1, runQoS: runQoS, sync: sync).run(number: number, workBlock: run)
     }
 }

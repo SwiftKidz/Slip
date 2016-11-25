@@ -27,10 +27,11 @@ import Foundation
 extension AsyncOperationFlow {
 
     func process(result: Result<[T]>) {
+        guard state != .canceled else { return }
         switch result {
         case .success(let results):
-            guard (state == .running && testEnabled)
-            else { state = .finished(results); break }
+            guard testEnabled else { state = .finished(results); break }
+            guard state == .running else { state = .finished(flowResults.stored); break }
             flowResults.add(results)
             state = .testing
         case .failure(let error):

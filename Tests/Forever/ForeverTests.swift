@@ -32,13 +32,16 @@ class ForeverTests: XCTestCase {
 
         var count: Int = 0
 
-        Forever<Int>(run: { (control) in
-            count += 1
-            guard count > 100 else { control.finish(count); return }
-            control.finish(MockErrors.errorOnFlow)
-        }).onError { _ in
-            expectation.fulfill()
-        }.start()
+        Forever<Int>()
+            .run { control in
+                count += 1
+                guard count > 100 else { control.finish(count); return }
+                control.finish(MockErrors.errorOnFlow)
+            }
+            .onError { _ in
+                expectation.fulfill()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }

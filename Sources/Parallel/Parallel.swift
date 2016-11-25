@@ -25,43 +25,33 @@
 
 import Foundation
 
-public final class Parallel<T>: FlowHandler<T> {
+public final class Parallel<T>: AsyncOperationFlow<T> {
 
     public typealias Block = (AsyncOp) -> ()
 
-    public convenience init(runBlocks: [Block],
-                            runQoS: QualityOfService = .background,
-                            sync: Bool = false) {
-
-        func toRunBlock(run: @escaping Block) -> BlockFlowApi.RunBlock {
-            return { (operation, _, _) in
-                run(operation)
-            }
-        }
-        let convertedBlocks: [BlockFlowApi.RunBlock] = runBlocks.map(toRunBlock)
-
-        self.init(runBlocks: convertedBlocks, limit: OperationQueue.defaultMaxConcurrentOperationCount, runQoS: runQoS, sync: sync)
-    }
-
-    public static func limit(runBlocks: [Block],
-                             limit: Int,
-                             runQoS: QualityOfService = .background,
-                             sync: Bool = false) -> Parallel<T> {
-
-        func toRunBlock(run: @escaping Block) -> BlockFlowApi.RunBlock {
-            return { (operation, _, _) in
-                run(operation)
-            }
-        }
-        let convertedBlocks: [BlockFlowApi.RunBlock] = runBlocks.map(toRunBlock)
-
-        return Parallel<T>(runBlocks: convertedBlocks, limit: limit, runQoS: runQoS, sync: sync)
-    }
-
-    private override init(runBlocks: [BlockFlowApi.RunBlock],
-                          limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
+    private override init(limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
                           runQoS: QualityOfService = .background,
                           sync: Bool = false) {
-        super.init(runBlocks: runBlocks, limit: limit, runQoS: runQoS, sync: sync)
+        super.init(limit: limit, runQoS: runQoS, sync: sync)
+    }
+
+    public init(runQoS: QualityOfService = .background,
+                sync: Bool = false) {
+        super.init(limit: OperationQueue.defaultMaxConcurrentOperationCount, runQoS: runQoS, sync: sync)
+    }
+
+    public static func limit(_ limit: Int,
+                             runQoS: QualityOfService = .background,
+                             sync: Bool = false) -> Parallel<T> {
+        return Parallel<T>(limit: limit, runQoS: runQoS, sync: sync)
+    }
+
+    @discardableResult
+    public func run(workBlocks: [Block]) -> Self {
+        return blocks(workBlocks.map { block in
+            return { (operation, _, _) in
+                block(operation)
+            }
+        })
     }
 }

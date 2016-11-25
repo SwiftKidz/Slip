@@ -30,7 +30,7 @@ extension AsyncOperation {
         retryTimes: Int = 0,
         orderNumber: Int = 0,
         store: AsyncOpResultStore? = nil,
-        test: @escaping TestOpFlow.Block)
+        test: @escaping FlowCoreApi.TestBlock)
         -> AsyncOperation {
           return AsyncOperation(qos: qos,
                       retryTimes: retryTimes,

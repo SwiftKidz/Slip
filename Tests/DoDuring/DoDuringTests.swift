@@ -32,24 +32,29 @@ class DoDuringTests: XCTestCase {
 
         var count: Int = 0
 
-        DoDuring<Int>(run: { (opHandler) in
-            count += 1
-            opHandler.finish(count)
-        }, test: { $0.success(count < 5) })
+        DoDuring<Int>()
+            .run { opHandler in
+                count += 1
+                opHandler.finish(count)
+            }
+            .test { $0.success(count < 5) }
             .onFinish { (state, result) in
                 XCTAssertNotNil(result.value)
                 XCTAssert(result.value! == [1, 2, 3, 4, 5])
                 expectationRun.fulfill()
-            }.start()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
 
         let expectationRunOnce = self.expectation(description: name ?? "Test")
 
-        DoDuring<Int>(run: { (opHandler) in
-            count += 1
-            opHandler.finish(count)
-        }, test: { $0.success(count < 5) })
+        DoDuring<Int>()
+            .run { opHandler in
+                count += 1
+                opHandler.finish(count)
+            }
+            .test { $0.success(count < 5) }
             .onFinish { (state, result) in
                 XCTAssertNotNil(result.value)
                 XCTAssert(result.value! == [6])

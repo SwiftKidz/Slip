@@ -24,7 +24,7 @@
 
 import XCTest
 
-@testable import Slip
+import Slip
 
 class DoWhilstTests: XCTestCase {
 
@@ -33,29 +33,35 @@ class DoWhilstTests: XCTestCase {
 
         var count: Int = 0
 
-        DoWhilst<Int>(run: { (opHandler) in
-            count += 1
-            opHandler.finish(count)
-        }, test: { return count < 5 })
+        DoWhilst<Int>()
+            .run { (opHandler) in
+                count += 1
+                opHandler.finish(count)
+            }
+            .test { count < 5 }
             .onFinish { (state, result) in
                 XCTAssertNotNil(result.value)
                 XCTAssert(result.value! == [1, 2, 3, 4, 5])
                 expectationRun.fulfill()
-            }.start()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
 
         let expectationRunOnce = self.expectation(description: name ?? "Test")
 
-        DoWhilst<Int>(run: { (opHandler) in
-            count += 1
-            opHandler.finish(count)
-        }, test: { return count < 5 })
+        DoWhilst<Int>()
+            .test { count < 5 }
+            .run { opHandler in
+                count += 1
+                opHandler.finish(count)
+            }
             .onFinish { (state, result) in
                 XCTAssertNotNil(result.value)
                 XCTAssert(result.value! == [6])
                 expectationRunOnce.fulfill()
-            }.start()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }

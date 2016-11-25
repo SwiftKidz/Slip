@@ -48,7 +48,8 @@ class SeriesTests: XCTestCase {
             control.finish(count)
         }
 
-        Series<Int>(runBlocks: [b1, b2, b3])
+        Series<Int>()
+            .run(workBlocks: [b1, b2, b3])
             .onFinish { state, result in
                 XCTAssertNil(result.error)
                 XCTAssertNotNil(result.value)

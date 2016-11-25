@@ -33,19 +33,24 @@ class TestFlowTests: XCTestCase {
         var count: Int = 0
 
         let flow = TestFlow<Int>()
-        .onFinish { state, result in
-            expectation.fulfill()
-        }
-        flow.onCancel {
-            XCTFail()
-        }.onError { _ in
-            XCTFail()
-        }.onRun { flow, iteration, results in
-            count += 1
-            flow.finish(iteration)
-        }.onTest { test in
-            test.complete(success: count < 5, error: nil)
-        }.start()
+        flow
+            .onFinish { state, result in
+                expectation.fulfill()
+            }
+            .onCancel {
+                XCTFail()
+            }
+            .onError { _ in
+                XCTFail()
+            }
+            .run { flow, iteration, results in
+                count += 1
+                flow.finish(iteration)
+            }
+            .test { test in
+                test.success(count < 5)
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
@@ -53,18 +58,12 @@ class TestFlowTests: XCTestCase {
     func testNoBlocksFunctionality() {
         let expectation = self.expectation(description: name ?? "Test")
 
-        let test = TestFlow<Int>()
-        .onFinish { state, result in
-            expectation.fulfill()
-        }
-
-        test.testBeforeRun = false
-        test.testPassingResult = true
-
-        XCTAssertFalse(test.testBeforeRun)
-        XCTAssertTrue(test.testPassingResult)
-
-        test.start()
+        let flow = TestFlow<Int>()
+        flow
+            .onFinish { state, result in
+                expectation.fulfill()
+            }
+        flow.start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }

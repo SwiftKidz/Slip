@@ -24,29 +24,30 @@
 
 import Foundation
 
-public final class Sequential<T>: FlowHandler<T> {
+public final class Sequential<T>: AsyncOperationFlow<T> {
 
     public typealias Block = (AsyncOp, T?) -> ()
 
-    public convenience init(runBlocks: [Block],
-                            runQoS: QualityOfService = .background,
-                            sync: Bool = false) {
-
-        func toRunBlock(run: @escaping Block) -> BlockFlowApi.RunBlock {
-            return { (operation, _, results) in
-                let lastResult = (results as? [T])?.last
-                run(operation, lastResult)
-            }
-        }
-        let convertedBlocks: [BlockFlowApi.RunBlock] = runBlocks.map(toRunBlock)
-
-        self.init(runBlocks: convertedBlocks, limit: 1, runQoS: runQoS, sync: sync)
+    public init(runQoS: QualityOfService = .background,
+                         sync: Bool = false) {
+        super.init(limit: 1, runQoS: runQoS, sync: sync)
     }
 
-    private override init(runBlocks: [BlockFlowApi.RunBlock],
-                          limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
-                          runQoS: QualityOfService = .background,
-                          sync: Bool = false) {
-        super.init(runBlocks: runBlocks, limit: limit, runQoS: runQoS, sync: sync)
+    @discardableResult
+    public func run(workBlocks: [Block]) -> Self {
+        return blocks(workBlocks.map { block in
+            return { (operation, _, results) in
+                let lastResult = (results as? [T])?.last
+                block(operation, lastResult)
+            }
+        })
+    }
+
+    @discardableResult
+    public func run(workBlock: @escaping Block) -> Self {
+        return run({ (operation, _, results) in
+            let lastResult = (results as? [T])?.last
+            workBlock(operation, lastResult)
+        })
     }
 }

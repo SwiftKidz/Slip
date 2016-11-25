@@ -27,7 +27,7 @@ import Foundation
 extension AsyncOperationFlow {
 
     @discardableResult
-    func onFinish(_ block: @escaping FinishBlock) -> Self {
+    public func onFinish(_ block: @escaping FinishBlock) -> Self {
         guard case .ready = state
         else { print("Cannot modify flow after starting") ; return self }
         finishBlock = block
@@ -35,7 +35,7 @@ extension AsyncOperationFlow {
     }
 
     @discardableResult
-    func onValue(_ block: @escaping ValueBlock) -> Self {
+    public func onValue(_ block: @escaping ValueBlock) -> Self {
         guard case .ready = state
         else { print("Cannot modify flow after starting") ; return self }
         valueBlock = block
@@ -43,7 +43,7 @@ extension AsyncOperationFlow {
     }
 
     @discardableResult
-    func onError(_ block: @escaping FlowCoreApi.ErrorBlock) -> Self {
+    public func onError(_ block: @escaping FlowCoreApi.ErrorBlock) -> Self {
         guard case .ready = state
         else { print("Cannot modify flow after starting") ; return self }
         errorBlock = block
@@ -51,7 +51,7 @@ extension AsyncOperationFlow {
     }
 
     @discardableResult
-    func onCancel(_ block: @escaping FlowCoreApi.CancelBlock) -> Self {
+    public func onCancel(_ block: @escaping FlowCoreApi.CancelBlock) -> Self {
         guard case .ready = state
         else { print("Cannot modify flow after starting") ; return self }
         cancelBlock = block
@@ -62,10 +62,18 @@ extension AsyncOperationFlow {
 extension AsyncOperationFlow {
 
     @discardableResult
-    func blocks(_ blocks: [FlowTypeBlocks.RunBlock]) -> Self {
+    func blocks(_ blocks: [FlowCoreApi.WorkBlock]) -> Self {
         guard case .ready = state
         else { print("Cannot modify flow after starting") ; return self }
         addBlocks(blocks)
+        return self
+    }
+
+    @discardableResult
+    func run(_ block: @escaping FlowCoreApi.WorkBlock) -> Self {
+        guard case .ready = state
+            else { print("Cannot modify flow after starting") ; return self }
+        addBlock(block)
         return self
     }
 }
@@ -73,21 +81,13 @@ extension AsyncOperationFlow {
 extension AsyncOperationFlow {
 
     @discardableResult
-    func test(beforeRun: Bool = true, expectedToPass: Bool = true, _ block: @escaping TestFlowApi.TestBlock) -> Self {
+    func test(beforeRun: Bool = true, expectedToPass: Bool = true, _ block: @escaping FlowCoreApi.TestBlock) -> Self {
         guard case .ready = state
         else { print("Cannot modify flow after starting") ; return self }
         testBlock = block
         testEnabled = true
         testFirst = beforeRun
         testPassResult = expectedToPass
-        return self
-    }
-
-    @discardableResult
-    func run(_ block: @escaping TestFlowApi.RunBlock) -> Self {
-        guard case .ready = state
-        else { print("Cannot modify flow after starting") ; return self }
-        addBlock(block)
         return self
     }
 }

@@ -24,28 +24,28 @@
 
 import Foundation
 
-public final class Waterfall<T>: FlowHandler<T> {
+public final class Waterfall<T>: AsyncOperationFlow<T> {
 
     public typealias Block = (AsyncOp, [T]) -> ()
 
-    public convenience init(runBlocks: [Block],
-                runQoS: QualityOfService = .background,
+    public init(runQoS: QualityOfService = .background,
                 sync: Bool = false) {
-
-        func toRunBlock(run: @escaping Block) -> BlockFlowApi.RunBlock {
-            return { (operation, _, results) in
-                run(operation, (results as? [T]) ?? [])
-            }
-        }
-        let convertedBlocks: [BlockFlowApi.RunBlock] = runBlocks.map(toRunBlock)
-
-        self.init(runBlocks: convertedBlocks, limit: 1, runQoS: runQoS, sync: sync)
+        super.init(limit: 1, runQoS: runQoS, sync: sync)
     }
 
-    private override init(runBlocks: [BlockFlowApi.RunBlock],
-                limit: Int = OperationQueue.defaultMaxConcurrentOperationCount,
-                runQoS: QualityOfService = .background,
-                sync: Bool = false) {
-        super.init(runBlocks: runBlocks, limit: limit, runQoS: runQoS, sync: sync)
+    @discardableResult
+    public func run(workBlocks: [Block]) -> Self {
+        return blocks(workBlocks.map { block in
+            return { (operation, _, results) in
+                block(operation, (results as? [T]) ?? [])
+            }
+        })
+    }
+
+    @discardableResult
+    public func run(workBlock: @escaping Block) -> Self {
+        return run({ (operation, _, results) in
+            workBlock(operation, (results as? [T]) ?? [])
+        })
     }
 }

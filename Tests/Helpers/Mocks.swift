@@ -41,7 +41,7 @@ enum TestConfig {
     }
 }
 
-struct MockFlow: FlowControl {
+struct MockFlow {
 
     func finish(_ error: Error) {
 

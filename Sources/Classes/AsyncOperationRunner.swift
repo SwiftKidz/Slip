@@ -65,22 +65,22 @@ internal final class AsyncOperationRunner<T> {
 
 extension AsyncOperationRunner {
 
-    fileprivate func resultStore(for maxOps: Int, isTest: Bool = false) -> AsyncResultsHandler {
-        guard maxOps != 1 else {
-            return AsyncResultsHandler() { results, error in
-                self.handleRun(result: results.first, error: error, isTest: isTest)
+    fileprivate func resultStore(for maxOps: Int = 1, isTest testFlow: Bool? = nil) -> AsyncResultsHandler {
+        guard let test = testFlow else {
+            return AsyncResultsHandler(maxOps: maxOps) { results, error in
+                guard !self.shouldStop else { return }
+
+                guard let error = error else {
+                    let outcome = self.orderedOutput ? results.sorted(by: { $0.0.order < $0.1.order }) : results
+                    self.finishWith(result: Result.success(outcome.flatMap { $0.result as? T }))
+                    return
+                }
+                self.finishWith(result: Result.failure(error))
             }
         }
 
-        return AsyncResultsHandler(maxOps: maxOps) { results, error in
-            guard !self.shouldStop else { return }
-
-            guard let error = error else {
-                let outcome = self.orderedOutput ? results.sorted(by: { $0.0.order < $0.1.order }) : results
-                self.finishWith(result: Result.success(outcome.flatMap { $0.result as? T }))
-                return
-            }
-            self.finishWith(result: Result.failure(error))
+        return AsyncResultsHandler() { results, error in
+            self.handleRun(result: results.first, error: error, isTest: test)
         }
     }
 }
@@ -109,7 +109,7 @@ extension AsyncOperationRunner {
 
 extension AsyncOperationRunner {
 
-    func runFlowOfBlocks(blocks: [FlowTypeBlocks.RunBlock]) {
+    func runFlowOfBlocks(blocks: [FlowCoreApi.WorkBlock]) {
         guard !blocks.isEmpty else { finishWith(result: Result.success([])); return }
 
         let store: AsyncOpResultStore = resultStore(for: blocks.count)
@@ -123,15 +123,15 @@ extension AsyncOperationRunner {
 
 extension AsyncOperationRunner {
 
-    func runClosure(runBlock: @escaping TestFlowApi.RunBlock) {
-        let store: AsyncOpResultStore = resultStore(for: 1)
+    func runClosure(runBlock: @escaping FlowCoreApi.WorkBlock) {
+        let store: AsyncOpResultStore = resultStore(isTest: false)
 
         let op = AsyncOperation.work(qos: .background, retryTimes: 0, orderNumber: testStore.current.count, store: store, run: runBlock)
         opQueue.addOperation(op)
     }
 
-    func runTest(testBlock: @escaping FlowTypeTests.TestBlock) {
-        let store: AsyncOpResultStore = resultStore(for: 1, isTest: true)
+    func runTest(testBlock: @escaping FlowCoreApi.TestBlock) {
+        let store: AsyncOpResultStore = resultStore(isTest: true)
 
         let op = AsyncOperation.test(qos: .background, retryTimes: 0, orderNumber: testStore.current.count, store: store, test: testBlock)
         opQueue.addOperation(op)

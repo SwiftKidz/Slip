@@ -33,27 +33,35 @@ class WhilstTests: XCTestCase {
 
         var count: Int = 0
 
-        Whilst<Int>(test: { return count < 5 }, run: { (opHandler) in
-            count += 1
-            opHandler.finish(count)
-        }).onFinish { (state, result) in
-            XCTAssertNotNil(result.value)
-            XCTAssert(result.value! == [1, 2, 3, 4, 5])
-            expectationRun.fulfill()
-        }.start()
+        Whilst<Int>()
+            .test { count < 5 }
+            .run { opHandler in
+                count += 1
+                opHandler.finish(count)
+            }
+            .onFinish { (state, result) in
+                XCTAssertNotNil(result.value)
+                XCTAssert(result.value! == [1, 2, 3, 4, 5])
+                expectationRun.fulfill()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
 
         let expectationNotRun = self.expectation(description: name ?? "Test")
 
-        Whilst<Int>(test: { return count < 5 }, run: { (opHandler) in
-            count += 1
-            opHandler.finish(count)
-        }).onFinish { (state, result) in
-            XCTAssertNotNil(result.value)
-            XCTAssertTrue(result.value!.isEmpty)
-            expectationNotRun.fulfill()
-            }.start()
+        Whilst<Int>()
+            .test { count < 5 }
+            .run { opHandler in
+                count += 1
+                opHandler.finish(count)
+            }
+            .onFinish { (state, result) in
+                XCTAssertNotNil(result.value)
+                XCTAssertTrue(result.value!.isEmpty)
+                expectationNotRun.fulfill()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }

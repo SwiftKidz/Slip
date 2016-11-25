@@ -25,8 +25,6 @@
 import Foundation
 
 protocol AsyncOpResultStore {
-
     var current: [AsyncOpResult] { get }
-
     func addNewResult(_ result: AsyncOpResult)
 }

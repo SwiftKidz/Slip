@@ -41,6 +41,7 @@ class WaterfallTests: XCTestCase {
         }
 
         let b2: Waterfall.Block = { (control, previousResult: [Int]) in
+            print(previousResult)
             XCTAssertFalse(previousResult.isEmpty)
             XCTAssertTrue([1] == previousResult)
             count += 1
@@ -48,19 +49,22 @@ class WaterfallTests: XCTestCase {
         }
 
         let b3: Waterfall.Block = { (control, previousResult: [Int]) in
+            print(previousResult)
             XCTAssertFalse(previousResult.isEmpty)
             XCTAssertTrue([1, 2] == previousResult)
             count += 1
             control.finish(count)
         }
 
-        Waterfall<Int>(runBlocks: [b1, b2, b3])
+        Waterfall<Int>()
+            .run(workBlocks: [b1, b2, b3])
             .onFinish { state, result in
                 XCTAssertNil(result.error)
                 XCTAssertNotNil(result.value)
                 XCTAssertTrue([1, 2, 3] == result.value!)
                 expectationOne.fulfill()
-            }.start()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }
@@ -89,13 +93,15 @@ class WaterfallTests: XCTestCase {
             control.finish("count")
         }
 
-        Waterfall<String>(runBlocks: [b1, b2, b3])
+        Waterfall<String>()
+            .run(workBlocks: [b1, b2, b3])
             .onFinish { state, result in
                 XCTAssertNil(result.error)
                 XCTAssertNotNil(result.value)
                 XCTAssertTrue(["count"] == result.value!)
                 expectationOne.fulfill()
-        }.start()
+            }
+            .start()
 
         waitForExpectations(timeout: TestConfig.timeout, handler: nil)
     }

@@ -37,7 +37,7 @@ extension AsyncOperationFlow {
 extension AsyncOperationFlow {
 
     func executeBlocks() {
-        flowRunner.runFlowOfBlocks(blocks: blocks)
+        flowRunner.runFlowOfBlocks(blocks: blocksToRun)
         guard !testEnabled else { return }
         removeAllBlocks()
     }
